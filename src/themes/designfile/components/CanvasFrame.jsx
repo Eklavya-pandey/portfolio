@@ -1890,14 +1890,14 @@ export default function CanvasFrame({
           {renderEditorialHeader('about')}
 
           <main data-page="about">
-            {/* ABOUT HERO */}
-            <section className="row" style={{ gridTemplateColumns: '1.7fr 1fr' }}>
-              <div className="cell hl">
-                <h1 className="disp xl2">PRODUCT<br />DESIGNER.</h1>
-                <p className="intro">
-                  Engineer-turned-designer with 5 years designing high-frequency fintech, options terminals, and multi-tier design systems.
+            {/* 1. ABOUT HERO */}
+            <section className="row about-hero" style={{ gridTemplateColumns: '1.08fr 1fr' }}>
+              <div className="cell hl about-hero-hl" style={{ justifyContent: 'flex-start', gap: 18 }}>
+                <h1 className="disp xl2" style={{ margin: 0 }}>PRODUCT<br />DESIGNER.</h1>
+                <p className="intro" style={{ fontSize: 17, lineHeight: 1.5, textTransform: 'none', fontWeight: 500, margin: 0 }}>
+                  5 years designing web and mobile products, from stock trading apps to mutual fund modules and wealth dashboards.
                 </p>
-                <div className="btns" style={{ marginTop: 14 }}>
+                <div className="btns" style={{ marginTop: 6 }}>
                   <a
                     className="btn fill"
                     href="/assets/Naveen_Pandey_CV.pdf"
@@ -1915,13 +1915,13 @@ export default function CanvasFrame({
                 </div>
               </div>
               <div className="stack">
-                <div className="portrait-frame" style={{ minHeight: 280 }}>
+                <div className="portrait-frame" style={{ minHeight: 260, maxHeight: 290 }}>
                   <img
                     src="/assets/hero-photo.jpg"
                     alt="Naveen Pandey"
                     onError={(e) => { e.currentTarget.src = '/assets/me.jpg'; }}
+                    style={{ objectFit: 'cover', objectPosition: 'center 20%' }}
                   />
-                  <span className="photo-badge">NAVEEN // PRODUCT DESIGNER</span>
                 </div>
                 <div className="spec-table">
                   <div className="spec-item">
@@ -1929,155 +1929,61 @@ export default function CanvasFrame({
                     <span className="v">Goa, India</span>
                   </div>
                   <div className="spec-item">
-                    <span className="k">EXPERIENCE</span>
-                    <span className="v">5+ Years (2021 — 2026)</span>
+                    <span className="k">DOMAIN</span>
+                    <span className="v">Fintech</span>
+                  </div>
+                  <div className="spec-item">
+                    <span className="k">FOCUS</span>
+                    <span className="v">Trading apps, design systems and internal tools</span>
                   </div>
                   <div className="spec-item">
                     <span className="k">AVAILABILITY</span>
-                    <span className="v">Open to Full-Time &amp; Contracts</span>
+                    <span className="v">Open to full-time roles and select contracts</span>
                   </div>
                 </div>
               </div>
             </section>
 
-            {/* WHO I AM NARRATIVE */}
-            <section className="row" style={{ gridTemplateColumns: '1fr 2fr' }}>
-              <div className="cell" style={{ background: 'var(--yellow)', display: 'flex', alignItems: 'center' }}>
-                <h2 className="disp h2" style={{ color: 'var(--ink)' }}>WHO<br />I AM.</h2>
-              </div>
-              <div className="cell" style={{ padding: '28px 32px', display: 'flex', flexDirection: 'column', gap: 14 }}>
-                <p style={{ fontSize: 15, lineHeight: 1.6, textTransform: 'none', fontWeight: 600, color: '#111' }}>
-                  I design data-dense fintech interfaces by eliminating cognitive friction from complex trading workflows and order executions. At Neo Wealth, this systems-first approach lifted active investor conversion from 1.2% to 4.4% across web and mobile.
-                </p>
-                <p style={{ fontSize: 13, lineHeight: 1.65, textTransform: 'none', color: '#444' }}>
-                  With a background in Civil Engineering (B.Tech), I look at digital products as load-bearing structures: data density requires clear structural hierarchy, not superficial decoration. I partner closely with frontend engineers to build scalable token architectures and maintain high-fidelity design QA.
-                </p>
-              </div>
-            </section>
-
-            {/* EDUCATION & CERTIFICATIONS */}
-            <section className="two-col">
-              <div className="cell" style={{ padding: '24px 28px' }}>
-                <span className="lbl">EDUCATION //</span>
-                <h3 style={{ fontSize: 18, marginTop: 10, letterSpacing: '.02em' }}>B.TECH IN CIVIL ENGINEERING</h3>
-                <p style={{ fontSize: 12, marginTop: 4, color: 'var(--grey)', textTransform: 'none' }}>
-                  Babu Banarasi Das University, Lucknow · 2016 — 2020
-                </p>
-                <p style={{ fontSize: 12, marginTop: 8, textTransform: 'none', color: '#444' }}>
-                  Engineering foundation in analytical modeling, rigorous stress calculation, and structural systems.
-                </p>
-              </div>
-              <div className="cell" style={{ padding: '24px 28px' }}>
-                <span className="lbl">CERTIFICATIONS //</span>
-                <h3 style={{ fontSize: 18, marginTop: 10, letterSpacing: '.02em' }}>UI/UX DESIGN SPECIALIZATION</h3>
-                <p style={{ fontSize: 12, marginTop: 4, color: 'var(--grey)', textTransform: 'none' }}>
-                  California Institute of the Arts (CalArts / Coursera)
-                </p>
-                <p style={{ fontSize: 12, marginTop: 8, textTransform: 'none', color: '#444' }}>
-                  Formal specialization in interaction design principles, visual hierarchy, and quantitative user testing.
-                </p>
-              </div>
-            </section>
-
-            {/* SKILLS MATRIX (NO ARROWS) */}
-            <section className="row" style={{ gridTemplateColumns: '1fr 1fr 1fr' }}>
-              <div className="cell" style={{ padding: '24px' }}>
-                <span className="lbl" style={{ color: 'var(--red)' }}>01 // DESIGN</span>
-                <ul style={{ listStyle: 'none', marginTop: 14, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  <li style={{ fontSize: 12, fontWeight: 700 }}>FIGMA (ADVANCED AUTO-LAYOUT)</li>
-                  <li style={{ fontSize: 12, fontWeight: 700 }}>DESIGN SYSTEMS &amp; TOKENS</li>
-                  <li style={{ fontSize: 12, fontWeight: 700 }}>INTERACTION DESIGN</li>
-                  <li style={{ fontSize: 12, fontWeight: 700 }}>FINANCIAL DATA VISUALIZATION</li>
-                  <li style={{ fontSize: 12, fontWeight: 700 }}>HIGH-FIDELITY PROTOTYPING</li>
-                </ul>
-              </div>
-              <div className="cell" style={{ padding: '24px' }}>
-                <span className="lbl" style={{ color: 'var(--ink)' }}>02 // TECHNICAL</span>
-                <ul style={{ listStyle: 'none', marginTop: 14, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  <li style={{ fontSize: 12, fontWeight: 700 }}>DESIGN QA (IOS &amp; ANDROID)</li>
-                  <li style={{ fontSize: 12, fontWeight: 700 }}>HTML5 / CSS3 / GRID ARCHITECTURE</li>
-                  <li style={{ fontSize: 12, fontWeight: 700 }}>REACT COMPONENT SPECS</li>
-                  <li style={{ fontSize: 12, fontWeight: 700 }}>GIT WORKFLOW &amp; HANDOFF</li>
-                  <li style={{ fontSize: 12, fontWeight: 700 }}>WCAG AAA ACCESSIBILITY AUDITING</li>
-                </ul>
-              </div>
-              <div className="cell" style={{ padding: '24px' }}>
-                <span className="lbl" style={{ color: 'var(--grey)' }}>03 // STRATEGY</span>
-                <ul style={{ listStyle: 'none', marginTop: 14, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  <li style={{ fontSize: 12, fontWeight: 700 }}>UX RESEARCH &amp; USABILITY LABS</li>
-                  <li style={{ fontSize: 12, fontWeight: 700 }}>PRODUCT ROADMAPPING</li>
-                  <li style={{ fontSize: 12, fontWeight: 700 }}>CONVERSION FUNNEL OPTIMIZATION</li>
-                  <li style={{ fontSize: 12, fontWeight: 700 }}>INTERNAL TOOLING SCOPING</li>
-                  <li style={{ fontSize: 12, fontWeight: 700 }}>CROSS-FUNCTIONAL LEADERSHIP</li>
-                </ul>
-              </div>
-            </section>
-          </main>
-
-          {renderEditorialCta()}
-        </div>
-
-        <p className="ed-foot">© 2026 NAVEEN KUMAR PANDEY</p>
-      </div>
-    );
-  };
-
-  /* ──────────────────────────────────────────────────────────
-     4. EDITORIAL EXPERIENCE ARTBOARD
-     ────────────────────────────────────────────────────────── */
-  const renderEditorialExperience = () => {
-    return (
-      <div className="ed-wrapper" style={{ width: '100%' }}>
-        <div className="ed-frame">
-          {renderEditorialHeader('experience')}
-
-          <main data-page="experience">
-            {/* EXPERIENCE HERO */}
+            {/* 2. WHO I AM NARRATIVE */}
             <section
-              className={getElemClass('exp-hero-group', 'row exp-hero')}
-              id="exp-hero-group"
-              style={{ gridTemplateColumns: '1.6fr 1.2fr' }}
-              onClick={(e) => handleAction('exp-hero-group', e)}
+              className={getElemClass('about-whoiam', 'row')}
+              id="about-whoiam"
+              style={{ gridTemplateColumns: '1fr 2fr' }}
+              onClick={(e) => handleAction('about-whoiam', e)}
             >
               <div
-                className={getElemClass('exp-headline', 'cell hl')}
-                id="exp-headline"
-                onClick={(e) => handleAction('exp-headline', e)}
+                className={getElemClass('whoiam-yellow-cell', 'cell')}
+                id="whoiam-yellow-cell"
+                style={{ background: 'var(--yellow)', display: 'flex', alignItems: 'center' }}
+                onClick={(e) => handleAction('whoiam-yellow-cell', e)}
               >
-                <h1 className="disp xl2">EXPERIENCE.</h1>
-                <p className="intro" style={{ fontSize: 17, lineHeight: 1.5, textTransform: 'none', fontWeight: 500 }}>
-                  5 years designing web and mobile products, from stock trading apps to mutual fund modules and wealth dashboards.
-                </p>
+                <h2 className="disp h2" style={{ color: 'var(--ink)' }}>WHO<br />I AM.</h2>
               </div>
               <div
-                className={getElemClass('exp-status-cell', 'cell')}
-                id="exp-status-cell"
-                style={{
-                  background: 'var(--yellow)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  padding: '24px'
-                }}
-                onClick={(e) => handleAction('exp-status-cell', e)}
+                className={getElemClass('whoiam-prose', 'cell')}
+                id="whoiam-prose"
+                style={{ padding: '28px 32px', display: 'flex', alignItems: 'center' }}
+                onClick={(e) => handleAction('whoiam-prose', e)}
               >
-                <span className="lbl">STATUS</span>
-                <div>
-                  <h2 className="disp" style={{ font: '400 36px/1.1 var(--disp)', color: 'var(--ink)' }}>
-                    OPEN TO ROLES
-                  </h2>
-                  <p style={{ marginTop: 8, fontSize: 11, fontWeight: 800, color: 'var(--ink)', letterSpacing: '.06em' }}>
-                    5 YEARS · 10+ PROJECTS SHIPPED
-                  </p>
-                </div>
+                <p style={{ fontSize: 17, lineHeight: 1.6, textTransform: 'none', fontWeight: 400, color: '#0A0A0A', margin: 0 }}>
+                  I design trading and wealth products as one system: research the flow, build it once in the design system, and QA it against the build. At BP Equities, that took conversion from 1.2% to 4.4%.
+                </p>
               </div>
             </section>
 
-            {/* TIMELINE ROLES */}
+            {/* 3. EXPERIENCE SECTION (MERGED FROM STANDALONE) */}
+            <section className="row" style={{ gridTemplateColumns: '1fr' }}>
+              <div className="cell hl" style={{ padding: '24px 28px' }}>
+                <h2 className="disp" style={{ fontSize: 36, letterSpacing: '.02em', margin: 0, color: 'var(--ink)' }}>
+                  EXPERIENCE.
+                </h2>
+              </div>
+            </section>
+
             <section
-              className={getElemClass('exp-timeline-group', 'stack')}
-              id="exp-timeline-group"
-              onClick={(e) => handleAction('exp-timeline-group', e)}
+              className={getElemClass('about-experience', 'stack')}
+              id="about-experience"
+              onClick={(e) => handleAction('about-experience', e)}
             >
               {/* Row 1: Neo Wealth and Asset Management */}
               <div
@@ -2264,7 +2170,192 @@ export default function CanvasFrame({
                 </div>
               </div>
             </section>
+
+            {/* 4. EDUCATION & CERTIFICATIONS (ONE ROW) */}
+            <section
+              className={getElemClass('about-edu-certs', 'row edu-certs-row')}
+              id="about-edu-certs"
+              onClick={(e) => handleAction('about-edu-certs', e)}
+            >
+              <div
+                className={getElemClass('about-education', 'cell')}
+                id="about-education"
+                style={{ padding: '24px 28px' }}
+                onClick={(e) => handleAction('about-education', e)}
+              >
+                <span className="lbl">EDUCATION</span>
+                <h3 style={{ fontSize: 18, marginTop: 12, letterSpacing: '.02em', fontWeight: 800, textTransform: 'none' }}>
+                  B.Tech Civil Engineering
+                </h3>
+                <p style={{ fontSize: 14, marginTop: 6, color: 'var(--grey)', textTransform: 'none', fontWeight: 600 }}>
+                  ABES Engineering College, Ghaziabad
+                </p>
+                <p style={{ fontSize: 13, marginTop: 4, color: 'var(--grey)', textTransform: 'none', fontWeight: 700 }}>
+                  2015 – 2019
+                </p>
+              </div>
+
+              <div
+                className={getElemClass('about-certifications', 'cell')}
+                id="about-certifications"
+                style={{ padding: '24px 28px' }}
+                onClick={(e) => handleAction('about-certifications', e)}
+              >
+                <span className="lbl">CERTIFICATIONS</span>
+                <div className="certs-grid">
+                  <div className="cert-item">
+                    <span className="cert-num">01</span>
+                    <span>PMI: Becoming an AI-First Product Leader</span>
+                  </div>
+                  <div className="cert-item">
+                    <span className="cert-num">02</span>
+                    <span>PMI: Technical Product Management</span>
+                  </div>
+                  <div className="cert-item">
+                    <span className="cert-num">03</span>
+                    <span>PMI: Product Management First Steps</span>
+                  </div>
+                  <div className="cert-item">
+                    <span className="cert-num">04</span>
+                    <span>PMI: Product Strategy &amp; Roadmap</span>
+                  </div>
+                  <div className="cert-item">
+                    <span className="cert-num">05</span>
+                    <span>Google (Udacity): Product Design</span>
+                  </div>
+                  <div className="cert-item">
+                    <span className="cert-num">06</span>
+                    <span>Product School: AI Micro-Certification</span>
+                  </div>
+                  <div className="cert-item">
+                    <span className="cert-num">07</span>
+                    <span>Outskill: Generative AI Mastermind</span>
+                  </div>
+                  <div className="cert-item">
+                    <span className="cert-num">08</span>
+                    <span>FutureLearn: Digital Skills, User Experience</span>
+                  </div>
+                  <div className="cert-item">
+                    <span className="cert-num">09</span>
+                    <span>Coursera: Low-Fidelity Prototype</span>
+                  </div>
+                  <div className="cert-item">
+                    <span className="cert-num">10</span>
+                    <span>Infosys Springboard: HTML5, The Language</span>
+                  </div>
+                  <div className="cert-item">
+                    <span className="cert-num">11</span>
+                    <span>Simplilearn: Introduction to Front End Development</span>
+                  </div>
+                </div>
+                <p className="cert-verify">
+                  Need verification? Reach me on{' '}
+                  <a href="https://linkedin.com/in/naveen-pandey" target="_blank" rel="noopener noreferrer">
+                    LinkedIn
+                  </a>.
+                </p>
+              </div>
+            </section>
+
+            {/* 5. SKILLS (5 CATEGORIES, 3 + 2 GRID) */}
+            <section className="row" style={{ gridTemplateColumns: '1fr' }}>
+              <div className="cell hl" style={{ padding: '20px 28px' }}>
+                <h2 className="disp" style={{ fontSize: 32, letterSpacing: '.02em', margin: 0, color: 'var(--ink)' }}>
+                  SKILLS
+                </h2>
+              </div>
+            </section>
+
+            <section
+              className={getElemClass('about-skills', 'skills-container')}
+              id="about-skills"
+              onClick={(e) => handleAction('about-skills', e)}
+            >
+              {/* Row 1: 3 Categories */}
+              <div className="skills-row-3">
+                <div
+                  className={getElemClass('skills-product', 'skill-cat-cell')}
+                  id="skills-product"
+                  onClick={(e) => handleAction('skills-product', e)}
+                >
+                  <span className="lbl" style={{ color: 'var(--ink)' }}>PRODUCT DESIGN</span>
+                  <ul className="skill-items-list">
+                    <li>PRODUCT STRATEGY</li>
+                    <li>UX STRATEGY</li>
+                    <li>PRODUCT DISCOVERY</li>
+                    <li>INTERACTION DESIGN</li>
+                    <li>INFORMATION ARCHITECTURE</li>
+                    <li>USER FLOWS</li>
+                    <li>PROTOTYPING</li>
+                    <li>UI DESIGN</li>
+                    <li>WIREFRAMES</li>
+                  </ul>
+                </div>
+
+                <div
+                  className={getElemClass('skills-research', 'skill-cat-cell')}
+                  id="skills-research"
+                  onClick={(e) => handleAction('skills-research', e)}
+                >
+                  <span className="lbl" style={{ color: 'var(--ink)' }}>RESEARCH &amp; STRATEGY</span>
+                  <ul className="skill-items-list">
+                    <li>DESIGN QA</li>
+                    <li>FUNCTIONAL QA</li>
+                    <li>UX RESEARCH</li>
+                    <li>STAKEHOLDER INTERVIEWING</li>
+                    <li>FEATURE SCOPING</li>
+                  </ul>
+                </div>
+
+                <div
+                  className={getElemClass('skills-tools', 'skill-cat-cell')}
+                  id="skills-tools"
+                  onClick={(e) => handleAction('skills-tools', e)}
+                >
+                  <span className="lbl" style={{ color: 'var(--ink)' }}>DESIGN TOOLS</span>
+                  <ul className="skill-items-list">
+                    <li>FIGMA</li>
+                    <li>ADOBE PHOTOSHOP</li>
+                    <li>ILLUSTRATOR</li>
+                    <li>INDESIGN</li>
+                    <li>HTML &amp; CSS</li>
+                    <li>POSTMAN</li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* Row 2: 2 Categories */}
+              <div className="skills-row-2">
+                <div
+                  className={getElemClass('skills-ai', 'skill-cat-cell')}
+                  id="skills-ai"
+                  onClick={(e) => handleAction('skills-ai', e)}
+                >
+                  <span className="lbl" style={{ color: 'var(--ink)' }}>AI &amp; PROTOTYPING TOOLS</span>
+                  <ul className="skill-items-list">
+                    <li>CURSOR</li>
+                    <li>LOVABLE</li>
+                    <li>FRAMER</li>
+                  </ul>
+                </div>
+
+                <div
+                  className={getElemClass('skills-visual', 'skill-cat-cell')}
+                  id="skills-visual"
+                  onClick={(e) => handleAction('skills-visual', e)}
+                >
+                  <span className="lbl" style={{ color: 'var(--ink)' }}>VISUAL &amp; MARKETING DESIGN</span>
+                  <ul className="skill-items-list">
+                    <li>BRANDING</li>
+                    <li>CONTENT DESIGN</li>
+                    <li>SOCIAL &amp; EMAIL CAMPAIGN DESIGN</li>
+                  </ul>
+                </div>
+              </div>
+            </section>
           </main>
+
+          {renderEditorialCta()}
         </div>
 
         <p className="ed-foot">© 2026 · Goa, India</p>
@@ -2506,9 +2597,8 @@ export default function CanvasFrame({
       case 'frame-work':
         return renderEditorialWork();
       case 'frame-about':
-        return renderEditorialAbout();
       case 'frame-experience':
-        return renderEditorialExperience();
+        return renderEditorialAbout();
       case 'frame-contact':
         return renderEditorialContact();
       default:
@@ -2516,7 +2606,7 @@ export default function CanvasFrame({
     }
   };
 
-  const isEdFrame = ['frame-home', 'frame-work', 'frame-about', 'frame-experience', 'frame-contact'].includes(frame.id);
+  const isEdFrame = ['frame-home', 'frame-work', 'frame-about', 'frame-contact'].includes(frame.id);
 
   if (isMobileLayout) {
     return (

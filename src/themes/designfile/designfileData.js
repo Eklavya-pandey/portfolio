@@ -25,12 +25,11 @@ export {
   portfolioData
 };
 
-/* ─── 5 Navigation Pages matching virtual Figma design file structure ─── */
+/* ─── 4 Navigation Pages matching virtual Figma design file structure ─── */
 export const PAGES = [
   { id: 'home', label: 'Home', icon: '◆' },
   { id: 'work', label: 'Work', icon: '◆' },
   { id: 'about', label: 'About', icon: '◆' },
-  { id: 'experience', label: 'Experience', icon: '◆' },
   { id: 'contact', label: 'Contact', icon: '◆' }
 ];
 
@@ -45,11 +44,8 @@ export const PAGE_FRAMES = {
   about: [
     { id: 'frame-about', page: 'about', name: '# About', tag: '02 // ABOUT', w: 1120 }
   ],
-  experience: [
-    { id: 'frame-experience', page: 'experience', name: '# Experience', tag: '03 // EXPERIENCE', w: 1120 }
-  ],
   contact: [
-    { id: 'frame-contact', page: 'contact', name: '# Contact', tag: '04 // CONTACT', w: 1120 }
+    { id: 'frame-contact', page: 'contact', name: '# Contact', tag: '03 // CONTACT', w: 1120 }
   ]
 };
 
@@ -200,66 +196,17 @@ export const PAGE_LAYERS = {
         {
           id: 'about-whoiam',
           label: 'Who I Am',
-          fullName: 'Narrative Prose & Bio',
+          fullName: 'Yellow Cell + Bio Narrative',
           type: 'frame',
           children: [
-            { id: 'whoiam-prose', label: 'Narrative Prose', fullName: 'Full Career Narrative Prose', type: 'text' },
-            { id: 'whoiam-specs', label: 'Specs Grid', fullName: 'Location / Experience / Degree Grid', type: 'component' },
-            { id: 'whoiam-photo', label: 'Profile Photo', fullName: 'Profile Photo Card', type: 'component' }
+            { id: 'whoiam-yellow-cell', label: 'Cell: WHO I AM.', fullName: 'Yellow WHO I AM. Cell', type: 'component' },
+            { id: 'whoiam-prose', label: 'Narrative Prose', fullName: '1-Paragraph Career Statement', type: 'text' }
           ]
         },
         {
-          id: 'about-education',
-          label: 'Education',
-          fullName: 'Education Block',
-          type: 'frame',
-          children: [
-            { id: 'edu-btech', label: 'B.Tech Civil', fullName: 'Degree: B.Tech in Civil Engineering', type: 'text' }
-          ]
-        },
-        {
-          id: 'about-certifications',
-          label: 'Certifications',
-          fullName: 'Certifications Block',
-          type: 'frame',
-          children: [
-            { id: 'cert-uiux', label: 'UI/UX Specialization', fullName: 'Certification: UI/UX Specialization', type: 'text' }
-          ]
-        },
-        {
-          id: 'about-skills',
-          label: 'Skills',
-          fullName: 'Skills & Competencies',
-          type: 'frame',
-          children: [
-            { id: 'skills-design', label: 'Design Skills', fullName: 'Design: Figma, UI/UX, Design Systems', type: 'component' },
-            { id: 'skills-tech', label: 'Technical Skills', fullName: 'Technical: Design QA, React, HTML/CSS', type: 'component' }
-          ]
-        }
-      ]
-    }
-  ],
-  experience: [
-    {
-      id: 'frame-experience',
-      label: '# Experience',
-      fullName: 'Experience Portfolio Artboard',
-      type: 'frame',
-      children: [
-        {
-          id: 'exp-hero-group',
-          label: 'Header & Status',
-          fullName: 'Headline & Availability Status',
-          type: 'frame',
-          children: [
-            { id: 'exp-headline', label: 'Headline: EXPERIENCE.', fullName: 'Experience Display Headline', type: 'text' },
-            { id: 'exp-status-cell', label: 'Yellow Cell: STATUS', fullName: 'Availability & Shipped Projects', type: 'component' }
-          ]
-        },
-        {
-          id: 'exp-timeline-group',
-          label: 'Experience Timeline',
-          fullName: '5 Verified Experience Rows',
+          id: 'about-experience',
+          label: 'Experience (5 Roles)',
+          fullName: 'Headline: EXPERIENCE. & 5 Roles Timeline',
           type: 'frame',
           children: [
             { id: 'exp-row-neo', label: 'Neo Wealth (2 Internal Tools)', fullName: 'Role: Product Designer, Neo Wealth', type: 'component' },
@@ -267,6 +214,29 @@ export const PAGE_LAYERS = {
             { id: 'exp-row-skydreams', label: 'Skydreams (5 Clients · 100%)', fullName: 'Role: Product Designer, Skydreams', type: 'component' },
             { id: 'exp-row-pigeon', label: 'Pigeon Edu (2,000+ Students)', fullName: 'Role: UI & Graphic Designer, Pigeon Edu', type: 'component' },
             { id: 'exp-row-freelance', label: 'Freelance (3 Engagements)', fullName: 'Role: Product Designer, Freelance', type: 'component' }
+          ]
+        },
+        {
+          id: 'about-edu-certs',
+          label: 'Education & 11 Certifications',
+          fullName: 'Education & 11 Verified Certifications',
+          type: 'frame',
+          children: [
+            { id: 'about-education', label: 'B.Tech Civil (ABES College)', fullName: 'Education: B.Tech Civil Engineering', type: 'component' },
+            { id: 'about-certifications', label: '11 Certifications (01-11)', fullName: '11 Verified Industry Certifications', type: 'component' }
+          ]
+        },
+        {
+          id: 'about-skills',
+          label: 'Skills (5 Groups, 3+2 Grid)',
+          fullName: 'Categorized Skill Architecture',
+          type: 'frame',
+          children: [
+            { id: 'skills-product', label: 'Product Design', fullName: 'Product Design Competencies', type: 'component' },
+            { id: 'skills-research', label: 'Research & Strategy', fullName: 'Research & Strategy Competencies', type: 'component' },
+            { id: 'skills-tools', label: 'Design Tools', fullName: 'Design Tools & Applications', type: 'component' },
+            { id: 'skills-ai', label: 'AI & Prototyping', fullName: 'AI & Prototyping Tools', type: 'component' },
+            { id: 'skills-visual', label: 'Visual & Marketing', fullName: 'Visual & Marketing Design', type: 'component' }
           ]
         }
       ]
