@@ -1787,14 +1787,43 @@ export default function CanvasFrame({
      2. EDITORIAL WORK ARTBOARD
      ────────────────────────────────────────────────────────── */
   const renderEditorialWork = () => {
+    const WORK_FILTER_OPTIONS = ['ALL', 'FINTECH', 'DESIGN SYSTEM', 'AI', 'WEB'];
+
     const filteredProjects = workFilter === 'ALL'
       ? PROJECTS
-      : PROJECTS.filter(p => {
-          if (workFilter === 'FINTECH') return p.category === 'fintech' || p.tag === 'FINTECH';
-          if (workFilter === 'DESIGN SYSTEM') return p.category === 'design-system' || p.tag === 'DESIGN SYSTEM';
-          if (workFilter === 'AI / TOOLS') return p.category === 'ai' || p.category === 'internal-tools';
-          return true;
+      : PROJECTS.filter((p) => {
+          const tag = (p.tag || '').toUpperCase();
+          const cats = (p.categories || []).map((c) => c.toUpperCase());
+          const cat = (p.category || '').toUpperCase();
+          const target = workFilter.toUpperCase();
+          return tag === target || cats.includes(target) || cat === target;
         });
+
+    const getWorkProjectDesc = (p, idx) => {
+      if (p.id === 'stock-trading-app' || idx === 0) {
+        return 'Traders needed fast, precise order flow on mobile.';
+      }
+      if (p.id === 'investment-modules' || idx === 1) {
+        return 'Investors had no single place to discover funds, options and baskets.';
+      }
+      if (p.id === 'markets-overview' || idx === 2) {
+        return 'Four investor apps, four inconsistent interfaces.';
+      }
+      return p.description || p.tagline || '';
+    };
+
+    const getWorkProjectMetric = (p, idx) => {
+      if (p.id === 'stock-trading-app' || idx === 0) {
+        return '2 platforms · ANDROID + iOS';
+      }
+      if (p.id === 'investment-modules' || idx === 1) {
+        return '1.2% → 4.4% · CONVERSION';
+      }
+      if (p.id === 'markets-overview' || idx === 2) {
+        return '4 apps · ONE SHARED SYSTEM';
+      }
+      return null;
+    };
 
     return (
       <div className="ed-wrapper" style={{ width: '100%' }}>
@@ -1803,27 +1832,27 @@ export default function CanvasFrame({
 
           <main data-page="work">
             {/* WORK HERO & CATEGORY FILTERS */}
-            <section className="row" style={{ gridTemplateColumns: '1.8fr 1fr' }}>
-              <div className="cell" style={{ padding: '32px 28px' }}>
-                <h1 className="disp xl2">SELECTED<br />WORK.</h1>
-                <p className="intro" style={{ marginTop: 16 }}>
-                  High-frequency trading terminals, thematic wealth management modules, and multi-tier design systems engineered for active investors.
+            <section className="row work-hero-row" style={{ gridTemplateColumns: '1.25fr 1fr' }}>
+              <div className="cell" style={{ padding: '28px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+                <h1 className="disp xl2" style={{ margin: 0 }}>SELECTED<br />WORK.</h1>
+                <p className="intro" style={{ fontSize: 17, lineHeight: 1.5, textTransform: 'none', fontWeight: 600, color: '#0A0A0A', margin: 0 }}>
+                  Trading apps, investment modules, design systems and internal tools.
                 </p>
               </div>
               <div className="cell" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '24px' }}>
                 <div>
-                  <span className="lbl">PORTFOLIO INDEX //</span>
-                  <p style={{ marginTop: 8, fontSize: 13, textTransform: 'none', color: '#444' }}>
-                    Showing <b>{filteredProjects.length}</b> case studies with verified outcome metrics and production mockups.
-                  </p>
+                  <span className="lbl" style={{ fontSize: 11, fontWeight: 800, letterSpacing: '.06em', color: 'var(--grey)', textTransform: 'uppercase' }}>
+                    SHOWING {filteredProjects.length} OF {PROJECTS.length} PROJECTS
+                  </span>
                 </div>
-                <div className="filter-row" style={{ marginTop: 16 }}>
-                  {['ALL', 'FINTECH', 'DESIGN SYSTEM', 'AI / TOOLS'].map((cat) => (
+                <div className="filter-row">
+                  {WORK_FILTER_OPTIONS.map((cat) => (
                     <button
                       key={cat}
                       type="button"
                       className={`filter-btn ${workFilter === cat ? 'active' : ''}`}
                       onClick={() => setWorkFilter(cat)}
+                      aria-pressed={workFilter === cat}
                     >
                       {cat}
                     </button>
@@ -1834,48 +1863,69 @@ export default function CanvasFrame({
 
             {/* FULL PROJECTS STACK */}
             <section className="stack">
-              {filteredProjects.map((p, idx) => (
-                <article
-                  key={p.id}
-                  className={getElemClass(p.id, 'proj')}
-                  id={p.id}
-                  onClick={(e) => handleAction(p.id, e)}
-                >
-                  <div className="n">{String(idx + 1).padStart(2, '0')}</div>
-                  <div className="t">
-                    <div>
-                      <b>{p.title}</b>
-                      <small>{p.tag || p.category?.toUpperCase() || 'FINTECH'}</small>
-                      <p className="prob-line">{p.description}</p>
-                      {p.stats && p.stats[2] && (
-                        <span className="metric-pill">
-                          {p.stats[2].value} {p.stats[2].label}
-                        </span>
+              {filteredProjects.map((p) => {
+                const projectIndex = PROJECTS.findIndex((item) => item.id === p.id);
+                const numStr = String(projectIndex >= 0 ? projectIndex + 1 : 1).padStart(2, '0');
+                const desc = getWorkProjectDesc(p, projectIndex);
+                const metricChip = getWorkProjectMetric(p, projectIndex);
+                const hasRealCover = ['stock-trading-app', 'investment-modules', 'markets-overview'].includes(p.id) && Boolean(p.image);
+                const hasCaseStudy = Boolean(p.caseStudyUrl || p.caseUrl);
+
+                return (
+                  <article
+                    key={p.id}
+                    className={getElemClass(p.id, 'proj')}
+                    id={p.id}
+                    tabIndex={0}
+                    onClick={(e) => handleAction(p.id, e)}
+                  >
+                    <div className="n">{numStr}</div>
+                    <div className="t">
+                      <div className="t-content">
+                        <b className="proj-title">{p.title}</b>
+                        <small className="proj-cat">
+                          {p.tag || (p.categories && p.categories[0]?.toUpperCase()) || 'FINTECH'}
+                        </small>
+                        <p className="prob-line">{desc}</p>
+                        {metricChip && (
+                          <span className="metric-pill">{metricChip}</span>
+                        )}
+                      </div>
+                      <div className="t-action">
+                        {hasCaseStudy ? (
+                          <span className="view-cs">
+                            VIEW CASE STUDY <span aria-hidden="true">↗</span>
+                          </span>
+                        ) : (
+                          <span className="cs-soon">Case study coming soon</span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="mockup-frame">
+                      {hasRealCover ? (
+                        <img
+                          src={p.image}
+                          alt={p.title}
+                          className={p.id === 'investment-modules' ? 'proj-img-02' : 'proj-img-03'}
+                          style={{
+                            objectPosition: p.imagePosition || (p.id === 'investment-modules' ? 'left top' : 'center top')
+                          }}
+                          loading="lazy"
+                        />
+                      ) : (
+                        <CrosshatchCover width="100%" height="100%" label="COVER IMAGE" />
                       )}
                     </div>
-                    {p.stats && p.stats.length > 0 && (
-                      <div className="proj-stats">
-                        {p.stats.map((s, si) => (
-                          <div key={si} className="proj-stat-cell">
-                            <span className="proj-stat-val">{s.value}</span>
-                            <span className="proj-stat-lbl">{s.label}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  <div className="mockup-frame">
-                    <img src={p.image || '/editorial/project1.png'} alt={p.title} loading="lazy" />
-                  </div>
-                </article>
-              ))}
+                  </article>
+                );
+              })}
             </section>
           </main>
 
           {renderEditorialCta()}
         </div>
 
-        <p className="ed-foot">© 2026 NAVEEN KUMAR PANDEY</p>
+        <p className="ed-foot">© 2026 · Goa, India</p>
       </div>
     );
   };

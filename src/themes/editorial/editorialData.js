@@ -19,7 +19,9 @@ export const PROJECTS = [
     categories: ['Fintech', 'Mobile'],
     title: 'STOCK TRADING APP',
     tagline: 'End-to-end mobile trading experience engineered for high-frequency precision and zero latency.',
+    description: 'Traders needed fast, precise order flow on mobile.',
     image: '/editorial/project1.png',
+    caseStudyUrl: '?project=stock-trading-app',
     stats: [
       { val: '3 mo', lbl: 'DURATION' },
       { val: 'Mobile', lbl: 'PLATFORM' },
@@ -51,8 +53,10 @@ export const PROJECTS = [
     categories: ['Fintech', 'Web'],
     title: 'INVESTMENT MODULES',
     tagline: 'Mutual Funds discovery, Option Chain terminal, and WealthBasket thematic investment journeys.',
+    description: 'Investors had no single place to discover funds, options and baskets.',
     image: '/editorial/project2.png',
     imagePosition: 'left top',
+    caseStudyUrl: '?project=investment-modules',
     stats: [
       { val: '3', lbl: 'MODULES' },
       { val: 'Web/App', lbl: 'PLATFORM' },
@@ -83,7 +87,10 @@ export const PROJECTS = [
     categories: ['Design System', 'Fintech', 'Web'],
     title: 'DESIGN SYSTEM & INFRASTRUCTURE',
     tagline: 'Unified multi-platform financial data visualization architecture powering 4 distinct investor applications.',
+    description: 'Four investor apps, four inconsistent interfaces.',
     image: '/editorial/project3.png',
+    imagePosition: 'center top',
+    caseStudyUrl: '?project=markets-overview',
     stats: [
       { val: '20', lbl: 'VARIANTS' },
       { val: 'FII/DII', lbl: 'DATA' },
@@ -114,7 +121,8 @@ export const PROJECTS = [
     categories: ['AI', 'Fintech'],
     title: 'INTERNAL AI CHATBOT & COPILOT',
     tagline: 'Conversational AI assistant for automated portfolio health checkups, intent mapping, and support escalation.',
-    image: '/editorial/project1.png',
+    description: 'Conversational AI assistant for automated portfolio health checkups, intent mapping, and support escalation.',
+    image: null,
     stats: [
       { val: '94%', lbl: 'INTENT ACCURACY' },
       { val: '-42%', lbl: 'ESCALATION' },
@@ -145,8 +153,8 @@ export const PROJECTS = [
     categories: ['Fintech', 'Web'],
     title: 'DISTRIBUTOR INVOICING DASHBOARD',
     tagline: 'Institutional commission tracking, automated partner invoicing, and client onboarding MIS analytics.',
-    image: '/editorial/project2.png',
-    imagePosition: 'left top',
+    description: 'Institutional commission tracking, automated partner invoicing, and client onboarding MIS analytics.',
+    image: null,
     stats: [
       { val: '1,200+', lbl: 'PARTNERS' },
       { val: '24h', lbl: 'INVOICE CYCLE' },
@@ -177,7 +185,8 @@ export const PROJECTS = [
     categories: ['Web'],
     title: 'SKYDREAMS CLIENT PORTFOLIO',
     tagline: 'Five end-to-end web applications and consumer platforms delivered with 100% first-launch client approval.',
-    image: '/editorial/project3.png',
+    description: 'Five end-to-end web applications and consumer platforms delivered with 100% first-launch client approval.',
+    image: null,
     stats: [
       { val: '5', lbl: 'CLIENTS' },
       { val: '100%', lbl: 'APPROVAL' },
@@ -208,7 +217,8 @@ export const PROJECTS = [
     categories: ['Web'],
     title: 'PIGEON EDU PLATFORM REVAMP',
     tagline: 'Educational software interface, interactive learning components, and student analytics dashboard.',
-    image: '/editorial/project1.png',
+    description: 'Educational software interface, interactive learning components, and student analytics dashboard.',
+    image: null,
     stats: [
       { val: '+32%', lbl: 'RETENTION' },
       { val: '12+', lbl: 'MODULES' },
@@ -239,7 +249,8 @@ export const PROJECTS = [
     categories: ['Fintech', 'AI'],
     title: 'IPO APPLICATION FLOW',
     tagline: 'Streamlined retail IPO bidding pipeline eliminating UPI mandate friction and investor drop-offs.',
-    image: '/editorial/project2.png',
+    description: 'Streamlined retail IPO bidding pipeline eliminating UPI mandate friction and investor drop-offs.',
+    image: null,
     stats: [
       { val: '6', lbl: 'SCREENS' },
       { val: 'JS', lbl: 'STACK' },

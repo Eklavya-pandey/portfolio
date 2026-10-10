@@ -151,27 +151,54 @@ export const PAGE_LAYERS = {
       type: 'frame',
       children: [
         {
-          id: 'work-header',
-          label: 'Header & Filters',
-          fullName: 'Work Header & Category Filters',
+          id: 'editorial-header',
+          label: 'Header & Navigation',
+          fullName: '6-Column Editorial Nav Bar',
           type: 'frame',
           children: [
-            { id: 'work-headline', label: 'Headline', fullName: 'Headline: SELECTED WORK.', type: 'text' },
-            { id: 'work-filters', label: 'Filter Pills', fullName: 'Category Filter Pills', type: 'component' }
+            { id: 'logo-brand', label: 'Brand: NAVEEN', fullName: 'Brand Monogram', type: 'text' },
+            { id: 'logo-location', label: 'Location: Goa, IN', fullName: 'Location Tag', type: 'text' },
+            { id: 'nav-work', label: 'Nav: WORK', fullName: 'Work Page Tab', type: 'component' },
+            { id: 'nav-about', label: 'Nav: ABOUT', fullName: 'About Page Tab', type: 'component' },
+            { id: 'nav-contact', label: 'Nav: CONTACT', fullName: 'Contact Page Tab', type: 'component' },
+            { id: 'nav-cv', label: 'Action: DOWNLOAD CV', fullName: 'Resume Download Button', type: 'component' }
+          ]
+        },
+        {
+          id: 'work-header',
+          label: 'Hero & Filters',
+          fullName: 'Work Hero & 5 Category Filters',
+          type: 'frame',
+          children: [
+            { id: 'work-headline', label: 'Headline: SELECTED WORK.', fullName: 'Selected Work Title', type: 'text' },
+            { id: 'work-intro', label: 'Intro: Trading apps, modules...', fullName: 'Work Subtitle', type: 'text' },
+            { id: 'work-counter', label: 'Counter: SHOWING X OF 8 PROJECTS', fullName: 'Dynamic Results Counter', type: 'text' },
+            { id: 'work-filters', label: 'Filters: ALL, FINTECH, DESIGN SYSTEM, AI, WEB', fullName: '5-Column Filter Row', type: 'component' }
           ]
         },
         {
           id: 'work-grid',
-          label: 'Projects Grid',
-          fullName: 'Projects Catalog Grid',
+          label: 'Projects Stack (8 Projects)',
+          fullName: 'Projects Catalog Stack',
           type: 'frame',
           children: PROJECTS.map((p) => ({
             id: p.id,
-            label: `Card: ${p.title.length > 18 ? p.title.slice(0, 16) + '...' : p.title}`,
-            fullName: `Project Card: ${p.title}`,
+            label: `Row: ${p.title.length > 20 ? p.title.slice(0, 18) + '...' : p.title}`,
+            fullName: `Project Row: ${p.title}`,
             type: 'component',
             projectId: p.id
           }))
+        },
+        {
+          id: 'cta-group',
+          label: 'Contact CTA',
+          fullName: 'Footer Action & Socials',
+          type: 'frame',
+          children: [
+            { id: 'cta-headline', label: 'Headline: Hiring a Fintech Designer?', fullName: 'Red Headline Banner', type: 'text' },
+            { id: 'cta-email', label: 'Email & Copy Action', fullName: 'Contact Action Block', type: 'component' },
+            { id: 'cta-socials', label: 'Find Me: LinkedIn, Behance, WhatsApp', fullName: 'Full Social Links', type: 'component' }
+          ]
         }
       ]
     }

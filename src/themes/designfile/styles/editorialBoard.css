@@ -475,30 +475,45 @@
 .ed-frame .proj .n {
   display: flex;
   align-items: center;
-  padding: 0 22px;
+  padding: 0 24px;
   font: 400 clamp(64px, 10vw, 124px)/1 var(--disp);
   background: var(--white);
+  color: var(--ink);
+  transition: background 0.15s ease, color 0.15s ease;
 }
 .ed-frame .proj .t {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   gap: 14px;
-  padding: 20px;
+  padding: 24px 28px;
   background: var(--white);
+  color: var(--ink);
+  transition: background 0.15s ease, color 0.15s ease;
 }
-.ed-frame .proj .t b {
+.ed-frame .proj .t .t-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ed-frame .proj .t b,
+.ed-frame .proj .t .proj-title {
   display: block;
-  font-size: 14px;
+  font-size: 15px;
+  font-weight: 800;
   letter-spacing: .04em;
   line-height: 1.25;
+  text-transform: uppercase;
+  color: var(--ink);
 }
-.ed-frame .proj .t small {
+.ed-frame .proj .t small,
+.ed-frame .proj .t .proj-cat {
   display: block;
   font-size: 11px;
-  margin-top: 4px;
   letter-spacing: .06em;
-  font-weight: 500;
+  font-weight: 700;
+  color: var(--grey);
+  text-transform: uppercase;
 }
 .ed-frame .metric-pill,
 .ed-frame .proj .metric-pill {
@@ -510,24 +525,40 @@
   font-weight: 800;
   letter-spacing: .06em;
   width: fit-content;
-}
-.ed-frame .proj .metric-pill {
+  text-transform: uppercase;
   margin-top: 8px;
 }
 .ed-frame .proj .prob-line {
-  font-size: 11px;
+  font-size: 14px;
   line-height: 1.45;
   text-transform: none;
   font-weight: 500;
   letter-spacing: 0;
   color: #3A3A3A;
-  margin-top: 6px;
+  margin-top: 4px;
 }
-.ed-frame .proj .t em {
-  font-style: normal;
+.ed-frame .proj .t .t-action {
+  margin-top: 12px;
+}
+.ed-frame .proj .t em,
+.ed-frame .proj .t .view-cs {
+  font-style: normal !important;
   font-weight: 800;
   font-size: 11px;
   letter-spacing: .06em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--ink);
+}
+.ed-frame .proj .t .cs-soon {
+  font-style: normal !important;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: none;
+  color: var(--grey);
+  display: inline-block;
 }
 .ed-frame .proj .mockup-frame {
   position: relative;
@@ -542,19 +573,45 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center top;
   display: block;
 }
 .ed-frame .proj .mockup-frame img.proj-img-02 {
   object-position: left top !important;
 }
-.ed-frame .proj .mockup-frame img.proj-img-03 {
+.ed-frame .proj .mockup-frame img.proj-img-03,
+.ed-frame .proj .mockup-frame img.proj-img-06 {
   object-fit: cover !important;
   object-position: center top !important;
+  max-width: 100%;
 }
 .ed-frame .proj:hover > .n,
-.ed-frame .proj:hover > .t {
-  background: var(--yellow);
-  color: var(--ink);
+.ed-frame .proj:hover > .t,
+.ed-frame .proj:focus-visible > .n,
+.ed-frame .proj:focus-visible > .t,
+.ed-frame .proj:focus-within > .n,
+.ed-frame .proj:focus-within > .t {
+  background: var(--red) !important;
+  color: #0A0A0A !important;
+}
+.ed-frame .proj:hover > .t b,
+.ed-frame .proj:hover > .t p,
+.ed-frame .proj:hover > .t small,
+.ed-frame .proj:hover > .t em,
+.ed-frame .proj:hover > .t .view-cs,
+.ed-frame .proj:hover > .t .cs-soon,
+.ed-frame .proj:focus-visible > .t b,
+.ed-frame .proj:focus-visible > .t p,
+.ed-frame .proj:focus-visible > .t small,
+.ed-frame .proj:focus-visible > .t em,
+.ed-frame .proj:focus-visible > .t .view-cs,
+.ed-frame .proj:focus-visible > .t .cs-soon {
+  color: #0A0A0A !important;
+}
+.ed-frame .proj:hover > .t .metric-pill,
+.ed-frame .proj:focus-visible > .t .metric-pill {
+  background: var(--yellow) !important;
+  color: #0A0A0A !important;
 }
 
 /* ===== ABOUT TEASER ===== */
@@ -711,26 +768,64 @@
 /* ===== INNER PAGES: WORK, ABOUT, EXPERIENCE, CONTACT ===== */
 /* Filter bar */
 .ed-frame .filter-row {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
   gap: var(--w);
   background: var(--ink);
+  width: 100%;
 }
 .ed-frame .filter-btn {
-  padding: 12px 18px;
+  padding: 10px 4px;
   background: var(--white);
   color: var(--ink);
   font-weight: 800;
   font-size: 11px;
-  letter-spacing: .08em;
+  letter-spacing: .04em;
   cursor: pointer;
-  flex: 1 1 auto;
   text-align: center;
+  white-space: nowrap;
+  border: none;
+  font-family: inherit;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 .ed-frame .filter-btn:hover,
 .ed-frame .filter-btn.active {
-  background: var(--yellow);
-  color: var(--ink);
+  background: var(--yellow) !important;
+  color: var(--ink) !important;
+}
+
+/* Crosshatch Placeholder strictly for Cover Image */
+.ed-frame .df-crosshatch-cover,
+.df-crosshatch-cover {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 200px;
+  background: #F2F1EA;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.ed-frame .df-crosshatch-svg,
+.df-crosshatch-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.85;
+}
+.ed-frame .df-crosshatch-label,
+.df-crosshatch-label {
+  position: relative;
+  z-index: 2;
+  background: var(--ink);
+  color: var(--white);
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
 }
 
 /* Project stats grid */
