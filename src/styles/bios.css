@@ -1,0 +1,147 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+body[data-theme="windows98"] {
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  background: #000000;
+  overflow: hidden;
+  font-family: 'VT323', monospace;
+  user-select: none;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: unset;
+}
+
+body.desktop-mode {
+  background: #008080 !important;
+}
+
+#viewport-container {
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  position: relative;
+  background: #000000;
+  overflow: hidden;
+}
+
+/* Fullscreen BIOS screen - pure black, full viewport, no rounded corners, no borders, no glow */
+.BiosBootScreen {
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: #000000;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* Authentic left/top positioning with generous empty black space */
+.BiosContainer {
+  position: absolute;
+  left: clamp(18px, 4vw, 56px);
+  top: clamp(16px, 2.5vh, 28px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 2vh, 23px); /* Distinct, authentic blank-line-style gap between groups */
+  width: max-content;
+  max-width: calc(100vw - 32px);
+}
+
+/* Grouping: tight spacing within a group */
+.bios-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1px; /* Tightly spaced lines within each group */
+}
+
+/* Sharp, authentic pixel/monospaced BIOS typography */
+.bios-line {
+  font-family: 'VT323', 'Courier New', monospace;
+  font-size: clamp(17.5px, 1.65vw, 21.5px);
+  font-weight: 400;
+  line-height: clamp(21px, 1.85vw, 25px);
+  min-height: clamp(21px, 1.85vw, 25px);
+  word-wrap: normal;
+  white-space: nowrap;
+  letter-spacing: 0.25px;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: unset;
+  text-rendering: geometricPrecision;
+  color: #ECECEC; /* Substantial, crisp authentic BIOS phosphor white */
+  transition: none !important;
+  animation: none !important;
+}
+
+.bios-leader,
+.bios-status {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Subtle hierarchy: Primary headers and prompts in bright white */
+.bios-line.bios-highlight,
+.NaveenBios40Release60,
+.NaveenPortfolioSystem,
+.SystemDetectionHeader,
+.StartingNaveenExe,
+.PressEnterToContinue {
+  color: #FFFFFF;
+}
+
+.PressEnterToContinue {
+  cursor: pointer;
+}
+
+/* Active streaming hardware cursor */
+.terminal-active-cursor {
+  display: inline-block;
+  color: #F2F2F2;
+  font-weight: 700;
+  margin-left: 1px;
+}
+
+/* Authentic terminal cursor */
+.cursor {
+  display: inline-block;
+  animation: blink-cursor 1s steps(2, start) infinite;
+}
+
+@keyframes blink-cursor {
+  to {
+    visibility: hidden;
+  }
+}
+
+/* Mobile & Small height viewports fallback */
+@media (max-height: 540px) or (max-width: 520px) {
+  .BiosContainer {
+    position: relative;
+    left: 0;
+    top: 0;
+    padding: 16px 14px;
+    gap: 12px;
+    max-height: 100vh;
+    overflow-y: auto;
+    width: 100%;
+  }
+
+  .bios-line {
+    font-size: 15px !important;
+    line-height: 19px !important;
+  }
+}

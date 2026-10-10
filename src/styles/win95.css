@@ -1,0 +1,1541 @@
+/* Windows 95 Design System & Reusable Components */
+
+:root {
+  --win-bg: #008080;
+  --win-gray: #C0C0C0;
+  --win-dark-gray: #808080;
+  --win-light-gray: #DFDFDF;
+  --win-darker-gray: #7F7F7F;
+  --win-blue: #000080;
+  --win-white: #FFFFFF;
+  --win-black: #000000;
+  --win-font: 'MS Sans Serif', 'Microsoft Sans Serif', Tahoma, 'Segoe UI', Arial, sans-serif;
+  --win-titlebar-height: 22px;
+  --win-menubar-height: 20px;
+}
+
+/* Authentic Windows 98 UI font — use the real MS Sans Serif if available, else Tahoma */
+@font-face {
+  font-family: 'MS Sans Serif';
+  src: local('MS Sans Serif'), local('Microsoft Sans Serif'), local('Tahoma');
+}
+@font-face {
+  font-family: 'MS W98 UI';
+  src: local('MS Sans Serif'), local('Microsoft Sans Serif'), local('Tahoma'), local('Segoe UI');
+}
+
+/* Base Desktop container */
+#desktop-environment {
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: var(--win-bg);
+  overflow: hidden;
+  font-family: var(--win-font);
+  font-size: 11px;
+}
+
+.Screen1Desktop, .Screen3Skills, .Screen4Proof, .Screen5Hello, .Screen6Oops, .Screen7Me, .Screen8Made, .Screen9NovaInvest {
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  background: var(--win-bg);
+  overflow: hidden;
+  position: relative;
+  font-family: var(--win-font);
+}
+
+.DesktopArea {
+  width: 100%;
+  height: calc(100% - 40px);
+  left: 0px;
+  top: 0px;
+  position: absolute;
+  background: var(--win-bg);
+  overflow: hidden;
+}
+
+/* Desktop Icons Column */
+.DesktopIconsColumn {
+  width: auto;
+  left: clamp(12px, 2vw, 24px);
+  top: clamp(12px, 2vh, 24px);
+  position: absolute;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: clamp(14px, 2.2vh, 28px);
+  display: inline-flex;
+  user-select: none;
+  z-index: 5;
+}
+
+.DesktopIconsColumn .Item {
+  width: 56px;
+  min-height: 52px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  display: flex;
+  cursor: pointer;
+  padding: 3px 2px;
+  border: 1px dotted transparent;
+  touch-action: manipulation;
+  box-sizing: border-box;
+}
+
+.DesktopIconsColumn .Item:hover {
+  background: rgba(0, 0, 128, 0.2);
+}
+
+.DesktopIconsColumn .Item.selected {
+  border: 1px dotted #FFFF80;
+}
+
+.DesktopIconsColumn .Item.selected .Label {
+  background: var(--win-blue);
+}
+
+.DesktopIconsColumn .Label {
+  align-self: stretch;
+  text-align: center;
+  color: white;
+  font-size: 11px;
+  font-family: var(--win-font);
+  font-weight: 400;
+  line-height: 12px;
+  word-wrap: break-word;
+  padding: 1px 2px;
+}
+
+/* ============================================================
+   GLOBAL WINDOW CHROME — all application windows share this
+   ============================================================ */
+
+.AboutMeWindow, .SkillsWindow, .ResumeWindow, .HelloWindow,
+.RecycleBinWindow, .MyComputerWindow, .MadeWindow, .NovaInvestWindow {
+  padding: 3px;
+  position: absolute;
+  background: var(--win-gray);
+  box-shadow: 2px 2px 0px #DFDFDF inset, -2px -2px 0px #7F7F7F inset,
+              1px 1px 0px white inset, -1px -1px 0px black inset;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 0px;
+  display: inline-flex;
+  z-index: 10;
+  box-sizing: border-box;
+  max-width: calc(100vw - 8px);
+  max-height: calc(100% - 6px);
+  font-family: var(--win-font);
+}
+
+/* Default Window Dimensions — slightly smaller to keep desktop visible, overrides Figma inline sizes */
+@media (min-width: 769px) {
+  .AboutMeWindow:not(.maximized) {
+    width: 560px !important;
+    height: 420px !important;
+  }
+
+  .SkillsWindow:not(.maximized) {
+    width: 620px !important;
+    height: 480px !important;
+  }
+
+  .ResumeWindow:not(.maximized) {
+    width: 600px !important;
+    height: 520px !important;
+  }
+
+  .HelloWindow:not(.maximized) {
+    width: 580px !important;
+    height: 460px !important;
+  }
+
+  .RecycleBinWindow:not(.maximized) {
+    width: 580px !important;
+    height: 440px !important;
+  }
+
+  .MyComputerWindow:not(.maximized) {
+    width: 600px !important;
+    height: 480px !important;
+  }
+
+  .MadeWindow:not(.maximized) {
+    width: 640px !important;
+    height: 460px !important;
+  }
+
+  .NovaInvestWindow:not(.maximized) {
+    width: 820px !important;
+    height: 580px !important;
+    min-width: 0 !important;
+  }
+}
+
+.NovaInvestWindow > * {
+  min-width: 0 !important;
+}
+
+/* Active window state via z-index managed by JS */
+.AboutMeWindow.active-win, .SkillsWindow.active-win, .ResumeWindow.active-win,
+.HelloWindow.active-win, .RecycleBinWindow.active-win, .MyComputerWindow.active-win,
+.MadeWindow.active-win, .NovaInvestWindow.active-win {
+  z-index: 25;
+}
+
+/* Maximized Window Mode across all viewports */
+.AboutMeWindow.maximized, .SkillsWindow.maximized, .ResumeWindow.maximized,
+.HelloWindow.maximized, .RecycleBinWindow.maximized, .MyComputerWindow.maximized,
+.MadeWindow.maximized, .NovaInvestWindow.maximized {
+  left: 0 !important;
+  top: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  border: 1px solid #DFDFDF !important;
+  box-shadow: none !important;
+}
+
+/* Nova Invest internal layout */
+.NovaInvestWindow .ClientArea {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  flex: 1 1 0 !important;
+  height: calc(100% - 40px) !important;
+  overflow: hidden !important;
+  display: flex !important;
+  position: relative !important;
+  box-sizing: border-box !important;
+}
+
+.NovaInvestWindow .ContentScroll {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  flex: 1 1 0 !important;
+  height: 100% !important;
+  box-sizing: border-box !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+
+.NovaInvestWindow .Scrollbar {
+  position: absolute !important;
+  right: 0 !important;
+  left: auto !important;
+  top: 0 !important;
+  height: 100% !important;
+  z-index: 5 !important;
+}
+
+.NovaInvestWindow .ContentScroll::-webkit-scrollbar {
+  display: none;
+}
+
+.NovaInvestWindow .ContentScroll > * {
+  flex-shrink: 0 !important;
+}
+
+/* ============================================================
+   TITLEBAR — globally consistent, authentic Win95/98
+   ============================================================ */
+.Titlebar {
+  flex-shrink: 0;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  align-self: stretch;
+  height: var(--win-titlebar-height);
+  padding: 2px 2px 2px 4px;
+  background: var(--win-blue);
+  justify-content: space-between !important;
+  align-items: center;
+  display: flex !important;
+  cursor: grab;
+  user-select: none;
+  box-sizing: border-box;
+}
+
+/* Active titlebar = blue */
+.Titlebar {
+  background: var(--win-blue);
+}
+
+/* Inactive titlebar = grey */
+.Titlebar.inactive {
+  background: var(--win-dark-gray) !important;
+}
+
+.Titlebar.inactive .Text {
+  color: var(--win-gray) !important;
+}
+
+.Titlebar:active {
+  cursor: grabbing;
+}
+
+.Titlebar .Label {
+  height: 16px;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 4px;
+  display: flex;
+  overflow: hidden;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.Titlebar .Text {
+  color: white;
+  font-size: 11px;
+  font-family: var(--win-font);
+  font-weight: 700;
+  line-height: 13px;
+  letter-spacing: 0.24px;
+  word-wrap: break-word;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Window Control Buttons — Min/Max/Close at top-right */
+.WindowButtons {
+  justify-content: flex-end;
+  align-items: center;
+  gap: 2px;
+  display: flex;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.ButtonWindowButton {
+  width: 16px;
+  height: 14px;
+  padding: 1px;
+  background: var(--win-gray);
+  box-shadow: 1px 1px 0px white inset, -1px -1px 0px black inset,
+              2px 2px 0px #DFDFDF inset, -2px -2px 0px #808080 inset;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  cursor: pointer;
+  touch-action: manipulation;
+  box-sizing: border-box;
+}
+
+.ButtonWindowButton:active {
+  box-shadow: 1px 1px 0px black inset, -1px -1px 0px white inset,
+              2px 2px 0px #808080 inset, -2px -2px 0px #DFDFDF inset;
+}
+
+/* ============================================================
+   MENU BAR — File | Edit | View | Help — below titlebar
+   ============================================================ */
+.WindowMenu {
+  flex-shrink: 0;
+  align-self: stretch;
+  height: var(--win-menubar-height);
+  position: relative;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  background: var(--win-gray);
+  border-bottom: 1px solid #808080;
+  box-shadow: 0 1px 0 #FFFFFF;
+}
+
+.WindowMenu .Rectangle {
+  width: 100% !important;
+  height: var(--win-menubar-height);
+  left: 0px;
+  top: 0px;
+  position: absolute;
+  background: var(--win-gray);
+}
+
+.MenuItem {
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: var(--win-font);
+  font-size: 11px;
+}
+
+.MenuItem div {
+  white-space: nowrap;
+  font-family: var(--win-font);
+}
+
+.MenuItem .File,
+.MenuItem .Edit,
+.MenuItem .View,
+.MenuItem .Help {
+  width: auto !important;
+  font-family: var(--win-font);
+}
+
+.MenuItem:hover {
+  background: #000080;
+}
+
+.MenuItem:hover .File,
+.MenuItem:hover .Edit,
+.MenuItem:hover .View,
+.MenuItem:hover .Help {
+  color: white !important;
+}
+
+.MenuItem:hover path {
+  stroke: white !important;
+}
+
+.MenuItem [class*="Underline"] {
+  top: 13.5px !important;
+}
+
+/* ============================================================
+   3D DIVIDER — replaces stray "- - - -" dash characters
+   ============================================================ */
+.DDivider {
+  align-self: stretch;
+  height: 2px;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  display: flex;
+  flex-shrink: 0;
+  margin: 1px 0;
+}
+
+.DDivider .Line:first-child {
+  align-self: stretch;
+  height: 0px;
+  border-top: 1px #808080 solid;
+}
+
+.DDivider .Line:last-child {
+  align-self: stretch;
+  height: 0px;
+  border-top: 1px white solid;
+}
+
+/* Client Area */
+.WindowClientArea {
+  align-self: stretch;
+  flex: 1 1 0;
+  background: var(--win-gray);
+  box-shadow: 2px 2px 0px black inset, -2px -2px 0px #C1C1C1 inset,
+              1px 1px 0px #808080 inset, -1px -1px 0px white inset;
+  display: flex;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+
+/* ============================================================
+   GLOBAL WINDOWS 98 BUTTON SYSTEM (Universal across all windows)
+   Square corners, grey face, 3D bevels, authentic states
+   ============================================================ */
+.win98-btn,
+.Button.win95-btn,
+.ButtonRow .Button,
+.ButtonRow button {
+  height: 24px;
+  min-width: 75px;
+  padding: 0 16px;
+  background: #C0C0C0 !important;
+  background-image: none !important;
+  box-shadow: 2px 2px 0px #DFDFDF inset, -2px -2px 0px #7F7F7F inset,
+              1px 1px 0px white inset, -1px -1px 0px black inset !important;
+  justify-content: center;
+  align-items: center;
+  display: inline-flex;
+  position: relative;
+  box-sizing: border-box;
+  border: none !important;
+  border-radius: 0 !important;
+  cursor: default;
+  user-select: none;
+  touch-action: manipulation;
+  font-family: 'MS W98 UI', 'MS Sans Serif', Tahoma, sans-serif !important;
+  font-size: 11px !important;
+  font-weight: 400 !important;
+  line-height: normal !important;
+  color: #000000 !important;
+  outline: none !important;
+  text-decoration: none !important;
+  white-space: nowrap;
+  transition: none !important;
+  filter: none !important;
+}
+
+/* Hover State: remains solid 3D bevel */
+.win98-btn:hover:not(:disabled),
+.Button.win95-btn:hover:not(:disabled) {
+  cursor: default;
+}
+
+/* Preferred / Default Dialog Button */
+.win98-btn.btn-preferred,
+.Button.win95-btn.btn-preferred {
+  box-shadow: 3px 3px 0px #DFDFDF inset, -3px -3px 0px #7F7F7F inset,
+              2px 2px 0px white inset, -2px -2px 0px black inset,
+              1px 1px 0px black inset, -1px -1px 0px black inset !important;
+}
+
+/* Focus State: black outer border and classic dotted inner focus rectangle */
+.win98-btn:focus-visible,
+.win98-btn.is-focused,
+.Button.win95-btn:focus-visible,
+.Button.win95-btn.is-focused {
+  box-shadow: 3px 3px 0px #DFDFDF inset, -3px -3px 0px #7F7F7F inset,
+              2px 2px 0px white inset, -2px -2px 0px black inset,
+              1px 1px 0px black inset, -1px -1px 0px black inset !important;
+}
+
+.win98-btn .btn-focus-rect,
+.Button.win95-btn .btn-focus-rect {
+  position: absolute;
+  top: 3px;
+  left: 4px;
+  right: 4px;
+  bottom: 3px;
+  border: 1px dotted #000000;
+  pointer-events: none;
+  display: none;
+}
+
+.win98-btn:focus-visible .btn-focus-rect,
+.win98-btn.is-focused .btn-focus-rect,
+.Button.win95-btn:focus-visible .btn-focus-rect,
+.Button.win95-btn.is-focused .btn-focus-rect {
+  display: block;
+}
+
+/* Pressed State: inverted/depressed bevel with content shifted 1px */
+.win98-btn:active,
+.win98-btn.is-pressed,
+.Button.win95-btn:active,
+.Button.win95-btn.is-pressed,
+.ButtonRow .Button:active {
+  box-shadow: 2px 2px 0px #808080 inset, -2px -2px 0px #C4C4C4 inset,
+              1px 1px 0px black inset, -1px -1px 0px white inset !important;
+}
+
+.win98-btn:active .btn-content,
+.win98-btn.is-pressed .btn-content,
+.win98-btn:active .btn-focus-rect,
+.win98-btn.is-pressed .btn-focus-rect,
+.Button.win95-btn:active .btn-content,
+.Button.win95-btn.is-pressed .btn-content,
+.Button.win95-btn:active .btn-focus-rect,
+.Button.win95-btn.is-pressed .btn-focus-rect,
+.ButtonRow .Button:active .btn-content,
+.ButtonRow .Button:active .ButtonText {
+  transform: translate(1px, 1px);
+}
+
+/* Disabled State: authentic embossed grey text */
+.win98-btn:disabled,
+.win98-btn.is-disabled,
+.Button.win95-btn:disabled,
+.Button.win95-btn.is-disabled {
+  box-shadow: 2px 2px 0px #DFDFDF inset, -2px -2px 0px #7F7F7F inset,
+              1px 1px 0px white inset, -1px -1px 0px black inset !important;
+  color: #808080 !important;
+  text-shadow: 1px 1px 0px #FFFFFF !important;
+  pointer-events: none !important;
+  cursor: default !important;
+}
+
+.win98-btn:disabled .btn-content,
+.Button.win95-btn:disabled .btn-content,
+.win98-btn.is-disabled .btn-content,
+.Button.win95-btn.is-disabled .btn-content {
+  color: #808080 !important;
+  text-shadow: 1px 1px 0px #FFFFFF !important;
+}
+
+/* 2. SKILL HOVER BEHAVIOUR (Skills screen only) */
+/* Individual Skill Items: Normal Arrow -> Hover Hand Pointer with ZERO background/visual changes */
+.SkillsWindow [data-layer^="skill-"] {
+  cursor: default !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  user-select: none;
+  min-height: 20px;
+  transition: none !important;
+}
+
+.SkillsWindow [data-layer^="skill-"]:hover {
+  cursor: pointer !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.SkillsWindow [data-layer^="skill-"]:hover * {
+  cursor: pointer !important;
+}
+
+/* Ensure skills window and grid containers never show pointer cursor or background changes */
+.SkillsWindow,
+.SkillsWindow .WindowClientArea,
+.SkillsWindow .SkillsGrid,
+.SkillsWindow .SkillsExe,
+.SkillsWindow .LeftColumn,
+.SkillsWindow .RightColumn,
+.SkillsWindow [class^="Group"] {
+  cursor: default !important;
+}
+
+.CheckboxIcon {
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.CheckboxIcon.unchecked .CheckIcon {
+  display: none;
+}
+
+.BorderDark {
+  position: absolute !important;
+  left: 0px !important;
+  right: 0px !important;
+  width: auto !important;
+  top: 7px !important;
+  bottom: 0px !important;
+  height: auto !important;
+  border: 1px #808080 solid !important;
+  pointer-events: none !important;
+}
+
+.BorderLight {
+  position: absolute !important;
+  left: 1px !important;
+  right: 1px !important;
+  width: auto !important;
+  top: 8px !important;
+  bottom: 1px !important;
+  height: auto !important;
+  border: 1px white solid !important;
+  pointer-events: none !important;
+}
+
+/* ============================================================
+   TASKBAR / NAVBAR — anchored to bottom of viewport
+   Matches reference: 28px height, 22px body elements, authentic 3D bevels
+   ============================================================ */
+.DesktopTaskbar,
+.Navbar {
+  width: 100%;
+  height: 28px;
+  left: 0px;
+  bottom: 0px;
+  top: auto;
+  position: absolute;
+  background: #C0C0C0;
+  box-shadow: 0px -1px 0px white, 0px -2px 0px #DFDFDF;
+  border-top: 1px solid #FFFFFF;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2px 3px;
+  overflow: hidden;
+  z-index: 10000;
+  user-select: none;
+  box-sizing: border-box;
+  font-family: 'MS W98 UI', 'MS Sans Serif', Tahoma, sans-serif;
+}
+
+.TaskbarLeft,
+.Navbar .Body {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 22px;
+  overflow: hidden;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 4px;
+  display: inline-flex;
+}
+
+.ButtonStart {
+  width: 60px;
+  height: 22px;
+  position: relative;
+  background: #C0C0C0;
+  box-shadow: -2px -2px 0px #818181 inset, 1px 1px 0px white inset, -1px -1px 0px black inset;
+  justify-content: center;
+  align-items: center;
+  gap: 3px;
+  display: flex;
+  cursor: pointer;
+  flex-shrink: 0;
+  user-select: none;
+  box-sizing: border-box;
+  touch-action: manipulation;
+}
+
+.ButtonStart:active, .ButtonStart.pressed {
+  box-shadow: 1px 1px 0px black inset, -1px -1px 0px white inset, 2px 2px 0px #808080 inset, -2px -2px 0px #DFDFDF inset !important;
+  transform: translate(1px, 1px);
+}
+
+.NavbarTab {
+  width: 120px;
+  min-width: 60px;
+  max-width: 160px;
+  height: 22px;
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  background: #C0C0C0;
+  box-shadow: -2px -2px 0px #818181 inset, 1px 1px 0px white inset, -1px -1px 0px black inset;
+  overflow: hidden;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 4px;
+  display: inline-flex;
+  cursor: pointer;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  touch-action: manipulation;
+  font-family: 'MS W98 UI', 'MS Sans Serif', Tahoma, sans-serif;
+  font-size: 11px;
+}
+
+.NavbarTab.active {
+  box-shadow: 1px 1px 0px black inset, -1px -1px 0px white inset, 2px 2px 0px #808080 inset, -2px -2px 0px #DFDFDF inset !important;
+  background: #DFDFDF !important;
+}
+
+.NavbarTab .Text {
+  flex: 1 1 0;
+  height: 10px;
+  color: black;
+  font-size: 11px;
+  font-family: 'MS W98 UI', 'MS Sans Serif', Tahoma, sans-serif;
+  font-weight: 400;
+  line-height: 10px;
+  word-wrap: break-word;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.NavbarTab.active .Text {
+  font-weight: 700;
+}
+
+.TaskbarRight,
+.Navbar .Time {
+  flex-shrink: 0;
+  height: 22px;
+  padding-left: 4px;
+  padding-right: 6px;
+  background: #C0C0C0;
+  box-shadow: 1px 1px 0px #808080 inset, -1px -1px 0px white inset;
+  overflow: hidden;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 8px;
+  display: inline-flex;
+  margin-left: 4px;
+  font-family: 'MS W98 UI', 'MS Sans Serif', Tahoma, sans-serif;
+  font-size: 11px;
+}
+
+.TaskbarRight .Clock,
+.Navbar .Time .Clock {
+  color: black;
+  font-size: 11px;
+  font-family: 'MS W98 UI', 'MS Sans Serif', Tahoma, sans-serif;
+  font-weight: 400;
+  line-height: 10px;
+  word-wrap: break-word;
+  white-space: nowrap;
+}
+
+/* Screen 4: Resume Window Details */
+.ClientWrapper {
+  align-self: stretch;
+  flex: 1 1 0;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 4px;
+  background: var(--win-gray);
+  overflow: hidden;
+  justify-content: flex-start;
+  align-items: flex-start;
+  display: inline-flex;
+}
+
+.DocumentArea {
+  flex: 1 1 0;
+  align-self: stretch;
+  padding-left: 24px;
+  padding-right: 24px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  background: white;
+  overflow-y: auto;
+  outline: 1px #808080 solid;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 14px;
+  display: inline-flex;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.DocumentArea::-webkit-scrollbar {
+  display: none;
+}
+
+/* Win95 Custom Scrollbar */
+.Scrollbar {
+  width: 16px;
+  align-self: stretch;
+  background: #DFDFDF;
+  overflow: hidden;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  display: inline-flex;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.ScrollUp, .ScrollDown {
+  align-self: stretch;
+  height: 16px;
+  position: relative;
+  background: #C0C0C0;
+  box-shadow: 1px 1px 0px #DFDFDF inset, -1px -1px 0px #7F7F7F inset,
+              1px 1px 0px white inset, -1px -1px 0px black inset;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.ScrollUp:active, .ScrollDown:active {
+  box-shadow: 1px 1px 0px black inset, -1px -1px 0px white inset;
+}
+
+.ScrollUp::after {
+  content: '';
+  width: 0;
+  height: 0;
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+  border-bottom: 4px solid black;
+}
+
+.ScrollDown::after {
+  content: '';
+  width: 0;
+  height: 0;
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+  border-top: 4px solid black;
+}
+
+.ScrollTrack {
+  align-self: stretch;
+  flex: 1 1 0;
+  position: relative;
+  background: #DFDFDF;
+  overflow: hidden;
+}
+
+.ScrollThumb {
+  width: 14px;
+  height: 80px;
+  left: 1px;
+  top: 10px;
+  position: absolute;
+  background: #C0C0C0;
+  box-shadow: 1px 1px 0px white inset, -1px -1px 0px black inset,
+              2px 2px 0px #DFDFDF inset, -2px -2px 0px #7F7F7F inset;
+  cursor: pointer;
+}
+
+/* Statusbar */
+.Statusbar {
+  align-self: stretch;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  height: 18px;
+  position: relative;
+  background: #C0C0C0;
+  box-shadow: 1px 1px 0px #808080 inset, -1px -1px 0px white inset;
+  flex-shrink: 0;
+  user-select: none;
+  font-family: var(--win-font);
+  font-size: 11px;
+}
+
+.Statusbar .ObjectS {
+  width: auto !important;
+  max-width: calc(100% - 24px) !important;
+  right: 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.Statusbar .DragSizeIcon {
+  right: 2px !important;
+  left: auto !important;
+}
+
+/* Screen 5: Hello Window */
+.HelloWindow a:hover {
+  text-decoration: underline !important;
+}
+
+.win-input:focus {
+  outline: none;
+}
+
+/* Screen 6: Recycle Bin Window */
+[class^="FileRow"] {
+  cursor: pointer;
+  user-select: none;
+}
+
+[class^="FileRow"]:hover:not(.selected) {
+  background: #E8E8E8;
+}
+
+[class^="FileRow"].selected {
+  background: #000080 !important;
+}
+
+[class^="FileRow"].selected div,
+[class^="FileRow"].selected .FigmaDesign,
+[class^="FileRow"].selected .IllustratorFile,
+[class^="FileRow"].selected .TextDocument,
+[class^="FileRow"].selected [class*="Fig"],
+[class^="FileRow"].selected [class*="Txt"],
+[class^="FileRow"].selected [class*="Am"],
+[class^="FileRow"].selected [class*="Pm"] {
+  color: white !important;
+}
+
+/* Screen 7: My Computer Window */
+.my-comp-btn-ok:active, .my-comp-btn-cancel:active {
+  box-shadow: 2px 2px 0px black inset, -1px -1px 0px white inset,
+              1px 1px 0px #7F7F7F inset !important;
+}
+
+.MyComputerWindow .WindowClientArea {
+  box-shadow: none !important;
+}
+
+/* Screen 8: Made Window */
+.ProjectRow {
+  cursor: pointer;
+  user-select: none;
+}
+
+.ProjectRow:hover:not(.selected) {
+  background: #E8E8E8 !important;
+}
+
+.ProjectRow:hover:not(.selected) div,
+.ProjectRow:hover:not(.selected) [class*="Stock"],
+.ProjectRow:hover:not(.selected) [class*="Mutual"],
+.ProjectRow:hover:not(.selected) [class*="Option"],
+.ProjectRow:hover:not(.selected) [class*="Wealth"],
+.ProjectRow:hover:not(.selected) [class*="Distributor"],
+.ProjectRow:hover:not(.selected) [class*="Ai"],
+.ProjectRow:hover:not(.selected) [class*="Client"] {
+  color: black !important;
+}
+
+.ProjectRow.selected {
+  background: #000080 !important;
+}
+
+.ProjectRow.selected div,
+.ProjectRow.selected [class*="Stock"],
+.ProjectRow.selected [class*="Mutual"],
+.ProjectRow.selected [class*="Option"],
+.ProjectRow.selected [class*="Wealth"],
+.ProjectRow.selected [class*="Distributor"],
+.ProjectRow.selected [class*="Ai"],
+.ProjectRow.selected [class*="Client"],
+.ProjectRow.selected .Application,
+.ProjectRow.selected .Product,
+.ProjectRow.selected .InternalTool,
+.ProjectRow.selected .Web,
+.ProjectRow.selected .NeoWealth,
+.ProjectRow.selected .BpEquities,
+.ProjectRow.selected .Skydreams {
+  color: white !important;
+}
+
+/* Phone Mockups inside Nova Invest */
+.PhoneMockups {
+  flex-shrink: 0 !important;
+  flex-wrap: wrap !important;
+  justify-content: center !important;
+  gap: 16px !important;
+}
+
+.PhoneMockups > * {
+  flex-shrink: 0 !important;
+}
+
+/* ============================================================
+   START MENU — anchored directly above taskbar
+   ============================================================ */
+.StartMenu {
+  box-sizing: border-box;
+  width: 200px;
+  height: auto;
+  padding: 3px;
+  left: 2px;
+  bottom: 28px !important;
+  top: auto !important;
+  position: absolute;
+  background: #C0C0C0;
+  box-shadow: 1px 1px 0px white inset, -1px -1px 0px black inset,
+              2px 2px 0px #DFDFDF inset, -2px -2px 0px #808080 inset;
+  overflow: visible;
+  justify-content: flex-start;
+  align-items: stretch;
+  display: flex;
+  z-index: 10002;
+  user-select: none;
+  font-family: var(--win-font);
+}
+
+.StartMenu .MenuItems > div:not(.Separator) {
+  cursor: pointer;
+  min-height: 24px;
+  display: flex;
+  align-items: center;
+  font-family: var(--win-font);
+  transition: none;
+}
+
+.StartMenu .MenuItems > div:not(.Separator):hover,
+.StartMenu .MenuItems > div:not(.Separator).is-selected,
+.StartSubmenu div.submenu-item:hover,
+.StartSubmenu div.submenu-item.is-selected,
+.DesktopContextMenu div.context-item:hover {
+  background: #000080 !important;
+}
+
+.StartMenu .MenuItems > div:not(.Separator):hover *,
+.StartMenu .MenuItems > div:not(.Separator).is-selected *,
+.StartSubmenu div.submenu-item:hover *,
+.StartSubmenu div.submenu-item.is-selected *,
+.DesktopContextMenu div.context-item:hover * {
+  color: white !important;
+}
+
+.ButtonStart.pressed {
+  box-shadow: 1px 1px 0px 1px rgba(0, 0, 0, 0.50) inset, -1px -1px 0px white !important;
+}
+
+/* ============================================================
+   DESKTOP CONTEXT MENU
+   ============================================================ */
+.DesktopContextMenu {
+  position: fixed;
+  box-sizing: border-box;
+  background: #C0C0C0;
+  box-shadow: 1px 1px 0px white inset, -1px -1px 0px black inset,
+              2px 2px 0px #DFDFDF inset, -2px -2px 0px #808080 inset;
+  padding: 2px;
+  z-index: 10010;
+  user-select: none;
+  font-family: var(--win-font);
+  font-size: 11px;
+  min-width: 140px;
+}
+
+.DesktopContextMenu .context-item {
+  padding: 3px 18px 3px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: black;
+  white-space: nowrap;
+  font-size: 11px;
+}
+
+.DesktopContextMenu .context-separator {
+  height: 2px;
+  margin: 3px 1px;
+  border-top: 1px solid #808080;
+  border-bottom: 1px solid white;
+}
+
+/* ============================================================
+   SHUT DOWN DIALOG — centered in viewport
+   ============================================================ */
+.ShutDownDialog {
+  width: 360px;
+  height: auto;
+  min-height: 240px;
+  padding: 4px;
+  position: absolute;
+  left: calc(50% - 180px);
+  top: calc(50% - 120px);
+  background: #C0C0C0;
+  box-shadow: 1px 1px 0px white inset, -1px -1px 0px black inset,
+              2px 2px 0px #DFDFDF inset, -2px -2px 0px #808080 inset;
+  overflow: hidden;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  display: none;
+  z-index: 10001;
+  user-select: none;
+  box-sizing: border-box;
+  font-family: var(--win-font);
+}
+
+.ShutDownDialog .Button:active {
+  box-shadow: 2px 2px 0px black inset, -1px -1px 0px white inset,
+              1px 1px 0px #7F7F7F inset !important;
+}
+
+.ShutDownDialog .RadioGroup > div:hover {
+  filter: brightness(0.95);
+}
+
+/* ============================================================
+   RESPONSIVE MEDIA QUERIES
+   Zero black bars, authentic Win95 look & touch usability
+   ============================================================ */
+
+/* Laptop screens (1025px - 1366px) */
+@media (min-width: 1025px) and (max-width: 1366px) {
+  .AboutMeWindow, .SkillsWindow, .ResumeWindow, .HelloWindow,
+  .RecycleBinWindow, .MyComputerWindow, .MadeWindow {
+    max-width: calc(100vw - 120px) !important;
+    max-height: calc(100% - 20px) !important;
+  }
+
+  .NovaInvestWindow {
+    width: min(820px, calc(100vw - 120px)) !important;
+    height: min(560px, calc(100% - 20px)) !important;
+  }
+
+  .ShutDownDialog {
+    left: calc(50% - 180px) !important;
+    top: calc(50% - 120px) !important;
+  }
+}
+
+/* Tablet screens (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .AboutMeWindow, .SkillsWindow, .ResumeWindow, .HelloWindow,
+  .RecycleBinWindow, .MyComputerWindow, .MadeWindow, .NovaInvestWindow {
+    width: calc(100vw - 28px) !important;
+    max-width: 780px !important;
+    height: calc(100% - 20px) !important;
+  }
+
+  .ShutDownDialog {
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+  }
+
+  .PhoneMockups {
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 16px !important;
+  }
+
+  .SkillsGrid {
+    gap: 12px !important;
+  }
+}
+
+/* Mobile screens (<= 768px) */
+@media (max-width: 768px) {
+  /* On mobile touch displays, Windows 95 applications expand to fill workspace (authentic Windows CE/Mobile style) */
+  .AboutMeWindow, .SkillsWindow, .ResumeWindow, .HelloWindow,
+  .RecycleBinWindow, .MyComputerWindow, .MadeWindow, .NovaInvestWindow {
+    width: 100% !important;
+    height: 100% !important;
+    left: 0 !important;
+    top: 0 !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 2px !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  /* Desktop icons grid when all windows minimized */
+  .DesktopIconsColumn {
+    left: 12px;
+    top: 12px;
+    gap: 12px;
+  }
+
+  .DesktopIconsColumn .Item {
+    min-width: 58px;
+    min-height: 56px;
+    padding: 6px 2px;
+  }
+
+  /* Shut Down Dialog centered on mobile */
+  .ShutDownDialog {
+    width: min(340px, calc(100vw - 16px)) !important;
+    height: auto !important;
+    min-height: 240px !important;
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Titlebars with touch-friendly targets */
+  .Titlebar {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    height: 28px !important;
+    padding: 3px 4px 3px 6px !important;
+    align-items: center !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    box-sizing: border-box !important;
+  }
+
+  .Titlebar .Label {
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+    overflow: hidden !important;
+  }
+
+  .Titlebar .Text {
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .WindowButtons {
+    flex-shrink: 0 !important;
+    margin-left: auto !important;
+  }
+
+  .ButtonWindowButton {
+    width: 22px !important;
+    height: 18px !important;
+    padding: 2px !important;
+  }
+
+  /* Taskbar on mobile */
+  .DesktopTaskbar {
+    height: 42px !important;
+    padding: 2px 4px !important;
+  }
+
+  .ButtonStart {
+    height: 26px !important;
+    width: 56px !important;
+  }
+
+  .NavbarTab {
+    height: 28px !important;
+    padding: 2px 6px !important;
+    max-width: 100px !important;
+  }
+
+  .NavbarTab .Text {
+    font-size: 10px !important;
+  }
+
+  .TaskbarRight {
+    height: 28px !important;
+    padding: 2px 6px !important;
+  }
+
+  /* Start Menu on mobile */
+  .StartMenu {
+    bottom: 28px !important;
+    left: 2px !important;
+    width: min(220px, calc(100vw - 8px)) !important;
+    height: auto !important;
+  }
+
+  .StartMenu .MenuItems > div:not(.Separator) {
+    min-height: 32px !important;
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+  }
+
+  /* Screen 9: Nova Invest responsive adjustments */
+  .NovaInvestWindow .ClientArea {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    height: calc(100% - 50px) !important;
+  }
+
+  .NovaInvestWindow .ContentScroll {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+    padding-top: 14px !important;
+    padding-bottom: 24px !important;
+    gap: 16px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .ProjectMeta, .OverviewGrid, .ApproachSteps, .DesignDecisions > div:nth-child(2) {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 12px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .ProjectMeta > div, .OverviewGrid > div {
+    min-width: 120px !important;
+    flex: 1 1 120px !important;
+    max-width: 100% !important;
+  }
+
+  .ApproachSteps > div {
+    min-width: 120px !important;
+    flex: 1 1 calc(50% - 10px) !important;
+    max-width: 100% !important;
+  }
+
+  .ASimplifiedInvestingExperienceDesignedToMakeMarketInformationEasierToUnderstandAndActOn {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .PhoneMockups {
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 16px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .PhoneMockups > div {
+    max-width: min(200px, 90vw) !important;
+  }
+
+  .ScreenLabels {
+    display: none !important;
+  }
+
+  /* Screen 3: Skills Grid becomes single column */
+  .SkillsWindow .WindowClientArea {
+    flex: 1 1 0 !important;
+    height: calc(100% - 48px) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 12px !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .SkillsGrid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .SkillsGrid .LeftColumn, .SkillsGrid .RightColumn {
+    width: 100% !important;
+    max-width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    flex: none !important;
+  }
+
+  .GroupProductDesign, .GroupFintech, .GroupDesignSystems, .GroupConversationalAi, .GroupTools {
+    width: 100% !important;
+    max-width: 100% !important;
+    position: relative !important;
+    box-sizing: border-box !important;
+    padding-top: 18px !important;
+    padding-bottom: 8px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    height: auto !important;
+  }
+
+  .GroupProductDesign .BorderDark, .GroupFintech .BorderDark,
+  .GroupDesignSystems .BorderDark, .GroupConversationalAi .BorderDark,
+  .GroupTools .BorderDark,
+  .GroupProductDesign .BorderLight, .GroupFintech .BorderLight,
+  .GroupDesignSystems .BorderLight, .GroupConversationalAi .BorderLight,
+  .GroupTools .BorderLight {
+    width: auto !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: auto !important;
+    top: 7px !important;
+    bottom: 0 !important;
+  }
+
+  /* Screen 7: My Computer Window */
+  .MyComputerWindow .WindowClientArea {
+    flex: 1 1 0 !important;
+    height: calc(100% - 48px) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 12px !important;
+  }
+
+  .MyComputerWindow .ContentColumns {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .MyComputerWindow .LeftColumn, .MyComputerWindow .RightColumn {
+    width: 100% !important;
+    max-width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    flex: none !important;
+  }
+
+  .MyComputerWindow .BorderDark, .MyComputerWindow .BorderLight {
+    width: auto !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: auto !important;
+    top: 7px !important;
+    bottom: 0 !important;
+  }
+
+  /* Screen 8: MADE Explorer adapts gracefully */
+  .ContentWrapper {
+    flex-direction: column !important;
+  }
+
+  .FileList {
+    flex: 1 1 180px !important;
+    min-height: 160px !important;
+    width: 100% !important;
+    overflow-x: auto !important;
+  }
+
+  #made-details-pane {
+    width: 100% !important;
+    border-left: none !important;
+    border-top: 1px solid #808080 !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+    padding: 8px !important;
+  }
+
+  /* Screen 5: HELLO contact columns stack */
+  .ContentColumns {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  .ContentColumns input, .ContentColumns textarea {
+    font-size: 13px !important;
+  }
+
+  /* Screen 4: Resume Document Area */
+  .DocumentArea {
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+    padding-top: 12px !important;
+  }
+
+  /* Screen 2: About Me client area */
+  .AboutMeWindow .WindowClientArea {
+    padding: 14px !important;
+    gap: 12px !important;
+  }
+
+  .AboutMeWindow .NaveenKumarPandey {
+    font-size: 20px !important;
+  }
+
+  .AboutMeWindow .PropRow {
+    flex-wrap: wrap !important;
+    gap: 4px !important;
+  }
+}
+
+/* Global Document Area & Resume Content Flow */
+#resume-doc-area,
+.DocumentArea {
+  overflow-y: auto !important;
+}
+
+#resume-doc-area > *,
+.DocumentArea > * {
+  flex-shrink: 0 !important;
+}
+
+#resume-doc-area .ExperienceList,
+#resume-doc-area .ExperienceList .Frame,
+#resume-doc-area .HighlightsGrid,
+#resume-doc-area .HighlightsGrid .Frame,
+.DocumentArea .ExperienceList,
+.DocumentArea .ExperienceList .Frame {
+  flex-shrink: 0 !important;
+  overflow: visible !important;
+}

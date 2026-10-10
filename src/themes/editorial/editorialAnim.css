@@ -1,0 +1,457 @@
+/* ============================================================================
+   EDITORIAL SUBTLE ANIMATION LAYER
+   Strictly animates transform and opacity (plus stroke-dashoffset on SVG).
+   GPU-accelerated, zero layout shift (CLS 0), progressive enhancement.
+   ============================================================================ */
+
+/* 1. Theme Tokens for Signal Dot */
+:root,
+.editorial-root,
+.editorial-root[data-mode="paper"] {
+  --signal-core: #FF5A1F;
+  --signal-glow: rgba(255, 90, 31, 0.35);
+  --signal-glow-blur: 8px;
+  --signal-tail: rgba(255, 90, 31, 0.5);
+  --signal-highlight: transparent;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root,
+  .editorial-root {
+    --signal-core: #FF5A1F;
+    --signal-highlight: #FFB08A;
+    --signal-glow: rgba(255, 90, 31, 0.6);
+    --signal-glow-blur: 12px;
+    --signal-tail: rgba(255, 120, 60, 0.6);
+  }
+}
+
+.editorial-root[data-mode="blueprint"] {
+  --signal-core: #FF5A1F;
+  --signal-highlight: #FFB08A;
+  --signal-glow: rgba(255, 90, 31, 0.6);
+  --signal-glow-blur: 12px;
+  --signal-tail: rgba(255, 120, 60, 0.6);
+}
+
+/* Dark theme only: faint spotlight in top-left corner of hero stats & featured cards */
+.editorial-hero-stats-row,
+.editorial-project-card {
+  position: relative;
+}
+
+.editorial-root[data-mode="blueprint"] .editorial-hero-stats-row::before,
+.editorial-root[data-mode="blueprint"] .editorial-project-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 140px;
+  height: 140px;
+  pointer-events: none;
+  border-radius: 0;
+  background: radial-gradient(circle at top left, rgba(255, 90, 31, 0.12), transparent 70%);
+  z-index: 1;
+}
+
+/* 2. Scroll Reveal System (Applied only after JS adds .js-anim to html) */
+html.js-anim :is([class*="-grid"] > *, [class*="-card"], .editorial-exp-accordion-item, .editorial-skill-category, .editorial-anim-reveal):not(.editorial-hero-card):not(.editorial-playground-tool-card) {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 350ms cubic-bezier(0.16, 1, 0.3, 1),
+              transform 350ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+/* Stagger delays within group (60ms step, max 300ms) */
+html.js-anim [class*="-grid"] > :nth-child(1) { --reveal-delay: 0ms; }
+html.js-anim [class*="-grid"] > :nth-child(2) { --reveal-delay: 60ms; }
+html.js-anim [class*="-grid"] > :nth-child(3) { --reveal-delay: 120ms; }
+html.js-anim [class*="-grid"] > :nth-child(4) { --reveal-delay: 180ms; }
+html.js-anim [class*="-grid"] > :nth-child(5) { --reveal-delay: 240ms; }
+html.js-anim [class*="-grid"] > :nth-child(n+6) { --reveal-delay: 300ms; }
+
+html.js-anim .is-revealed {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+
+/* Section Rule Lines: Scale left to right */
+html.js-anim .editorial-section-line {
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 500ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html.js-anim .editorial-section-line.is-revealed {
+  transform: scaleX(1);
+}
+
+/* Orange Section Indicator Bar: Grows scaleY (250ms, fill-mode both, end at scale 1) */
+@keyframes sectionBarGrow {
+  0% {
+    transform: scaleY(0);
+  }
+  100% {
+    transform: scaleY(1);
+  }
+}
+
+html.js-anim .editorial-section-indicator {
+  transform-origin: bottom center;
+}
+
+html.js-anim :is(.is-revealed, .editorial-section-tag.is-revealed, [class*="-card"].is-revealed, [class*="-header"].is-revealed) .editorial-section-indicator,
+html.js-anim .editorial-section-indicator.is-revealed {
+  animation: sectionBarGrow 250ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* 3. Signal Dot Anatomy & Runner */
+.editorial-signal-runner {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 25;
+  overflow: visible;
+}
+
+.editorial-signal-dot {
+  position: absolute;
+  width: 46px;
+  height: 18px;
+  offset-path: rect(0 100% 100% 0 round 0);
+  offset-anchor: 100% 50%;
+  offset-rotate: auto;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Support pseudo-elements (0 child DOM nodes needed) */
+.editorial-signal-dot::before,
+.editorial-section-line-dot::before {
+  content: '';
+  position: absolute;
+  right: 6px;
+  top: 8px;
+  width: 40px;
+  height: 2px;
+  background: linear-gradient(to right, transparent, var(--signal-tail));
+  border-radius: 1px;
+}
+
+.editorial-signal-dot::after,
+.editorial-section-line-dot::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 6px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--signal-core);
+  box-shadow: 0 0 var(--signal-glow-blur) var(--signal-glow);
+}
+
+.editorial-root[data-mode="blueprint"] .editorial-signal-dot::after,
+.editorial-root[data-mode="blueprint"] .editorial-section-line-dot::after {
+  background: radial-gradient(circle at center, var(--signal-highlight) 35%, var(--signal-core) 100%);
+  box-shadow: 0 0 var(--signal-glow-blur) var(--signal-glow);
+}
+
+/* Also support explicit spans if present */
+.editorial-signal-tail {
+  position: absolute;
+  right: 6px;
+  top: 8px;
+  width: 40px;
+  height: 2px;
+  background: linear-gradient(to right, transparent, var(--signal-tail));
+  border-radius: 1px;
+}
+
+.editorial-signal-glow {
+  position: absolute;
+  right: -3px;
+  top: 3px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--signal-glow);
+  filter: blur(var(--signal-glow-blur));
+  pointer-events: none;
+}
+
+.editorial-signal-core {
+  position: absolute;
+  right: 0;
+  top: 6px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--signal-core);
+}
+
+.editorial-root[data-mode="blueprint"] .editorial-signal-core {
+  background: radial-gradient(circle at center, var(--signal-highlight) 35%, var(--signal-core) 100%);
+}
+
+/* Lap Animation Keyframe */
+@keyframes signalDotLap {
+  0% {
+    offset-distance: 0%;
+    opacity: 0;
+  }
+  3% {
+    opacity: 1;
+  }
+  96% {
+    opacity: 1;
+  }
+  100% {
+    offset-distance: 100%;
+    opacity: 0;
+  }
+}
+
+.editorial-signal-runner.running-lap .editorial-signal-dot {
+  animation: signalDotLap var(--lap-duration, 1s) cubic-bezier(0.2, 0, 0.2, 1) forwards;
+}
+
+/* Section Rule Line Travel Dot */
+.editorial-section-line-dot-wrap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.editorial-section-line-dot {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  margin-top: -9px;
+  width: 46px;
+  height: 18px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes signalDotLineTravel {
+  0% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(var(--line-width, 300px));
+    opacity: 0;
+  }
+}
+
+.editorial-section-line-dot.traveling {
+  animation: signalDotLineTravel 500ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Frame Idle Lap (Home Only) */
+@keyframes signalDotIdleLap {
+  0% {
+    offset-distance: 0%;
+    opacity: 0.4;
+  }
+  100% {
+    offset-distance: 100%;
+    opacity: 0.4;
+  }
+}
+
+.editorial-frame-idle-runner .editorial-signal-dot {
+  opacity: 0.4;
+  animation: signalDotIdleLap var(--frame-idle-duration, 45s) linear infinite;
+}
+
+@media (max-width: 600px) {
+  .editorial-frame-idle-runner {
+    display: none !important;
+  }
+}
+
+/* 4. Sliding Nav Underline */
+.editorial-nav-links {
+  position: relative;
+}
+
+.editorial-nav-sliding-underline {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 1px;
+  height: 2px;
+  background-color: #FF5E1F;
+  pointer-events: none;
+  opacity: 0;
+  transform-origin: left center;
+  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 150ms ease-out;
+  z-index: 10;
+}
+
+html.js-anim .editorial-nav-link.active {
+  border-bottom-color: transparent !important;
+}
+
+/* 5. Card Hover: Image scale only, no lift, no shadow, no color change */
+.editorial-card-image-wrap {
+  overflow: hidden !important;
+}
+
+.editorial-card-image {
+  transition: transform 300ms ease-out !important;
+}
+
+.editorial-project-card:hover .editorial-card-image {
+  transform: scale(1.03) !important;
+}
+
+.editorial-hero-card:hover,
+.editorial-hero-card:focus-within,
+.editorial-hero-stats-row:hover,
+.editorial-hero-stats-row:focus-within,
+.editorial-project-card:hover,
+.editorial-contact-form-card:hover,
+.editorial-contact-info-card:hover,
+.editorial-about-teaser-card:hover,
+.editorial-playground-card:hover,
+.editorial-font-preset-card:hover {
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: #1A1A1A !important;
+  transform: none !important;
+}
+
+.editorial-root[data-mode="blueprint"] :is(
+  .editorial-hero-card:hover,
+  .editorial-hero-card:focus-within,
+  .editorial-hero-stats-row:hover,
+  .editorial-hero-stats-row:focus-within,
+  .editorial-project-card:hover,
+  .editorial-contact-form-card:hover,
+  .editorial-contact-info-card:hover,
+  .editorial-about-teaser-card:hover,
+  .editorial-playground-card:hover,
+  .editorial-font-preset-card:hover
+) {
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: #2D2F38 !important;
+  transform: none !important;
+}
+
+/* Signal runner cleanup: nothing may stay drawn after lap */
+.editorial-signal-runner:not(.running-lap):not(.editorial-frame-idle-runner) {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+/* 6. Stats Count-Up: Tabular Numerals and Fixed Width */
+.editorial-hero-stat-number {
+  font-variant-numeric: tabular-nums;
+  display: inline-block;
+  min-width: 1.8ch;
+  text-align: left;
+}
+
+/* 7. Playground ASCII & Font Swapper Transitions */
+@keyframes asciiRowReveal {
+  0% {
+    clip-path: inset(0 0 100% 0);
+    opacity: 0.85;
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+}
+
+.ascii-revealing {
+  animation: asciiRowReveal 600ms steps(30, end) forwards;
+}
+
+.editorial-font-sample-display,
+.editorial-font-sample-preview {
+  transition: opacity 150ms ease-out;
+}
+
+.editorial-font-sample-display.cross-fading,
+.editorial-font-sample-preview.cross-fading,
+.editorial-font-preset-card.cross-fading .editorial-font-sample-display,
+.editorial-font-preset-card.cross-fading .editorial-font-sample-preview {
+  opacity: 0.2;
+}
+
+/* 8. Safety Nets: Force reveal everything on .reveal-all and print */
+html.reveal-all :is([class*="-grid"] > *, [class*="-card"], .editorial-exp-accordion-item, .editorial-skill-category, .editorial-section-tag, .editorial-hero-stats-row, .editorial-anim-reveal),
+html.reveal-all .editorial-section-line,
+html.reveal-all .editorial-section-indicator {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+  animation: none !important;
+}
+
+html.reveal-all .editorial-signal-runner {
+  display: none !important;
+}
+
+@media print {
+  html.js-anim :is([class*="-grid"] > *, [class*="-card"], .editorial-exp-accordion-item, .editorial-skill-category, .editorial-section-tag, .editorial-hero-stats-row, .editorial-anim-reveal),
+  html.js-anim .editorial-section-line,
+  html.js-anim .editorial-section-indicator {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+  .editorial-signal-runner {
+    display: none !important;
+  }
+}
+
+/* 9. Reduced Motion: Disable ALL transforms, dots, count-ups and reveals */
+@media (prefers-reduced-motion: reduce) {
+  html.js-anim :is([class*="-grid"] > *, [class*="-card"], .editorial-exp-accordion-item, .editorial-skill-category, .editorial-section-tag, .editorial-hero-stats-row, .editorial-anim-reveal),
+  html.js-anim .editorial-section-line,
+  html.js-anim .editorial-section-indicator {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .editorial-signal-runner,
+  .editorial-section-line-dot-wrap,
+  .editorial-frame-idle-runner,
+  .editorial-nav-sliding-underline {
+    display: none !important;
+  }
+
+  .ascii-revealing {
+    animation: none !important;
+    clip-path: none !important;
+  }
+
+  .editorial-project-card:hover .editorial-card-image {
+    transform: none !important;
+  }
+
+  html.js-anim .editorial-nav-link.active {
+    border-bottom: 2px solid #FF5E1F !important;
+  }
+}

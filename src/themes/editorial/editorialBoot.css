@@ -1,0 +1,361 @@
+/* ============================================================================
+   EDITORIAL BLUEPRINT BOOT LOADING SCREEN
+   Technical CAD / architectural drafting reveal overlay with shutter split.
+   ============================================================================ */
+
+#nd-boot-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  z-index: 999999;
+  overflow: hidden;
+  user-select: none;
+  cursor: pointer;
+  background-color: #E8E8E6;
+}
+
+html.nd-boot-skip #nd-boot-overlay,
+html.nd-boot-hidden #nd-boot-overlay {
+  display: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #nd-boot-overlay {
+    display: none !important;
+  }
+}
+
+/* ============================================================================
+   Shutter Halves (Split at exact 50% centerline)
+   ============================================================================ */
+.nd-boot-shutter {
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 50%;
+  overflow: hidden;
+  background-color: #E8E8E6;
+  background-image: 
+    linear-gradient(to right, rgba(26, 26, 26, 0.048) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(26, 26, 26, 0.048) 1px, transparent 1px);
+  background-size: 229.33px 120px;
+  background-position: center top;
+  transition: transform 0.38s cubic-bezier(0.7, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.nd-boot-shutter-top {
+  top: 0;
+}
+
+.nd-boot-shutter-bottom {
+  top: 50%;
+}
+
+/* Shutter Opening Transitions */
+#nd-boot-overlay.shutter-open {
+  pointer-events: none;
+}
+
+#nd-boot-overlay.shutter-open .nd-boot-shutter-top {
+  transform: translateY(-100%);
+}
+
+#nd-boot-overlay.shutter-open .nd-boot-shutter-bottom {
+  transform: translateY(100%);
+}
+
+/* ============================================================================
+   Full Viewport Stages (Aligned so top and bottom create one seamless frame)
+   ============================================================================ */
+.nd-boot-stage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.nd-boot-stage-bottom {
+  top: -50vh;
+  top: -50dvh;
+}
+
+/* Center Frame Wrapper */
+.nd-boot-frame-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  box-sizing: border-box;
+}
+
+/* Sharp Blueprint Frame */
+.nd-boot-frame {
+  position: relative;
+  width: 100%;
+  background: #E8E8E6;
+  border-radius: 0;
+  border: 2px solid transparent;
+  box-sizing: border-box;
+  overflow: visible;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+}
+
+/* Frame Drawing SVG */
+.nd-boot-frame-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.nd-boot-frame-rect {
+  stroke: #1A1A1A;
+  stroke-width: 2;
+  fill: none;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: ndBootDrawFrame 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes ndBootDrawFrame {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* CAD Corner Crosshairs (+) */
+.nd-boot-ticks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 25;
+}
+
+.nd-boot-tick {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  color: #1A1A1A;
+  opacity: 0;
+  transform: scale(0.4);
+  animation: ndBootSnapTick 0.15s cubic-bezier(0.16, 1, 0.3, 1) 0.25s forwards;
+}
+
+.nd-tick-tl { top: -6px; left: -6px; }
+.nd-tick-tr { top: -6px; right: -6px; }
+.nd-tick-bl { bottom: -6px; left: -6px; }
+.nd-tick-br { bottom: -6px; right: -6px; }
+
+@keyframes ndBootSnapTick {
+  to {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+}
+
+/* ============================================================================
+   Frame Header Bar
+   ============================================================================ */
+.nd-boot-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 24px 12px;
+  border-bottom: 1px solid rgba(26, 26, 26, 0.12);
+  background: rgba(26, 26, 26, 0.02);
+}
+
+.nd-boot-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nd-boot-logo-box {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 1.5px solid #1A1A1A;
+  background-color: transparent;
+  box-sizing: border-box;
+  animation: ndBootFillLogo 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+}
+
+@keyframes ndBootFillLogo {
+  0% {
+    background-color: transparent;
+  }
+  100% {
+    background-color: #FF5A1F;
+  }
+}
+
+.nd-boot-header-title {
+  font-family: var(--font-display, 'Chakra Petch', sans-serif);
+  font-size: 13px;
+  font-weight: 700;
+  color: #1A1A1A;
+  letter-spacing: 0.03em;
+}
+
+.nd-boot-counter {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 13px;
+  font-weight: 700;
+  color: #1A1A1A;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.05em;
+}
+
+/* ============================================================================
+   Frame Body & Log
+   ============================================================================ */
+.nd-boot-body {
+  padding: 16px 24px 14px;
+  box-sizing: border-box;
+}
+
+.nd-boot-log {
+  min-height: 140px;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 13px;
+  line-height: 1.8;
+  color: #1A1A1A;
+  text-align: left;
+  overflow: hidden;
+}
+
+.nd-boot-log-line {
+  white-space: pre;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+}
+
+.nd-boot-ok {
+  color: #B23A0A !important;
+  font-weight: 700;
+}
+
+.nd-boot-ready {
+  color: #FF5A1F;
+  font-weight: 800;
+  margin-left: 6px;
+  animation: ndBootReadyFlash 0.35s ease-in-out infinite alternate;
+}
+
+@keyframes ndBootReadyFlash {
+  from { opacity: 0.35; }
+  to { opacity: 1; }
+}
+
+/* Blinking Block Cursor */
+.nd-boot-cursor {
+  display: inline-block;
+  width: 7px;
+  height: 13px;
+  background-color: #1A1A1A;
+  margin-left: 3px;
+  vertical-align: -1px;
+  animation: ndBootCursorBlink 0.5s steps(2, start) infinite;
+}
+
+@keyframes ndBootCursorBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Progress Track & Fill */
+.nd-boot-progress-track {
+  height: 2px;
+  background: rgba(26, 26, 26, 0.12);
+  width: 100%;
+  border-radius: 1px;
+  overflow: hidden;
+  margin-top: 14px;
+  margin-bottom: 12px;
+}
+
+.nd-boot-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: #FF5A1F;
+  border-radius: 1px;
+  transition: width 0.04s linear;
+}
+
+/* Footer Skip Caption */
+.nd-boot-footer {
+  text-align: center;
+  padding-top: 2px;
+}
+
+.nd-boot-skip-caption {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 12px;
+  font-weight: 600;
+  color: #4A4A48;
+  letter-spacing: 0.06em;
+  opacity: 0.9;
+}
+
+/* ============================================================================
+   Mobile Adjustments (<= 480px)
+   ============================================================================ */
+@media (max-width: 480px) {
+  .nd-boot-stage {
+    padding: 12px;
+  }
+  .nd-boot-frame-wrap {
+    max-width: calc(100% - 4px);
+  }
+  .nd-boot-frame {
+    border-radius: 18px;
+  }
+  .nd-boot-header {
+    padding: 12px 18px 10px;
+  }
+  .nd-boot-header-title {
+    font-size: 12px;
+  }
+  .nd-boot-counter {
+    font-size: 12px;
+  }
+  .nd-boot-body {
+    padding: 12px 18px 12px;
+  }
+  .nd-boot-log {
+    font-size: 12px;
+    min-height: 125px;
+    line-height: 1.75;
+  }
+  .nd-boot-cursor {
+    width: 6px;
+    height: 12px;
+  }
+  .nd-boot-skip-caption {
+    font-size: 10px;
+  }
+}
