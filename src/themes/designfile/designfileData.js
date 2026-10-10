@@ -261,9 +261,26 @@ export const PAGE_LAYERS = {
       fullName: 'Contact Portfolio Artboard',
       type: 'frame',
       children: [
-        { id: 'contact-headline', label: 'Headline', fullName: 'Headline: LET\'S DESIGN WHAT\'S NEXT.', type: 'text' },
-        { id: 'contact-channels', label: 'Direct Channels', fullName: 'Email / Phone / Location / Socials / CV', type: 'component' },
-        { id: 'contact-form-dispatch', label: 'Dispatch Form', fullName: 'Interactive Contact Inquiry Form', type: 'component' }
+        {
+          id: 'contact-hero-group',
+          label: 'Contact Hero & Open To',
+          fullName: 'Hero & Availability Grid',
+          type: 'frame',
+          children: [
+            { id: 'contact-headline', label: 'Headline: HIRING A FINTECH DESIGNER?', fullName: 'Contact Display Headline', type: 'text' },
+            { id: 'contact-open-cell', label: 'Yellow Cell: OPEN TO', fullName: 'Availability & What to Expect', type: 'component' }
+          ]
+        },
+        {
+          id: 'contact-body-row',
+          label: 'Contact Details & Form',
+          fullName: 'Contact Channels & Message Form',
+          type: 'frame',
+          children: [
+            { id: 'contact-channels', label: 'Contact Details & Find Me', fullName: 'Email, Base & Social Links', type: 'component' },
+            { id: 'contact-form-box', label: 'Send a Message Form', fullName: 'Interactive Inquiry Form', type: 'component' }
+          ]
+        }
       ]
     }
   ],

@@ -81,8 +81,18 @@ export default function CanvasFrame({
   const [frameDimensions, setFrameDimensions] = useState({ w: 1024, h: 480 });
   const [hoveredCardId, setHoveredCardId] = useState(null);
   const [workFilter, setWorkFilter] = useState('ALL');
-  const [testFontText, setTestFontText] = useState('0123456789 $1,284,920.45 +42.8% USD/EUR [ACTIVE_ORDER]');
   const [activeFontPreset, setActiveFontPreset] = useState(FONT_PRESETS[0] || null);
+  const [contactCopied, setContactCopied] = useState(false);
+
+  const handleContactCopy = (e) => {
+    if (e) e.preventDefault();
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText('naveen85pandey@gmail.com');
+    }
+    setContactCopied(true);
+    if (onCopyEmail) onCopyEmail();
+    setTimeout(() => setContactCopied(false), 2000);
+  };
 
   // Measure frame height to hug content dynamically
   useLayoutEffect(() => {
@@ -2152,46 +2162,93 @@ export default function CanvasFrame({
 
           <main data-page="contact">
             {/* CONTACT HERO */}
-            <section className="row" style={{ gridTemplateColumns: '1.6fr 1fr' }}>
-              <div className="cell hl">
+            <section
+              className={getElemClass('contact-hero-group', 'row contact-hero')}
+              id="contact-hero-group"
+              onClick={(e) => handleAction('contact-hero-group', e)}
+            >
+              <div
+                className={getElemClass('contact-headline', 'cell hl')}
+                id="contact-headline"
+                onClick={(e) => handleAction('contact-headline', e)}
+              >
                 <h1 className="disp xl2">HIRING A FINTECH<br />DESIGNER?</h1>
-                <p className="intro">
-                  Let's talk about trading platforms, wealth apps, design systems, or advisory contracts. Typical response time is under 4 hours.
+                <p className="intro" style={{ fontSize: 17, lineHeight: 1.5, textTransform: 'none', fontWeight: 500 }}>
+                  Product designer for trading apps, design systems and internal tools. Open to full-time roles and select contracts.
                 </p>
               </div>
-              <div className="cell" style={{ background: 'var(--yellow)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '24px' }}>
-                <span className="lbl">DIRECT DISPATCH //</span>
+              <div
+                className={getElemClass('contact-open-cell', 'cell contact-yellow-cell')}
+                id="contact-open-cell"
+                onClick={(e) => handleAction('contact-open-cell', e)}
+              >
                 <div>
-                  <b style={{ font: '400 36px/1.1 var(--disp)' }}>OPEN TO ROLES &amp; CONTRACTS</b>
-                  <p style={{ marginTop: 8, fontSize: 11, fontWeight: 800 }}>
-                    FULL-TIME · CONSULTING · DESIGN AUDITING
-                  </p>
+                  <span className="lbl">OPEN TO</span>
+                  <h2 className="disp contact-open-hd" style={{ marginTop: 8 }}>
+                    OPEN TO FULL-TIME ROLES AND SELECT CONTRACTS.
+                  </h2>
+                </div>
+                <div className="expect-box">
+                  <span className="lbl expect-lbl">WHAT TO EXPECT</span>
+                  <div className="expect-list">
+                    <div className="expect-item">
+                      <span className="expect-num">01</span>
+                      <span>Reply within 24h</span>
+                    </div>
+                    <div className="expect-item">
+                      <span className="expect-num">02</span>
+                      <span>Overlap with EU and US mornings</span>
+                    </div>
+                    <div className="expect-item">
+                      <span className="expect-num">03</span>
+                      <span>Open to remote and hybrid</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </section>
 
             {/* CONTACT DETAILS & DISPATCH FORM */}
-            <section className="contact-row">
-              <div className="contact-channels">
+            <section
+              className={getElemClass('contact-body-row', 'row contact-row')}
+              id="contact-body-row"
+              onClick={(e) => handleAction('contact-body-row', e)}
+            >
+              <div
+                className={getElemClass('contact-channels', 'contact-channels')}
+                id="contact-channels"
+                onClick={(e) => handleAction('contact-channels', e)}
+              >
                 <div>
-                  <span className="lbl">DIRECT CHANNELS</span>
-                  <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  <span className="lbl">CONTACT DETAILS</span>
+                  <div style={{ marginTop: 18, display: 'flex', flexDirection: 'column', gap: 18 }}>
                     <div>
-                      <small style={{ fontSize: 10, color: 'var(--grey)', letterSpacing: '.06em' }}>EMAIL ADDRESS</small>
-                      <p style={{ fontSize: 14, fontWeight: 800, textTransform: 'none', marginTop: 2 }}>
-                        naveen85pandey@gmail.com
-                      </p>
+                      <small style={{ fontSize: 11, fontWeight: 800, color: 'var(--grey)', letterSpacing: '.08em', display: 'block' }}>EMAIL ADDRESS</small>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginTop: 4 }}>
+                        <a
+                          href="mailto:naveen85pandey@gmail.com"
+                          style={{ fontSize: 14, fontWeight: 700, textTransform: 'none', wordBreak: 'break-all' }}
+                        >
+                          naveen85pandey@gmail.com
+                        </a>
+                        <button
+                          type="button"
+                          className="copy-btn"
+                          onClick={handleContactCopy}
+                          aria-label="Copy email address"
+                        >
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                            <rect x="9" y="9" width="13" height="13"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                          </svg>
+                          <span>{contactCopied || copiedEmail ? 'Copied!' : 'COPY'}</span>
+                        </button>
+                      </div>
                     </div>
                     <div>
-                      <small style={{ fontSize: 10, color: 'var(--grey)', letterSpacing: '.06em' }}>LOCATION</small>
-                      <p style={{ fontSize: 13, fontWeight: 700, marginTop: 2 }}>
-                        GOA, INDIA (REMOTE WORLDWIDE)
-                      </p>
-                    </div>
-                    <div>
-                      <small style={{ fontSize: 10, color: 'var(--grey)', letterSpacing: '.06em' }}>RESPONSE SLA</small>
-                      <p style={{ fontSize: 13, fontWeight: 700, marginTop: 2 }}>
-                        GUARANTEED UNDER 4 HOURS
+                      <small style={{ fontSize: 11, fontWeight: 800, color: 'var(--grey)', letterSpacing: '.08em', display: 'block' }}>BASE</small>
+                      <p style={{ fontSize: 13, fontWeight: 700, marginTop: 4, textTransform: 'none' }}>
+                        Goa, India (UTC +5:30)
                       </p>
                     </div>
                   </div>
@@ -2200,95 +2257,119 @@ export default function CanvasFrame({
                 <div>
                   <span className="lbl">FIND ME</span>
                   <div className="soc" style={{ marginTop: 10 }}>
-                    <a href="https://linkedin.com/in/naveen-pandey" target="_blank" rel="noopener noreferrer">
+                    <a
+                      href="https://linkedin.com/in/naveen-pandey"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="LinkedIn"
+                    >
                       <span>LINKEDIN</span> <span aria-hidden="true">↗</span>
                     </a>
-                    <a href="https://behance.net" target="_blank" rel="noopener noreferrer">
+                    <a
+                      href="https://behance.net"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="Behance"
+                    >
                       <span>BEHANCE</span> <span aria-hidden="true">↗</span>
                     </a>
-                    <a href="https://wa.me" target="_blank" rel="noopener noreferrer">
-                      <span>WHATSAPP</span> <span aria-hidden="true">↗</span>
-                    </a>
-                  </div>
-                  <div style={{ marginTop: 14 }}>
                     <a
-                      className="btn y"
-                      style={{ width: '100%', justifyContent: 'center' }}
-                      href="/assets/Naveen_Pandey_CV.pdf"
-                      download="Naveen_Pandey_CV.pdf"
+                      href="https://wa.me"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="WhatsApp"
                     >
-                      DOWNLOAD CURRICULUM VITAE <span aria-hidden="true">↓</span>
+                      <span>WHATSAPP</span> <span aria-hidden="true">↗</span>
                     </a>
                   </div>
                 </div>
               </div>
 
               {/* INTERACTIVE FORM */}
-              <div className="contact-form-box">
-                <span className="lbl">TRANSMIT INQUIRY</span>
+              <div
+                className={getElemClass('contact-form-box', 'contact-form-box')}
+                id="contact-form-box"
+                onClick={(e) => handleAction('contact-form-box', e)}
+              >
+                <span className="lbl">SEND A MESSAGE</span>
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
-                    onCopyEmail && onCopyEmail();
+                    if (onCopyEmail) onCopyEmail();
                   }}
                   style={{ display: 'flex', flexDirection: 'column', gap: 14 }}
                 >
                   <div className="form-group">
-                    <label htmlFor="ed-name">NAME OR ORGANIZATION *</label>
+                    <label htmlFor="ed-name">NAME OR COMPANY *</label>
                     <input
                       id="ed-name"
                       type="text"
                       className="form-field"
-                      placeholder="e.g. Neo Capital / Jane Doe"
+                      placeholder="Your name or company"
                       defaultValue=""
+                      required
                     />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="ed-email">WORK EMAIL *</label>
+                    <label htmlFor="ed-email">EMAIL *</label>
                     <input
                       id="ed-email"
                       type="email"
                       className="form-field"
-                      placeholder="e.g. jane@neocapital.com"
+                      placeholder="you@company.com"
                       defaultValue=""
+                      required
                     />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="ed-role">PROJECT TYPE / ROLE</label>
-                    <input
-                      id="ed-role"
-                      type="text"
+                    <label htmlFor="ed-engagement">ENGAGEMENT TYPE (OPTIONAL)</label>
+                    <select
+                      id="ed-engagement"
                       className="form-field"
-                      placeholder="e.g. Senior Fintech Designer / Trading Platform Redesign"
                       defaultValue=""
-                    />
+                    >
+                      <option value="" disabled>Select engagement type</option>
+                      <option value="full-time">Full-time role</option>
+                      <option value="contract">Contract</option>
+                      <option value="freelance">Freelance project</option>
+                      <option value="consulting">Consulting</option>
+                      <option value="hi">Just saying hi</option>
+                    </select>
                   </div>
                   <div className="form-group">
-                    <label htmlFor="ed-msg">MESSAGE / INQUIRY DETAILS *</label>
+                    <label htmlFor="ed-msg">MESSAGE *</label>
                     <textarea
                       id="ed-msg"
                       rows={4}
                       className="form-field"
-                      placeholder="Tell me about your product, timeline, and goals..."
+                      placeholder="Tell me about your project"
                       defaultValue=""
+                      required
                     />
                   </div>
                   <button
                     type="submit"
                     className="btn fill"
-                    style={{ justifyContent: 'center', marginTop: 4 }}
+                    style={{ justifyContent: 'center', marginTop: 4, width: '100%' }}
                   >
-                    TRANSMIT INQUIRY <span aria-hidden="true">↗</span>
+                    SEND MESSAGE <span aria-hidden="true">↗</span>
                   </button>
+                  <div className="form-subnote">
+                    <p>Sent directly to my inbox</p>
+                    <p>
+                      Form not working?{' '}
+                      <a href="mailto:naveen85pandey@gmail.com" className="form-fallback-link">
+                        Email me directly.
+                      </a>
+                    </p>
+                  </div>
                 </form>
               </div>
             </section>
           </main>
-
-          {renderEditorialCta()}
         </div>
 
-        <p className="ed-foot">© 2026 NAVEEN KUMAR PANDEY</p>
+        <p className="ed-foot">© 2026 · Goa, India</p>
       </div>
     );
   };
