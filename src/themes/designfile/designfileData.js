@@ -46,7 +46,7 @@ export const PAGE_FRAMES = {
     { id: 'frame-about', page: 'about', name: '# About', tag: '02 // ABOUT', w: 1120 }
   ],
   experience: [
-    { id: 'frame-experience', page: 'experience', name: '# Experience', tag: '03 // CAREER', w: 1120 }
+    { id: 'frame-experience', page: 'experience', name: '# Experience', tag: '03 // EXPERIENCE', w: 1120 }
   ],
   contact: [
     { id: 'frame-contact', page: 'contact', name: '# Contact', tag: '04 // CONTACT', w: 1120 }
@@ -246,11 +246,29 @@ export const PAGE_LAYERS = {
       fullName: 'Experience Portfolio Artboard',
       type: 'frame',
       children: [
-        { id: 'exp-header', label: 'Tag: CAREER', fullName: 'Tag: 03 // CAREER & EXPERIENCE', type: 'text' },
-        { id: 'exp-neo', label: 'Neo Wealth', fullName: 'Role: Senior Product Designer, Neo Wealth', type: 'component' },
-        { id: 'exp-bp', label: 'BP Equities', fullName: 'Role: Product Designer, BP Equities', type: 'component' },
-        { id: 'exp-skydreams', label: 'Skydreams', fullName: 'Role: Product Designer, Skydreams', type: 'component' },
-        { id: 'exp-pigeon', label: 'Pigeon Edu', fullName: 'Role: UI & Graphic Designer, Pigeon Edu', type: 'component' }
+        {
+          id: 'exp-hero-group',
+          label: 'Header & Status',
+          fullName: 'Headline & Availability Status',
+          type: 'frame',
+          children: [
+            { id: 'exp-headline', label: 'Headline: EXPERIENCE.', fullName: 'Experience Display Headline', type: 'text' },
+            { id: 'exp-status-cell', label: 'Yellow Cell: STATUS', fullName: 'Availability & Shipped Projects', type: 'component' }
+          ]
+        },
+        {
+          id: 'exp-timeline-group',
+          label: 'Experience Timeline',
+          fullName: '5 Verified Experience Rows',
+          type: 'frame',
+          children: [
+            { id: 'exp-row-neo', label: 'Neo Wealth (2 Internal Tools)', fullName: 'Role: Product Designer, Neo Wealth', type: 'component' },
+            { id: 'exp-row-bp', label: 'BP Equities (1.2% → 4.4%)', fullName: 'Role: Product Designer, BP Equities', type: 'component' },
+            { id: 'exp-row-skydreams', label: 'Skydreams (5 Clients · 100%)', fullName: 'Role: Product Designer, Skydreams', type: 'component' },
+            { id: 'exp-row-pigeon', label: 'Pigeon Edu (2,000+ Students)', fullName: 'Role: UI & Graphic Designer, Pigeon Edu', type: 'component' },
+            { id: 'exp-row-freelance', label: 'Freelance (3 Engagements)', fullName: 'Role: Product Designer, Freelance', type: 'component' }
+          ]
+        }
       ]
     }
   ],

@@ -7,6 +7,13 @@ import React, { useState, useEffect, useCallback } from 'react';
  */
 export function getCurrentPage() {
   if (typeof window === 'undefined') return 'home';
+  try {
+    const search = new URLSearchParams(window.location.search);
+    const p = search.get('page');
+    if (p) return p.toLowerCase();
+    const hash = window.location.hash.toLowerCase().replace('#', '');
+    if (hash && ['home', 'work', 'about', 'experience', 'playground', 'contact'].includes(hash)) return hash;
+  } catch {}
   const path = window.location.pathname.toLowerCase();
   if (path.includes('work')) return 'work';
   if (path.includes('about')) return 'about';

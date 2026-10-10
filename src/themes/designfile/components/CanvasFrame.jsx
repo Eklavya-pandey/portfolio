@@ -2033,120 +2033,241 @@ export default function CanvasFrame({
 
           <main data-page="experience">
             {/* EXPERIENCE HERO */}
-            <section className="row" style={{ gridTemplateColumns: '2fr 1fr' }}>
-              <div className="cell hl">
-                <h1 className="disp xl2">CAREER &amp;<br />TRACK RECORD.</h1>
-                <p className="intro">
-                  5 years leading product design across fintech brokerages, asset management platforms, and developer design infrastructure.
+            <section
+              className={getElemClass('exp-hero-group', 'row exp-hero')}
+              id="exp-hero-group"
+              style={{ gridTemplateColumns: '1.6fr 1.2fr' }}
+              onClick={(e) => handleAction('exp-hero-group', e)}
+            >
+              <div
+                className={getElemClass('exp-headline', 'cell hl')}
+                id="exp-headline"
+                onClick={(e) => handleAction('exp-headline', e)}
+              >
+                <h1 className="disp xl2">EXPERIENCE.</h1>
+                <p className="intro" style={{ fontSize: 17, lineHeight: 1.5, textTransform: 'none', fontWeight: 500 }}>
+                  5 years designing web and mobile products, from stock trading apps to mutual fund modules and wealth dashboards.
                 </p>
               </div>
-              <div className="cell" style={{ background: 'var(--yellow)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '24px' }}>
-                <span className="lbl">STATUS //</span>
+              <div
+                className={getElemClass('exp-status-cell', 'cell')}
+                id="exp-status-cell"
+                style={{
+                  background: 'var(--yellow)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  padding: '24px'
+                }}
+                onClick={(e) => handleAction('exp-status-cell', e)}
+              >
+                <span className="lbl">STATUS</span>
                 <div>
-                  <b style={{ font: '400 42px/1 var(--disp)' }}>2021 — 2026</b>
-                  <p style={{ marginTop: 6, fontSize: 11, fontWeight: 800 }}>
-                    4 ORGANIZATIONS · 10+ PRODUCTS SHIPPED
+                  <h2 className="disp" style={{ font: '400 36px/1.1 var(--disp)', color: 'var(--ink)' }}>
+                    OPEN TO ROLES
+                  </h2>
+                  <p style={{ marginTop: 8, fontSize: 11, fontWeight: 800, color: 'var(--ink)', letterSpacing: '.06em' }}>
+                    5 YEARS · 10+ PROJECTS SHIPPED
                   </p>
                 </div>
               </div>
             </section>
 
             {/* TIMELINE ROLES */}
-            <section className="stack">
-              {/* Neo Wealth */}
-              <div className="exp-row">
-                <div className="exp-period">
-                  <div>
-                    <b>2023 — PRESENT</b>
-                    <span>GOA / HYBRID</span>
-                  </div>
-                  <span className="metric-pill">SENIOR PRODUCT DESIGNER</span>
+            <section
+              className={getElemClass('exp-timeline-group', 'stack')}
+              id="exp-timeline-group"
+              onClick={(e) => handleAction('exp-timeline-group', e)}
+            >
+              {/* Row 1: Neo Wealth and Asset Management */}
+              <div
+                className={getElemClass('exp-row-neo', 'exp-row')}
+                id="exp-row-neo"
+                onClick={(e) => handleAction('exp-row-neo', e)}
+              >
+                <div className="exp-left">
+                  <b className="exp-date">Dec 2025 – Present</b>
+                  <span className="exp-loc">GOA</span>
+                  <span className="exp-role">PRODUCT DESIGNER</span>
                 </div>
                 <div className="exp-detail">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: 10 }}>
-                    <h3>NEO WEALTH &amp; ASSET MANAGEMENT</h3>
-                    <span className="metric-pill" style={{ background: 'var(--yellow)' }}>1.2% → 4.4% CONVERSION LIFT</span>
+                  <div className="exp-header">
+                    <h3 className="exp-company">NEO WEALTH AND ASSET MANAGEMENT</h3>
+                    <span className="metric-pill">2 INTERNAL TOOLS</span>
                   </div>
-                  <ul>
-                    <li>Spearheaded end-to-end UX for high-frequency mobile and web stock-trading terminal.</li>
-                    <li>Designed unified design system spanning 140+ design tokens and 20+ responsive components.</li>
-                    <li>Owned production design QA across iOS, Android, and Web releases, ensuring 100% token fidelity.</li>
-                    <li>Partnered directly with VP of Product and engineering leads on conversational AI copilot and distributor invoicing.</li>
+                  <ul className="exp-bullets">
+                    <li className="exp-bullet">
+                      <span className="exp-marker" aria-hidden="true" />
+                      <span>Trading app UX for Android and iOS.</span>
+                    </li>
+                    <li className="exp-bullet">
+                      <span className="exp-marker" aria-hidden="true" />
+                      <span>Design system across web and mobile.</span>
+                    </li>
+                    <li className="exp-bullet">
+                      <span className="exp-marker" aria-hidden="true" />
+                      <span>Two internal tools: invoicing and an AI chatbot.</span>
+                    </li>
                   </ul>
+                  <div className="exp-chips">
+                    <span className="exp-chip">Figma</span>
+                    <span className="exp-chip">Design Systems</span>
+                    <span className="exp-chip">Design QA</span>
+                    <span className="exp-chip">Interaction Design</span>
+                    <span className="exp-chip">UX Research</span>
+                    <span className="exp-chip">iOS / Android</span>
+                  </div>
                 </div>
               </div>
 
-              {/* BP Equities */}
-              <div className="exp-row">
-                <div className="exp-period">
-                  <div>
-                    <b>2022 — 2023</b>
-                    <span>MUMBAI, IN</span>
-                  </div>
-                  <span className="metric-pill">PRODUCT DESIGNER</span>
+              {/* Row 2: BP Equities */}
+              <div
+                className={getElemClass('exp-row-bp', 'exp-row')}
+                id="exp-row-bp"
+                onClick={(e) => handleAction('exp-row-bp', e)}
+              >
+                <div className="exp-left">
+                  <b className="exp-date">Feb 2024 – Dec 2025</b>
+                  <span className="exp-loc">MUMBAI</span>
+                  <span className="exp-role">PRODUCT DESIGNER</span>
                 </div>
                 <div className="exp-detail">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: 10 }}>
-                    <h3>BP EQUITIES</h3>
-                    <span className="metric-pill" style={{ background: 'var(--yellow)' }}>+32% ACTIVATION RATE</span>
+                  <div className="exp-header">
+                    <h3 className="exp-company">BP EQUITIES</h3>
+                    <span className="metric-pill">1.2% → 4.4% CONVERSION</span>
                   </div>
-                  <ul>
-                    <li>Designed core trading workflows, Option Chain exploration terminal, and Mutual Fund investment journeys.</li>
-                    <li>Reduced trade-entry friction by 40%, cutting average order placement execution to under 100 milliseconds.</li>
-                    <li>Collaborated closely with quant analysts to transform complex financial data into readable visual cards.</li>
+                  <ul className="exp-bullets">
+                    <li className="exp-bullet">
+                      <span className="exp-marker" aria-hidden="true" />
+                      <span>Designed the Mutual Funds, Option Chain and WealthBasket modules.</span>
+                    </li>
+                    <li className="exp-bullet">
+                      <span className="exp-marker" aria-hidden="true" />
+                      <span>Designed landing pages alongside the product.</span>
+                    </li>
+                    <li className="exp-bullet">
+                      <span className="exp-marker" aria-hidden="true" />
+                      <span>40K → 61K Instagram followers.</span>
+                    </li>
                   </ul>
+                  <div className="exp-chips">
+                    <span className="exp-chip">Figma</span>
+                    <span className="exp-chip">Mutual Funds</span>
+                    <span className="exp-chip">Option Chain</span>
+                    <span className="exp-chip">WealthBasket</span>
+                    <span className="exp-chip">Landing Pages</span>
+                  </div>
                 </div>
               </div>
 
-              {/* Skydreams */}
-              <div className="exp-row">
-                <div className="exp-period">
-                  <div>
-                    <b>2021 — 2022</b>
-                    <span>REMOTE</span>
-                  </div>
-                  <span className="metric-pill">PRODUCT DESIGNER</span>
+              {/* Row 3: Skydreams */}
+              <div
+                className={getElemClass('exp-row-skydreams', 'exp-row')}
+                id="exp-row-skydreams"
+                onClick={(e) => handleAction('exp-row-skydreams', e)}
+              >
+                <div className="exp-left">
+                  <b className="exp-date">May 2023 – Jan 2024</b>
+                  <span className="exp-loc">MUMBAI</span>
+                  <span className="exp-role">PRODUCT DESIGNER</span>
                 </div>
                 <div className="exp-detail">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: 10 }}>
-                    <h3>SKYDREAMS</h3>
-                    <span className="metric-pill" style={{ background: 'var(--yellow)' }}>0 → 1 PRODUCT LAUNCH</span>
+                  <div className="exp-header">
+                    <h3 className="exp-company">SKYDREAMS</h3>
+                    <span className="metric-pill">5 CLIENTS · 100% FIRST-LAUNCH APPROVAL</span>
                   </div>
-                  <ul>
-                    <li>Delivered end-to-end interface design from initial user research wireframes to production handoff.</li>
-                    <li>Built modular component libraries in Figma, speeding up sprint turnaround by 35%.</li>
-                    <li>Conducted usability interviews and translated feedback into high-converting onboarding flows.</li>
+                  <ul className="exp-bullets">
+                    <li className="exp-bullet">
+                      <span className="exp-marker" aria-hidden="true" />
+                      <span>Web design for 5 clients.</span>
+                    </li>
+                    <li className="exp-bullet">
+                      <span className="exp-marker" aria-hidden="true" />
+                      <span>Responsive design, prototyping and developer handoff.</span>
+                    </li>
                   </ul>
+                  <div className="exp-chips">
+                    <span className="exp-chip">Figma</span>
+                    <span className="exp-chip">Web Design</span>
+                    <span className="exp-chip">Responsive Design</span>
+                    <span className="exp-chip">Prototyping</span>
+                    <span className="exp-chip">Developer Handoff</span>
+                  </div>
                 </div>
               </div>
 
-              {/* Pigeon Edu */}
-              <div className="exp-row">
-                <div className="exp-period">
-                  <div>
-                    <b>2020 — 2021</b>
-                    <span>LUCKNOW, IN</span>
-                  </div>
-                  <span className="metric-pill">UI &amp; GRAPHIC DESIGNER</span>
+              {/* Row 4: Pigeon Edu Technology */}
+              <div
+                className={getElemClass('exp-row-pigeon', 'exp-row')}
+                id="exp-row-pigeon"
+                onClick={(e) => handleAction('exp-row-pigeon', e)}
+              >
+                <div className="exp-left">
+                  <b className="exp-date">Nov 2021 – Apr 2023</b>
+                  <span className="exp-loc">BENGALURU</span>
+                  <span className="exp-role">UI &amp; GRAPHIC DESIGNER</span>
                 </div>
                 <div className="exp-detail">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: 10 }}>
-                    <h3>PIGEON EDU</h3>
-                    <span className="metric-pill" style={{ background: 'var(--yellow)' }}>BRAND &amp; DESIGN SYSTEM</span>
+                  <div className="exp-header">
+                    <h3 className="exp-company">PIGEON EDU TECHNOLOGY</h3>
+                    <span className="metric-pill">2,000+ STUDENTS</span>
                   </div>
-                  <ul>
-                    <li>Created educational mobile application interfaces, marketing collateral, and brand identity systems.</li>
-                    <li>Streamlined cross-platform asset export pipelines, accelerating developer integration.</li>
+                  <ul className="exp-bullets">
+                    <li className="exp-bullet">
+                      <span className="exp-marker" aria-hidden="true" />
+                      <span>Dashboard design.</span>
+                    </li>
+                    <li className="exp-bullet">
+                      <span className="exp-marker" aria-hidden="true" />
+                      <span>Study material design for 2,000+ students.</span>
+                    </li>
+                  </ul>
+                  <div className="exp-chips">
+                    <span className="exp-chip">Figma</span>
+                    <span className="exp-chip">Adobe Photoshop</span>
+                    <span className="exp-chip">Illustrator</span>
+                    <span className="exp-chip">Dashboard Design</span>
+                    <span className="exp-chip">Study Material Design</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Row 5: Freelance */}
+              <div
+                className={getElemClass('exp-row-freelance', 'exp-row')}
+                id="exp-row-freelance"
+                onClick={(e) => handleAction('exp-row-freelance', e)}
+              >
+                <div className="exp-left">
+                  <b className="exp-date">FREELANCE</b>
+                  <span className="exp-role" style={{ marginTop: 2 }}>PRODUCT DESIGNER</span>
+                </div>
+                <div className="exp-detail">
+                  <div className="exp-header">
+                    <h3 className="exp-company">FREELANCE</h3>
+                    <span className="metric-pill">3 ENGAGEMENTS</span>
+                  </div>
+                  <ul className="exp-bullets">
+                    <li className="exp-bullet">
+                      <span className="exp-marker" aria-hidden="true" />
+                      <span>The Souled Store</span>
+                    </li>
+                    <li className="exp-bullet">
+                      <span className="exp-marker" aria-hidden="true" />
+                      <span>Plus365 (Abu Dhabi)</span>
+                    </li>
+                    <li className="exp-bullet">
+                      <span className="exp-marker" aria-hidden="true" />
+                      <span>Key Education Foundation</span>
+                    </li>
                   </ul>
                 </div>
               </div>
             </section>
           </main>
-
-          {renderEditorialCta()}
         </div>
 
-        <p className="ed-foot">© 2026 NAVEEN KUMAR PANDEY</p>
+        <p className="ed-foot">© 2026 · Goa, India</p>
       </div>
     );
   };
