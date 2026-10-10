@@ -4,8 +4,8 @@
   --paper: #F4F2EC;
   --white: #FFFFFF;
   --yellow: #FFE000;
-  --red: #C92E0D;
-  --grey: #555555;
+  --red: #FF6C47;
+  --grey: #4A4A4A;
   --w: 3px;
   --disp: 'Anton', Impact, 'Arial Narrow Bold', 'Arial Narrow', sans-serif;
   --body: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
@@ -59,9 +59,12 @@
   text-transform: uppercase;
 }
 
-.ed-frame :focus-visible {
-  outline: 3px solid var(--ink) !important;
+.ed-frame :focus-visible,
+.ed-frame a:focus-visible,
+.ed-frame button:focus-visible {
+  outline: 3px solid #0A0A0A !important;
   outline-offset: 2px !important;
+  box-shadow: inset 0 0 0 6px #FFE000 !important;
 }
 
 /* ===== GRID SYSTEM: ink background + gap = cell borders, no double lines ===== */
@@ -119,8 +122,8 @@
   text-transform: uppercase;
 }
 .ed-frame .xl {
-  font-size: clamp(68px, 11vw, 144px);
-  line-height: 0.98;
+  font-size: clamp(82px, 12.5vw, 148px);
+  line-height: 1.04;
   letter-spacing: 0.01em;
 }
 .ed-frame .xl2 { font-size: clamp(56px, 9.5vw, 116px); line-height: .96; }
@@ -157,7 +160,7 @@
 
 /* ===== HEADER ===== */
 .ed-frame .hdr {
-  grid-template-columns: 1.4fr 1.6fr 1fr 1fr 1.1fr 1fr 1.7fr;
+  grid-template-columns: 1.4fr 1.6fr 1fr 1fr 1fr 1.7fr;
 }
 .ed-frame .dc {
   display: contents;
@@ -217,8 +220,10 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 11px;
-  letter-spacing: .06em;
+  font-size: 17px;
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: 0;
 }
 .ed-frame .sq {
   width: 12px;
@@ -232,7 +237,7 @@
   align-items: flex-end;
 }
 .ed-frame .hero .stack {
-  grid-template-rows: auto auto 1fr auto;
+  grid-template-rows: auto auto 1fr;
 }
 .ed-frame .intro {
   font-size: 15px;
@@ -301,7 +306,11 @@
 }
 .ed-frame .stat.r {
   background: var(--red);
-  color: var(--white);
+  color: var(--ink);
+}
+.ed-frame .stat.r b,
+.ed-frame .stat.r span {
+  color: var(--ink);
 }
 .ed-frame .portrait-frame {
   position: relative;
@@ -387,62 +396,34 @@
   display: inline-block;
 }
 
-/* ===== SOCIAL PROOF / LOGO STRIP & TESTIMONIAL ===== */
-.ed-frame .logo-strip {
+/* ===== WORKED WITH STRIP ===== */
+.ed-frame .worked-with-strip {
   display: grid;
-  grid-template-columns: 140px 1fr;
+  grid-template-columns: 160px repeat(5, 1fr);
   gap: var(--w);
   background: var(--ink);
 }
-.ed-frame .logo-strip .lbl-cell {
+.ed-frame .worked-with-lbl {
   background: var(--yellow);
   color: var(--ink);
-  padding: 14px 16px;
+  padding: 16px 18px;
   font-size: 11px;
   font-weight: 800;
   letter-spacing: .08em;
   display: flex;
   align-items: center;
 }
-.ed-frame .logo-strip .logos {
+.ed-frame .worked-with-item {
   background: var(--white);
-  padding: 14px 20px;
+  color: var(--ink);
+  padding: 16px 14px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 20px;
+  justify-content: center;
   font-weight: 800;
   font-size: 11px;
   letter-spacing: .08em;
-  flex-wrap: wrap;
-}
-.ed-frame .quote-row {
-  display: grid;
-  grid-template-columns: 70px 1fr;
-  gap: var(--w);
-  background: var(--ink);
-}
-.ed-frame .quote-body {
-  background: var(--white);
-  padding: 22px 28px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.ed-frame .quote-body q {
-  font-size: 14px;
-  line-height: 1.55;
-  text-transform: none;
-  font-weight: 500;
-  letter-spacing: 0;
-  color: #111111;
-}
-.ed-frame .quote-body cite {
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: .08em;
-  font-style: normal;
-  color: #555555;
+  text-align: center;
 }
 
 /* ===== SELECTED WORK ===== */
@@ -520,8 +501,8 @@
   display: inline-block;
   background: var(--yellow);
   color: var(--ink);
-  padding: 4px 8px;
-  font-size: 10px;
+  padding: 5px 9px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: .06em;
   margin-top: 8px;
@@ -535,6 +516,12 @@
   letter-spacing: 0;
   color: #3A3A3A;
   margin-top: 6px;
+}
+.ed-frame .proj .t em {
+  font-style: normal;
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: .06em;
 }
 .ed-frame .proj .mockup-frame {
   position: relative;
@@ -550,6 +537,13 @@
   height: 100%;
   object-fit: cover;
   display: block;
+}
+.ed-frame .proj .mockup-frame img.proj-img-02 {
+  object-position: left top !important;
+}
+.ed-frame .proj .mockup-frame img.proj-img-03 {
+  object-fit: cover !important;
+  object-position: center top !important;
 }
 .ed-frame .proj:hover > .n,
 .ed-frame .proj:hover > .t {
@@ -580,8 +574,11 @@
 }
 .ed-frame .ab p {
   max-width: 46ch;
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.55;
+  text-transform: none;
+  font-weight: 500;
+  letter-spacing: 0;
 }
 .ed-frame .list {
   display: grid;
@@ -622,14 +619,16 @@
 }
 .ed-frame .cta .red {
   background: var(--red);
-  color: var(--white);
+  color: var(--ink);
   display: flex;
   align-items: center;
   padding: 28px;
 }
 .ed-frame .cta .red h2 {
-  font-size: clamp(34px, 4.4vw, 56px);
-  line-height: 1.05;
+  color: var(--ink);
+  font-size: clamp(30px, 3.2vw, 44px);
+  line-height: 1.08;
+  text-wrap: balance;
 }
 .ed-frame .c2 {
   display: flex;
@@ -666,12 +665,12 @@
 .foot {
   max-width: 1120px;
   margin: 14px auto 0;
-  font-size: 10px;
-  letter-spacing: .1em;
-  color: var(--grey, #555555);
+  font-size: 11px;
+  letter-spacing: .08em;
+  color: var(--grey, #4A4A4A);
   font-family: var(--body, 'Archivo', sans-serif);
   font-weight: 700;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 /* Artboard inner flush sizing */

@@ -1285,14 +1285,6 @@ export default function CanvasFrame({
           ABOUT
         </a>
         <a
-          className={`cell nav ${activePage === 'experience' ? 'on' : ''}`}
-          data-nav="experience"
-          href="#experience"
-          onClick={(e) => handleAction('hdr-nav', e, 'experience')}
-        >
-          CAREER
-        </a>
-        <a
           className={`cell nav ${activePage === 'contact' ? 'on' : ''}`}
           data-nav="contact"
           href="#contact"
@@ -1330,7 +1322,7 @@ export default function CanvasFrame({
         id="cta-headline"
         onClick={(e) => handleAction('cta-headline', e)}
       >
-        <h2 className="disp">HIRING A FINTECH<br />DESIGNER? TALK TO ME.</h2>
+        <h2 className="disp">HIRING A FINTECH DESIGNER?<br />TALK TO ME.</h2>
       </div>
       <div
         className={getElemClass('cta-email', 'cell c2')}
@@ -1451,7 +1443,7 @@ export default function CanvasFrame({
                     id="hero-tag"
                     onClick={(e) => handleAction('hero-tag', e)}
                   >
-                    <i className="sq" />PRODUCT DESIGNER FOR TRADING AND WEALTH APPS.
+                    <i className="sq" />Product designer for trading and wealth apps.
                   </p>
                   <div
                     className={getElemClass('hero-ctas', 'btns')}
@@ -1506,7 +1498,7 @@ export default function CanvasFrame({
                     <span className="fact-no">03</span>
                     <div className="fact-text">
                       <b>MEASURED OUTCOMES</b>
-                      <span>Lifted retail conversion from 1.2% to 4.4% at Neo Wealth</span>
+                      <span>Lifted conversion from 1.2% to 4.4% at BP Equities</span>
                     </div>
                   </div>
                 </div>
@@ -1547,16 +1539,6 @@ export default function CanvasFrame({
                     alt="Naveen Pandey — Product Designer"
                     onError={(e) => { e.currentTarget.src = '/assets/me.jpg'; }}
                   />
-                  <span className="photo-badge">NAVEEN // PRODUCT DESIGNER</span>
-                </div>
-                {/* Caption without repeated name */}
-                <div
-                  className={getElemClass('hero-cap', 'cell cap')}
-                  id="hero-cap"
-                  onClick={(e) => handleAction('hero-cap', e)}
-                >
-                  <span>PRODUCT DESIGNER</span>
-                  <span>LOC: GOA, IN</span>
                 </div>
               </div>
             </section>
@@ -1594,37 +1576,18 @@ export default function CanvasFrame({
               </a>
             </section>
 
-            {/* PROOF OF WORK: LOGO STRIP & TESTIMONIAL */}
+            {/* WORKED WITH STRIP */}
             <section
-              className={getElemClass('social-proof-group', 'stack')}
-              id="social-proof-group"
-              onClick={(e) => handleAction('social-proof-group', e)}
+              className={getElemClass('worked-with-group', 'row worked-with-strip')}
+              id="worked-with-group"
+              onClick={(e) => handleAction('worked-with-group', e)}
             >
-              <div className="logo-strip" id="logo-strip">
-                <div className="lbl-cell">TRUSTED BY //</div>
-                <div className="logos">
-                  <span>NEO WEALTH</span>
-                  <span>•</span>
-                  <span>BP EQUITIES</span>
-                  <span>•</span>
-                  <span>SKYDREAMS</span>
-                  <span>•</span>
-                  <span>PIGEON EDU</span>
-                  <span>•</span>
-                  <span>THE SOULED STORE</span>
-                </div>
-              </div>
-              <div className="quote-row" id="testimonial-quote">
-                <div className="cell vt">
-                  <span>QUOTE</span>
-                </div>
-                <div className="quote-body">
-                  <q>
-                    "Naveen transformed our high-frequency order placement experience into the fastest trading workflow on the market. Our active trader conversion surged from 1.2% to 4.4% in the first quarter post-launch."
-                  </q>
-                  <cite>— VP OF PRODUCT &amp; ENGINEERING, NEO WEALTH</cite>
-                </div>
-              </div>
+              <div className="cell worked-with-lbl" id="worked-with-lbl">WORKED WITH</div>
+              <div className="cell worked-with-item">NEO WEALTH</div>
+              <div className="cell worked-with-item">BP EQUITIES</div>
+              <div className="cell worked-with-item">SKYDREAMS</div>
+              <div className="cell worked-with-item">PIGEON EDU</div>
+              <div className="cell worked-with-item">THE SOULED STORE</div>
             </section>
 
             {/* SELECTED WORK */}
@@ -1664,9 +1627,9 @@ export default function CanvasFrame({
                       <b>STOCK TRADING APP</b>
                       <small>FINTECH / MOBILE</small>
                       <p className="prob-line">
-                        Problem: Legacy mobile order terminal caused trade-entry drop-off during peak 9:15 AM market open.
+                        Traders needed fast, precise order flow on mobile.
                       </p>
-                      <span className="metric-pill">+32% ACTIVATION · SUB-100MS ORDER ENTRY</span>
+                      <span className="metric-pill">2 platforms / ANDROID + iOS</span>
                     </div>
                     <em>VIEW CASE STUDY ↗</em>
                   </div>
@@ -1675,7 +1638,7 @@ export default function CanvasFrame({
                   </div>
                 </a>
 
-                {/* 02 Investment Modules (Removed static red highlight) */}
+                {/* 02 Investment Modules */}
                 <a
                   className={getElemClass('investment-modules', 'proj')}
                   id="investment-modules"
@@ -1688,14 +1651,19 @@ export default function CanvasFrame({
                       <b>INVESTMENT MODULES</b>
                       <small>FINTECH / WEB + APP</small>
                       <p className="prob-line">
-                        Problem: Retail users struggled to discover thematic baskets and navigate fragmented multi-leg options.
+                        Investors had no single place to discover funds, options and baskets.
                       </p>
-                      <span className="metric-pill">1.2% → 4.4% CONVERSION · +52% RETENTION</span>
+                      <span className="metric-pill">1.2% → 4.4% / CONVERSION</span>
                     </div>
                     <em>VIEW CASE STUDY ↗</em>
                   </div>
                   <div className="mockup-frame">
-                    <img src="/editorial/project2.png" alt="Investment Modules Mockup" loading="lazy" />
+                    <img
+                      src="/editorial/project2.png"
+                      alt="Investment Modules Mockup"
+                      className="proj-img-02"
+                      loading="lazy"
+                    />
                   </div>
                 </a>
 
@@ -1712,14 +1680,19 @@ export default function CanvasFrame({
                       <b>DESIGN SYSTEM &amp; INFRASTRUCTURE</b>
                       <small>DESIGN SYSTEM / MULTI-PLATFORM</small>
                       <p className="prob-line">
-                        Problem: 4 investor applications suffered from conflicting table standards and fragmented token styling.
+                        Four investor apps, four inconsistent interfaces.
                       </p>
-                      <span className="metric-pill">-40% DEV HANDOFF TIME · 100% TOKEN REUSE</span>
+                      <span className="metric-pill">4 apps / ONE SHARED SYSTEM</span>
                     </div>
                     <em>VIEW CASE STUDY ↗</em>
                   </div>
                   <div className="mockup-frame">
-                    <img src="/editorial/project3.png" alt="Design System Mockup" loading="lazy" />
+                    <img
+                      src="/editorial/project3.png"
+                      alt="Design System Mockup"
+                      className="proj-img-03"
+                      loading="lazy"
+                    />
                   </div>
                 </a>
               </div>
@@ -1752,7 +1725,7 @@ export default function CanvasFrame({
               >
                 <h2 className="disp h2">WHO I AM.</h2>
                 <p>
-                  I design data-dense fintech interfaces by eliminating cognitive friction from complex trading workflows and order executions. At Neo Wealth, this systems-first approach lifted active investor conversion from 1.2% to 4.4% across web and mobile.
+                  I design trading and wealth products as one system: research the flow, build it once in the design system, and QA it against the build. At BP Equities, that took conversion from 1.2% to 4.4%.
                 </p>
                 <div className="btns">
                   <a
@@ -1795,7 +1768,7 @@ export default function CanvasFrame({
           {renderEditorialCta()}
         </div>
 
-        <p className="ed-foot">© 2026 NAVEEN KUMAR PANDEY</p>
+        <p className="ed-foot">© 2026 · Goa, India</p>
       </div>
     );
   };

@@ -86,8 +86,7 @@ export const PAGE_LAYERS = {
             { id: 'hero-facts', label: '3 Key Facts', fullName: 'High-Frequency Fintech Facts', type: 'component' },
             { id: 'hero-intro', label: 'Intro Bio Cell', fullName: 'Sentence-Case Bio', type: 'text' },
             { id: 'hero-stats', label: 'Stats: 10+ Shipped / 5 Yrs', fullName: 'Stats Duo Grid', type: 'component' },
-            { id: 'hero-portrait', label: 'Portrait: Real Photo Frame', fullName: 'Portrait Photo Frame', type: 'component' },
-            { id: 'hero-cap', label: 'Caption: Product Designer', fullName: 'Portrait Meta Caption', type: 'text' }
+            { id: 'hero-portrait', label: 'Portrait: Real Photo Frame', fullName: 'Portrait Photo Frame', type: 'component' }
           ]
         },
         {
@@ -102,13 +101,12 @@ export const PAGE_LAYERS = {
           ]
         },
         {
-          id: 'social-proof-group',
-          label: 'Proof of Work & Logos',
-          fullName: 'Logo Strip & Verified Testimonial',
+          id: 'worked-with-group',
+          label: 'Worked With Strip',
+          fullName: 'Worked With Client Strip (6 Cells)',
           type: 'frame',
           children: [
-            { id: 'logo-strip', label: 'Client Logos Strip', fullName: '5 Client & Employer Logos', type: 'component' },
-            { id: 'testimonial-quote', label: 'Verified Testimonial', fullName: 'Neo Wealth Leadership Quote', type: 'text' }
+            { id: 'worked-with-lbl', label: 'Label: WORKED WITH', fullName: 'Worked With Yellow Label', type: 'text' }
           ]
         },
         {
@@ -117,9 +115,9 @@ export const PAGE_LAYERS = {
           fullName: 'Selected Work (3 Projects with Outcomes)',
           type: 'frame',
           children: [
-            { id: 'stock-trading-app', label: '01 Stock Trading App', fullName: 'Project: Stock Trading App (+32% Activation)', type: 'component', projectId: 'stock-trading-app' },
-            { id: 'investment-modules', label: '02 Investment Modules', fullName: 'Project: Investment Modules (1.2% → 4.4%)', type: 'component', projectId: 'investment-modules' },
-            { id: 'markets-overview', label: '03 Design System', fullName: 'Project: Design System (-40% Cycle Time)', type: 'component', projectId: 'markets-overview' },
+            { id: 'stock-trading-app', label: '01 Stock Trading App', fullName: 'Project: Stock Trading App (2 platforms / ANDROID + iOS)', type: 'component', projectId: 'stock-trading-app' },
+            { id: 'investment-modules', label: '02 Investment Modules', fullName: 'Project: Investment Modules (1.2% → 4.4% / CONVERSION)', type: 'component', projectId: 'investment-modules' },
+            { id: 'markets-overview', label: '03 Design System', fullName: 'Project: Design System (4 apps / ONE SHARED SYSTEM)', type: 'component', projectId: 'markets-overview' },
             { id: 'home-view-all-cta', label: 'Action: View All Work', fullName: 'View All Work Link', type: 'component' }
           ]
         },
@@ -130,7 +128,7 @@ export const PAGE_LAYERS = {
           type: 'frame',
           children: [
             { id: 'about-star', label: 'Emblem: Asterisk', fullName: '6-Point Asterisk SVG', type: 'vector' },
-            { id: 'about-bio', label: 'Bio: Who I Am (2 Sentences)', fullName: 'Specific Approach & Result', type: 'text' },
+            { id: 'about-bio', label: 'Bio: Who I Am (2 Sentences)', fullName: 'Specific Approach & BP Equities Result', type: 'text' },
             { id: 'about-more-cta', label: 'Action: More About Me', fullName: 'About Page Link', type: 'component' },
             { id: 'about-skills', label: 'Skills: 5 Items (No Arrows)', fullName: 'Core Skills Index', type: 'component' }
           ]
