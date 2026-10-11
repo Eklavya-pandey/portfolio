@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { useTheme, THEMES } from './context/ThemeContext';
 import Windows98Theme from './themes/windows98/Windows98Theme';
 import EditorialTheme from './themes/editorial/EditorialTheme';
@@ -26,13 +27,33 @@ export default function App() {
 
   switch (activeTheme) {
     case THEMES?.EDITORIAL:
-      return <EditorialTheme />;
+      return (
+        <>
+          <EditorialTheme />
+          <Analytics />
+        </>
+      );
     case THEMES?.GAMING:
-      return <GamingTheme />;
+      return (
+        <>
+          <GamingTheme />
+          <Analytics />
+        </>
+      );
     case THEMES?.DESIGNFILE:
-      return <DesignFileTheme />;
+      return (
+        <>
+          <DesignFileTheme />
+          <Analytics />
+        </>
+      );
     case THEMES?.WINDOWS98:
     default:
-      return <Windows98Theme />;
+      return (
+        <>
+          <Windows98Theme />
+          <Analytics />
+        </>
+      );
   }
 }
