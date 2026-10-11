@@ -1,7 +1,8 @@
 /**
  * Editorial Background Music Manager
  * Single background music track, loop at volume 0.4.
- * Default state: OFF on page load. No autoplay.
+ * Starts automatically on arrival (with seamless one-time gesture unlock fallback).
+ * Provides pause, stop, and mute controls via floating hover button.
  */
 
 export const BG_MUSIC_SRC = "/assets/bg-music.mp3";
@@ -11,7 +12,9 @@ class EditorialMusicManager {
     this.audio = null;
     this.isPlaying = false;
     this.isUnavailable = false;
+    this.isMuted = false;
     this.listeners = new Set();
+    this.autoStarted = false;
   }
 
   getAudio() {
@@ -55,7 +58,9 @@ class EditorialMusicManager {
   getState() {
     return {
       isPlaying: this.isPlaying,
-      isUnavailable: this.isUnavailable
+      isUnavailable: this.isUnavailable,
+      isMuted: this.isMuted,
+      volume: this.audio ? this.audio.volume : 0.4
     };
   }
 
@@ -86,7 +91,13 @@ class EditorialMusicManager {
 
     try {
       audio.loop = true;
-      audio.volume = 0.4;
+      if (this.isMuted) {
+        audio.muted = true;
+      } else {
+        audio.muted = false;
+        audio.volume = 0.4;
+      }
+
       const playPromise = audio.play();
       if (playPromise !== undefined) {
         await playPromise;
@@ -96,9 +107,8 @@ class EditorialMusicManager {
       this.notify();
       return true;
     } catch (err) {
-      console.warn('[BG_MUSIC] Play rejected:', err);
       if (err.name === 'NotAllowedError') {
-        // User interaction required, do not mark as permanently unavailable
+        // Autoplay policy prevented immediate playback without user interaction
         this.isPlaying = false;
       } else {
         this.isUnavailable = true;
@@ -119,17 +129,78 @@ class EditorialMusicManager {
     this.notify();
   }
 
+  stop() {
+    if (this.audio) {
+      try {
+        this.audio.pause();
+        this.audio.currentTime = 0;
+      } catch {}
+    }
+    this.isPlaying = false;
+    this.notify();
+  }
+
+  mute() {
+    if (this.audio) {
+      this.audio.muted = true;
+    }
+    this.isMuted = true;
+    this.notify();
+  }
+
+  unmute() {
+    if (this.audio) {
+      this.audio.muted = false;
+      this.audio.volume = 0.4;
+    }
+    this.isMuted = false;
+    this.notify();
+  }
+
+  toggleMute() {
+    if (this.isMuted) {
+      this.unmute();
+    } else {
+      this.mute();
+    }
+    return this.isMuted;
+  }
+
   async toggle() {
     if (this.isUnavailable) {
-      return { isPlaying: false, isUnavailable: true };
+      return { isPlaying: false, isUnavailable: true, isMuted: this.isMuted };
     }
     if (this.isPlaying) {
       this.pause();
-      return { isPlaying: false, isUnavailable: false };
+      return { isPlaying: false, isUnavailable: false, isMuted: this.isMuted };
     } else {
       const ok = await this.play();
-      return { isPlaying: ok, isUnavailable: this.isUnavailable };
+      return { isPlaying: ok, isUnavailable: this.isUnavailable, isMuted: this.isMuted };
     }
+  }
+
+  autoStart() {
+    if (typeof window === 'undefined') return;
+    if (this.autoStarted) return;
+    this.autoStarted = true;
+
+    // 1. Attempt immediate play upon arrival
+    this.play().then((started) => {
+      if (started) return;
+
+      // 2. Fallback: browser requires user gesture. Start on first interaction anywhere.
+      const gestureEvents = ['pointerdown', 'keydown', 'click', 'scroll', 'touchstart'];
+      const onFirstGesture = () => {
+        this.play();
+        gestureEvents.forEach((evt) => {
+          window.removeEventListener(evt, onFirstGesture, true);
+        });
+      };
+
+      gestureEvents.forEach((evt) => {
+        window.addEventListener(evt, onFirstGesture, { once: true, passive: true, capture: true });
+      });
+    }).catch(() => {});
   }
 }
 

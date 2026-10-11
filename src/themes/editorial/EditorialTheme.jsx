@@ -39,6 +39,7 @@ import {
 
 import EditorialTypingTest from './components/EditorialTypingTest';
 import EditorialAsciiArt from './components/EditorialAsciiArt';
+import EditorialMusicHoverButton from './components/EditorialMusicHoverButton';
 
 import './editorial.css';
 
@@ -73,13 +74,14 @@ export default function EditorialTheme() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [expandedExps, setExpandedExps] = useState({ 0: true }); // First one open by default
   const [toast, setToast] = useState(null);
-  const [isAudioEnabled, setIsAudioEnabled] = useState(false);
+  const isAudioEnabled = true; // Permanently enabled
   const [isInspectMode, setIsInspectMode] = useState(false);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
   const [isMusicUnavailable, setIsMusicUnavailable] = useState(false);
 
-  // Background single music track subscription (volume 0.4, loop, default off, no autoplay)
+  // Background music auto-start on arrival & state subscription
   useEffect(() => {
+    editorialMusic.autoStart();
     return editorialMusic.subscribe(({ isPlaying, isUnavailable }) => {
       setIsMusicPlaying(isPlaying);
       setIsMusicUnavailable(isUnavailable);
@@ -214,16 +216,6 @@ export default function EditorialTheme() {
     showToast({
       title: 'THEME SWITCHED',
       message: newMode === 'blueprint' ? 'Activated Technical Blueprint Mode' : 'Activated Paper Editorial Mode'
-    });
-  };
-
-  // Toggle Audio
-  const toggleAudio = () => {
-    const nextState = editorialAudio.toggle();
-    setIsAudioEnabled(nextState);
-    showToast({
-      title: 'AUDIO PREFERENCE',
-      message: nextState ? 'Mechanical sound effects enabled' : 'Mechanical sound effects muted'
     });
   };
 
@@ -689,39 +681,6 @@ export default function EditorialTheme() {
                     <span className="editorial-nav-tools-item-kbd">A</span>
                   </button>
 
-                  {/* Background Music Toggle */}
-                  <button
-                    type="button"
-                    role="menuitem"
-                    className={`editorial-nav-tools-item ${isMusicUnavailable ? 'disabled' : ''} ${isMusicPlaying ? 'active' : ''}`}
-                    disabled={isMusicUnavailable}
-                    aria-disabled={isMusicUnavailable}
-                    aria-pressed={isMusicPlaying}
-                    onClick={() => {
-                      if (!isMusicUnavailable) {
-                        setIsNavToolsOpen(false);
-                        toggleMusic();
-                      }
-                    }}
-                  >
-                    <span className="editorial-nav-tools-item-left">
-                      <span className="editorial-nav-tools-item-icon"><IconMusic size={16} /></span>
-                      <span className="editorial-nav-tools-item-label">
-                        {isMusicUnavailable ? 'MUSIC: UNAVAILABLE' : `MUSIC: ${isMusicPlaying ? 'ON' : 'OFF'}`}
-                      </span>
-                    </span>
-                    <span className="editorial-nav-tools-item-right">
-                      {isMusicPlaying && (
-                        <span className="editorial-music-bars-indicator" aria-hidden="true">
-                          <span className="music-bar bar-1" />
-                          <span className="music-bar bar-2" />
-                          <span className="music-bar bar-3" />
-                        </span>
-                      )}
-                      <span className="editorial-nav-tools-item-kbd">M</span>
-                    </span>
-                  </button>
-
                   {/* Blueprint / Paper Mode */}
                   <button
                     type="button"
@@ -738,26 +697,6 @@ export default function EditorialTheme() {
                       <span className="editorial-nav-tools-item-label">{mode === 'blueprint' ? 'PAPER MODE' : 'BLUEPRINT MODE'}</span>
                     </span>
                     <span className="editorial-nav-tools-item-kbd">B</span>
-                  </button>
-
-                  {/* UI Sounds Toggle */}
-                  <button
-                    type="button"
-                    role="menuitem"
-                    aria-pressed={isAudioEnabled}
-                    className={`editorial-nav-tools-item ${isAudioEnabled ? 'active' : ''}`}
-                    onClick={() => {
-                      setIsNavToolsOpen(false);
-                      toggleAudio();
-                    }}
-                  >
-                    <span className="editorial-nav-tools-item-left">
-                      <span className="editorial-nav-tools-item-icon"><IconUiSounds size={16} isEnabled={isAudioEnabled} /></span>
-                      <span className="editorial-nav-tools-item-label">UI SOUNDS</span>
-                    </span>
-                    <span className={`editorial-nav-tools-item-badge ${isAudioEnabled ? 'active' : ''}`}>
-                      {isAudioEnabled ? 'ON' : 'OFF'}
-                    </span>
                   </button>
 
                   {/* Win 98 Theme */}
@@ -934,31 +873,6 @@ export default function EditorialTheme() {
                   </button>
                   <button
                     type="button"
-                    className={`editorial-nav-mobile-tool-btn ${isMusicUnavailable ? 'disabled' : ''} ${isMusicPlaying ? 'active' : ''}`}
-                    disabled={isMusicUnavailable}
-                    aria-disabled={isMusicUnavailable}
-                    aria-pressed={isMusicPlaying}
-                    onClick={() => {
-                      if (!isMusicUnavailable) {
-                        setIsMobileNavOpen(false);
-                        toggleMusic();
-                      }
-                    }}
-                  >
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                      <IconMusic size={16} />
-                      <span>{isMusicUnavailable ? 'MUSIC: UNAVAILABLE' : `MUSIC: ${isMusicPlaying ? 'ON' : 'OFF'}`}</span>
-                    </span>
-                    {isMusicPlaying && (
-                      <span className="editorial-music-bars-indicator" aria-hidden="true" style={{ marginLeft: 6 }}>
-                        <span className="music-bar bar-1" />
-                        <span className="music-bar bar-2" />
-                        <span className="music-bar bar-3" />
-                      </span>
-                    )}
-                  </button>
-                  <button
-                    type="button"
                     className="editorial-nav-mobile-tool-btn"
                     onClick={() => {
                       setIsMobileNavOpen(false);
@@ -968,19 +882,6 @@ export default function EditorialTheme() {
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                       <IconBlueprintMode size={16} />
                       <span>{mode === 'blueprint' ? 'PAPER' : 'BLUEPRINT'}</span>
-                    </span>
-                  </button>
-                  <button
-                    type="button"
-                    aria-pressed={isAudioEnabled}
-                    className={`editorial-nav-mobile-tool-btn ${isAudioEnabled ? 'active' : ''}`}
-                    onClick={() => {
-                      toggleAudio();
-                    }}
-                  >
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                      <IconUiSounds size={16} isEnabled={isAudioEnabled} />
-                      <span>UI SOUNDS: {isAudioEnabled ? 'ON' : 'OFF'}</span>
                     </span>
                   </button>
                   <button
@@ -1130,16 +1031,11 @@ export default function EditorialTheme() {
         onSelectProject={(projId) => handleSelectCaseStudyById(projId)}
         onToggleMode={toggleMode}
         currentMode={mode}
-        onToggleAudio={toggleAudio}
-        isAudioEnabled={isAudioEnabled}
         onToggleInspect={toggleInspect}
         isInspectMode={isInspectMode}
         onOpenFont={toggleFontSwapper}
         onOpenType={openTypingTest}
         onOpenAscii={openAsciiArt}
-        onToggleMusic={toggleMusic}
-        isMusicPlaying={isMusicPlaying}
-        isMusicUnavailable={isMusicUnavailable}
         onCopyEmail={handleCopyEmail}
         onSwitchToWin98={() => setTheme(THEMES.WINDOWS98)}
         onSwitchToDesignFile={() => setTheme(THEMES.DESIGNFILE)}
@@ -1172,6 +1068,9 @@ export default function EditorialTheme() {
           onClose={closeActiveTool}
         />
       )}
+
+      {/* Floating Hover Music Controller */}
+      <EditorialMusicHoverButton mode={mode} />
 
       {/* System Toast Notification */}
       <EditorialToast toast={toast} />

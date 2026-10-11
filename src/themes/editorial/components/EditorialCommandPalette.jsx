@@ -8,16 +8,11 @@ export default function EditorialCommandPalette({
   onSelectProject,
   onToggleMode,
   currentMode,
-  onToggleAudio,
-  isAudioEnabled,
   onToggleInspect,
   isInspectMode,
   onOpenFont,
   onOpenType,
   onOpenAscii,
-  onToggleMusic,
-  isMusicPlaying,
-  isMusicUnavailable,
   onCopyEmail,
   onSwitchToWin98,
   onSwitchToDesignFile,
@@ -51,16 +46,6 @@ export default function EditorialCommandPalette({
       shortcut: 'A',
       run: onOpenAscii
     },
-    {
-      id: 'tool-music',
-      category: 'TOOLS',
-      label: isMusicUnavailable
-        ? 'MUSIC: UNAVAILABLE'
-        : `MUSIC: ${isMusicPlaying ? 'ON' : 'OFF'}`,
-      shortcut: 'M',
-      disabled: isMusicUnavailable,
-      run: isMusicUnavailable ? () => {} : onToggleMusic
-    },
 
     // Navigation
     { id: 'nav-home', category: 'NAVIGATION', label: 'Go to Homepage', shortcut: 'H', run: () => { window.history.pushState(null, '', 'index.html'); window.dispatchEvent(new Event('editorial_navigate')); window.scrollTo({ top: 0, behavior: 'smooth' }); } },
@@ -88,13 +73,6 @@ export default function EditorialCommandPalette({
       label: currentMode === 'blueprint' ? 'Switch to Paper Mode (Light)' : 'Switch to Blueprint Mode (Dark)',
       shortcut: 'B',
       run: onToggleMode
-    },
-    {
-      id: 'act-sfx',
-      category: 'PREFERENCES',
-      label: isAudioEnabled ? 'Disable UI Sounds (Mute)' : 'Enable UI Sounds',
-      shortcut: 'S',
-      run: onToggleAudio
     },
     { id: 'act-email', category: 'ACTIONS', label: 'Copy Email Address to Clipboard', shortcut: '↵', run: onCopyEmail },
     {

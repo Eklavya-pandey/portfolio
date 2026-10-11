@@ -7,7 +7,7 @@
 class EditorialAudioService {
   constructor() {
     this.ctx = null;
-    this.enabled = false; // Default state OFF on every load
+    this.enabled = true; // Permanently ON
   }
 
   getAudioContext() {
@@ -25,15 +25,13 @@ class EditorialAudioService {
   }
 
   isEnabled() {
-    return this.enabled;
+    return true; // Permanently enabled
   }
 
   toggle() {
-    this.enabled = !this.enabled;
-    if (this.enabled) {
-      this.playSuccess();
-    }
-    return this.enabled;
+    // UI sound is permanently active
+    this.enabled = true;
+    return true;
   }
 
   /**
