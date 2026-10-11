@@ -11,6 +11,8 @@ import { CadCrossBox, IconArrow } from '../../editorial/components/EditorialIcon
 import { FONT_PRESETS } from '../../editorial/components/EditorialFontSwapper';
 import EditorialTypingTest from '../../editorial/components/EditorialTypingTest';
 import EditorialAsciiArt from '../../editorial/components/EditorialAsciiArt';
+import CaseStudyContent from '../../../components/CaseStudyContent';
+import { getActiveCaseStudySlug } from '../../editorial/editorialRouter';
 
 /* ── Crosshatch Case Study Cover Image Placeholder (Strictly covers only) ── */
 export function CrosshatchCover({ width = '100%', height = '180px', label = 'COVER IMAGE' }) {
@@ -83,6 +85,19 @@ export default function CanvasFrame({
   const [workFilter, setWorkFilter] = useState('ALL');
   const [activeFontPreset, setActiveFontPreset] = useState(FONT_PRESETS[0] || null);
   const [contactCopied, setContactCopied] = useState(false);
+  const [activeCaseStudySlug, setActiveCaseStudySlug] = useState(() => getActiveCaseStudySlug());
+
+  useEffect(() => {
+    const handleNav = () => {
+      setActiveCaseStudySlug(getActiveCaseStudySlug());
+    };
+    window.addEventListener('popstate', handleNav);
+    window.addEventListener('editorial_navigate', handleNav);
+    return () => {
+      window.removeEventListener('popstate', handleNav);
+      window.removeEventListener('editorial_navigate', handleNav);
+    };
+  }, []);
 
   const handleContactCopy = (e) => {
     if (e) e.preventDefault();
@@ -723,9 +738,27 @@ export default function CanvasFrame({
                       <button type="button" className="editorial-card-preview-btn">
                         PREVIEW <IconArrow size={9} />
                       </button>
-                      <span className="editorial-card-full-btn">
-                        VIEW CASE STUDY <IconArrow size={9} />
-                      </span>
+                      {proj.hasCaseStudy ? (
+                        <span
+                          className="editorial-card-full-btn"
+                          style={{ cursor: 'pointer' }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const slug = proj.slug || proj.id;
+                            setActiveCaseStudySlug(slug);
+                            try {
+                              window.history.pushState(null, '', `/work/${slug}`);
+                              window.dispatchEvent(new Event('editorial_navigate'));
+                            } catch {}
+                          }}
+                        >
+                          VIEW CASE STUDY <IconArrow size={9} />
+                        </span>
+                      ) : (
+                        <span className="editorial-card-full-btn" style={{ opacity: 0.6 }}>
+                          CASE STUDY COMING SOON
+                        </span>
+                      )}
                     </div>
                   </div>
 
@@ -747,28 +780,30 @@ export default function CanvasFrame({
                     </p>
                   </div>
 
-                  <div className="editorial-stats-grid">
-                    <div className="editorial-stats-row">
-                      <div className="editorial-stat-box border-right headline-stat">
-                        <span className="editorial-stat-val font-mono">{proj.stats?.[0]?.value ?? proj.stats?.[0]?.val ?? '3 mo'}</span>
-                        <span className="editorial-stat-lbl">{proj.stats?.[0]?.label ?? proj.stats?.[0]?.lbl ?? 'DURATION'}</span>
+                  {(!proj.hasCaseStudy || proj.stats) && (
+                    <div className="editorial-stats-grid">
+                      <div className="editorial-stats-row">
+                        <div className="editorial-stat-box border-right headline-stat">
+                          <span className="editorial-stat-val font-mono">{proj.stats?.[0]?.value ?? proj.stats?.[0]?.val ?? '3 mo'}</span>
+                          <span className="editorial-stat-lbl">{proj.stats?.[0]?.label ?? proj.stats?.[0]?.lbl ?? 'DURATION'}</span>
+                        </div>
+                        <div className="editorial-stat-box">
+                          <span className="editorial-stat-val font-mono">{proj.stats?.[1]?.value ?? proj.stats?.[1]?.val ?? 'Mobile'}</span>
+                          <span className="editorial-stat-lbl">{proj.stats?.[1]?.label ?? proj.stats?.[1]?.lbl ?? 'PLATFORM'}</span>
+                        </div>
                       </div>
-                      <div className="editorial-stat-box">
-                        <span className="editorial-stat-val font-mono">{proj.stats?.[1]?.value ?? proj.stats?.[1]?.val ?? 'Mobile'}</span>
-                        <span className="editorial-stat-lbl">{proj.stats?.[1]?.label ?? proj.stats?.[1]?.lbl ?? 'PLATFORM'}</span>
+                      <div className="editorial-stats-row row-bottom">
+                        <div className="editorial-stat-box border-right">
+                          <span className="editorial-stat-val font-mono">{proj.stats?.[2]?.value ?? proj.stats?.[2]?.val ?? 'UI/UX'}</span>
+                          <span className="editorial-stat-lbl">{proj.stats?.[2]?.label ?? proj.stats?.[2]?.lbl ?? 'ROLE'}</span>
+                        </div>
+                        <div className="editorial-stat-box">
+                          <span className="editorial-stat-val font-mono">{proj.stats?.[3]?.value ?? proj.stats?.[3]?.val ?? '6'}</span>
+                          <span className="editorial-stat-lbl">{proj.stats?.[3]?.label ?? proj.stats?.[3]?.lbl ?? 'SCREENS'}</span>
+                        </div>
                       </div>
                     </div>
-                    <div className="editorial-stats-row row-bottom">
-                      <div className="editorial-stat-box border-right">
-                        <span className="editorial-stat-val font-mono">{proj.stats?.[2]?.value ?? proj.stats?.[2]?.val ?? 'UI/UX'}</span>
-                        <span className="editorial-stat-lbl">{proj.stats?.[2]?.label ?? proj.stats?.[2]?.lbl ?? 'ROLE'}</span>
-                      </div>
-                      <div className="editorial-stat-box">
-                        <span className="editorial-stat-val font-mono">{proj.stats?.[3]?.value ?? proj.stats?.[3]?.val ?? '6'}</span>
-                        <span className="editorial-stat-lbl">{proj.stats?.[3]?.label ?? proj.stats?.[3]?.lbl ?? 'SCREENS'}</span>
-                      </div>
-                    </div>
-                  </div>
+                  )}
                 </article>
               );
             })}
@@ -1787,6 +1822,33 @@ export default function CanvasFrame({
      2. EDITORIAL WORK ARTBOARD
      ────────────────────────────────────────────────────────── */
   const renderEditorialWork = () => {
+    if (activeCaseStudySlug) {
+      return (
+        <div
+          className="df-case-study-artboard"
+          style={{
+            width: '100%',
+            background: '#FFFFFF',
+            boxSizing: 'border-box'
+          }}
+        >
+          <CaseStudyContent
+            slug={activeCaseStudySlug}
+            theme="designfile"
+            onBack={() => {
+              setActiveCaseStudySlug(null);
+              try {
+                window.history.pushState(null, '', '/work.html');
+                window.dispatchEvent(new Event('editorial_navigate'));
+              } catch {}
+            }}
+            themeClass="designfile-cs-theme"
+            backHref="/work.html"
+          />
+        </div>
+      );
+    }
+
     const WORK_FILTER_OPTIONS = ['ALL', 'FINTECH', 'DESIGN SYSTEM', 'AI', 'WEB'];
 
     const filteredProjects = workFilter === 'ALL'
@@ -1800,6 +1862,7 @@ export default function CanvasFrame({
         });
 
     const getWorkProjectDesc = (p, idx) => {
+      if (p.problemLine) return p.problemLine;
       if (p.id === 'stock-trading-app' || idx === 0) {
         return 'Traders needed fast, precise order flow on mobile.';
       }
@@ -1813,6 +1876,8 @@ export default function CanvasFrame({
     };
 
     const getWorkProjectMetric = (p, idx) => {
+      if (p.id === 'onestepprint' || p.metric === null) return null;
+      if (p.metric) return p.metric;
       if (p.id === 'stock-trading-app' || idx === 0) {
         return '2 platforms · ANDROID + iOS';
       }
@@ -1868,8 +1933,8 @@ export default function CanvasFrame({
                 const numStr = String(projectIndex >= 0 ? projectIndex + 1 : 1).padStart(2, '0');
                 const desc = getWorkProjectDesc(p, projectIndex);
                 const metricChip = getWorkProjectMetric(p, projectIndex);
-                const hasRealCover = ['stock-trading-app', 'investment-modules', 'markets-overview'].includes(p.id) && Boolean(p.image);
-                const hasCaseStudy = Boolean(p.caseStudyUrl || p.caseUrl);
+                const hasRealCover = Boolean(p.image);
+                const hasCaseStudy = Boolean(p.hasCaseStudy || p.caseStudyUrl || p.caseUrl);
 
                 return (
                   <article
@@ -1877,7 +1942,19 @@ export default function CanvasFrame({
                     className={getElemClass(p.id, 'proj')}
                     id={p.id}
                     tabIndex={0}
-                    onClick={(e) => handleAction(p.id, e)}
+                    onClick={(e) => {
+                      if (hasCaseStudy) {
+                        e.stopPropagation();
+                        const slug = p.slug || p.id;
+                        setActiveCaseStudySlug(slug);
+                        try {
+                          window.history.pushState(null, '', `/work/${slug}`);
+                          window.dispatchEvent(new Event('editorial_navigate'));
+                        } catch {}
+                        return;
+                      }
+                      handleAction(p.id, e);
+                    }}
                   >
                     <div className="n">{numStr}</div>
                     <div className="t">
@@ -1911,6 +1988,9 @@ export default function CanvasFrame({
                             objectPosition: p.imagePosition || (p.id === 'investment-modules' ? 'left top' : 'center top')
                           }}
                           loading="lazy"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                          }}
                         />
                       ) : (
                         <CrosshatchCover width="100%" height="100%" label="COVER IMAGE" />

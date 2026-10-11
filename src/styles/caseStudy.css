@@ -1,0 +1,305 @@
+/* ==========================================================================
+   UNIVERSAL FIXED CASE STUDY STYLES
+   RULE: One source of truth. Every theme renders this exact fixed structure.
+   A theme changes styling and chrome only; content, copy and section order
+   are identical everywhere.
+   ========================================================================== */
+
+.case-study-article-root {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Optional Inline Back to Work Bar */
+.case-study-back-bar {
+  padding: 16px 36px 0 36px;
+}
+
+.case-study-back-link {
+  display: inline-flex;
+  align-items: center;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  cursor: pointer;
+  padding: 6px 14px;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.case-study-back-link:focus-visible {
+  outline: 2px solid #FF5E1F;
+  outline-offset: 2px;
+}
+
+/* ==========================================================================
+   THEME ADAPTATION: WINDOWS 98 (.win98-cs-theme)
+   ========================================================================== */
+
+.win98-cs-theme {
+  font-family: 'MS Sans Serif', Tahoma, Arial, sans-serif;
+  color: #000000;
+  background: #C0C0C0;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.win98-btn:hover {
+  background: #D5D5D5 !important;
+}
+
+.win98-btn:active {
+  border-top: 2px solid #000 !important;
+  border-left: 2px solid #000 !important;
+  border-right: 2px solid #FFF !important;
+  border-bottom: 2px solid #FFF !important;
+}
+
+.win98-cs-theme .case-study-back-link:active,
+.win98-cs-theme .editorial-cs-back-home-btn:active,
+.win98-cs-theme .editorial-cta-btn:active {
+  border-top: 2px solid #808080 !important;
+  border-left: 2px solid #808080 !important;
+  border-right: 2px solid #FFFFFF !important;
+  border-bottom: 2px solid #FFFFFF !important;
+}
+
+.win98-cs-theme .editorial-cs-header {
+  background: #FFFFFF;
+  border: 2px solid #808080;
+  padding: 24px;
+  border-radius: 0;
+  margin-bottom: 16px;
+}
+
+.win98-cs-theme .editorial-cs-title {
+  font-family: inherit;
+  font-size: 26px;
+  font-weight: bold;
+  letter-spacing: normal;
+  text-transform: none;
+  color: #000080;
+}
+
+.win98-cs-theme .editorial-card-tag {
+  background: #000080;
+  color: #FFFFFF;
+  border-radius: 0;
+  padding: 2px 6px;
+  font-size: 10px;
+}
+
+.win98-cs-theme .editorial-cs-spec-table {
+  border: 2px solid #808080;
+  border-radius: 0;
+  background: #DFDFDF;
+}
+
+.win98-cs-theme .editorial-cs-spec-item {
+  border-right: 1px solid #808080;
+}
+
+.win98-cs-theme .editorial-cs-image-frame {
+  border: 2px solid #808080;
+  border-radius: 0;
+  margin-bottom: 16px;
+}
+
+.win98-cs-theme .editorial-cs-section {
+  background: #FFFFFF;
+  border: 2px solid #808080;
+  padding: 20px;
+  border-radius: 0;
+  margin-bottom: 16px;
+}
+
+.win98-cs-theme .editorial-cs-section-heading {
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: bold;
+  color: #000080;
+  text-transform: none;
+}
+
+.win98-cs-theme .editorial-cs-box,
+.win98-cs-theme .editorial-cs-concept-container,
+.win98-cs-theme .editorial-cs-deliverable-item,
+.win98-cs-theme .editorial-cs-outcome-card,
+.win98-cs-theme .editorial-cs-takeaway-card {
+  border: 1px solid #808080;
+  border-radius: 0;
+  background: #F4F4F4;
+}
+
+.win98-cs-theme .editorial-cs-pagination {
+  border: 2px solid #808080;
+  border-radius: 0;
+  background: #DFDFDF;
+  margin-bottom: 16px;
+}
+
+.win98-cs-theme .editorial-bottom-cta {
+  background: #FFFFFF;
+  border: 2px solid #808080;
+  border-radius: 0;
+  padding: 24px;
+}
+
+/* ==========================================================================
+   THEME ADAPTATION: DESIGN FILE (.designfile-cs-theme)
+   ========================================================================== */
+
+.designfile-cs-theme {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #1E1E1E;
+  background: #FFFFFF;
+  box-sizing: border-box;
+}
+
+.designfile-cs-theme .case-study-back-link {
+  background: #F5F5F5;
+  color: #1E1E1E;
+  border: 1px solid #E0E0E0;
+}
+
+.designfile-cs-theme .case-study-back-link:hover {
+  background: #0D99FF;
+  color: #FFFFFF;
+  border-color: #0D99FF;
+}
+
+.designfile-cs-theme .editorial-cs-header {
+  padding: 32px 0 24px 0;
+  border-bottom: 1px solid #E5E5E5;
+}
+
+.designfile-cs-theme .editorial-cs-title {
+  font-family: 'Inter', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.designfile-cs-theme .editorial-cs-spec-table {
+  border: 1px solid #E0E0E0;
+  border-radius: 6px;
+}
+
+.designfile-cs-theme .editorial-cs-spec-item {
+  border-right: 1px solid #E0E0E0;
+}
+
+.designfile-cs-theme .editorial-cs-image-frame {
+  border: 1px solid #E0E0E0;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 24px 0;
+}
+
+.designfile-cs-theme .editorial-cs-section {
+  padding: 36px 0;
+  border-bottom: 1px solid #E5E5E5;
+}
+
+.designfile-cs-theme .editorial-cs-box,
+.designfile-cs-theme .editorial-cs-concept-container,
+.designfile-cs-theme .editorial-cs-deliverable-item,
+.designfile-cs-theme .editorial-cs-outcome-card,
+.designfile-cs-theme .editorial-cs-takeaway-card {
+  border: 1px solid #E0E0E0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.designfile-cs-theme .editorial-cs-pagination {
+  border: 1px solid #E0E0E0;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 32px 0;
+}
+
+.designfile-cs-theme .editorial-cs-nav-card {
+  border-right: 1px solid #E0E0E0;
+}
+
+.designfile-cs-theme .editorial-bottom-cta {
+  padding: 40px 0;
+  border-top: 1px solid #E5E5E5;
+}
+
+/* ==========================================================================
+   THEME ADAPTATION: GAMING / CYBER (.gaming-cs-theme)
+   ========================================================================== */
+
+.gaming-cs-theme {
+  font-family: 'Courier New', monospace;
+  color: #00FFCC;
+  background: #0A0A12;
+  box-sizing: border-box;
+}
+
+.gaming-cs-theme .case-study-back-link {
+  background: #FF0055;
+  color: #FFFFFF;
+  border: none;
+}
+
+.gaming-cs-theme .editorial-cs-header {
+  border-bottom-color: rgba(0, 255, 204, 0.3);
+}
+
+.gaming-cs-theme .editorial-cs-title {
+  color: #FFFFFF;
+  text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+}
+
+.gaming-cs-theme .editorial-cs-tagline {
+  color: #A0A5B5;
+}
+
+.gaming-cs-theme .editorial-cs-spec-table {
+  background: #10101C;
+  border-color: rgba(0, 255, 204, 0.4);
+}
+
+.gaming-cs-theme .editorial-cs-spec-item {
+  border-right-color: rgba(0, 255, 204, 0.2);
+}
+
+.gaming-cs-theme .editorial-cs-spec-val {
+  color: #00FFCC;
+}
+
+.gaming-cs-theme .editorial-cs-image-frame {
+  border-color: rgba(0, 255, 204, 0.4);
+  box-shadow: 0 0 15px rgba(0, 255, 204, 0.15);
+}
+
+.gaming-cs-theme .editorial-cs-section {
+  border-bottom-color: rgba(0, 255, 204, 0.3);
+}
+
+.gaming-cs-theme .editorial-cs-section-heading {
+  color: #00FFCC;
+  text-shadow: 0 0 8px rgba(0, 255, 204, 0.4);
+}
+
+.gaming-cs-theme .editorial-cs-box,
+.gaming-cs-theme .editorial-cs-concept-container,
+.gaming-cs-theme .editorial-cs-deliverable-item,
+.gaming-cs-theme .editorial-cs-outcome-card,
+.gaming-cs-theme .editorial-cs-takeaway-card {
+  background: #121320;
+  border-color: rgba(0, 255, 204, 0.3);
+}
+
+.gaming-cs-theme .editorial-cs-pagination {
+  border-color: rgba(0, 255, 204, 0.3);
+}
+
+.gaming-cs-theme .editorial-bottom-cta {
+  border-top-color: rgba(0, 255, 204, 0.3);
+}

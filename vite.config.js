@@ -3,7 +3,20 @@ import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    {
+      name: 'work-route-fallback',
+      configureServer(server) {
+        server.middlewares.use((req, res, next) => {
+          if (req.url && req.url.startsWith('/work/')) {
+            req.url = '/work.html';
+          }
+          next();
+        });
+      }
+    }
+  ],
   base: './',
   build: {
     rollupOptions: {

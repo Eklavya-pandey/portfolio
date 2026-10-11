@@ -5,163 +5,8 @@ import EditorialTiltCard from '../components/EditorialTiltCard';
 import EditorialScrambleText from '../components/EditorialScrambleText';
 import { EditorialLink } from '../editorialRouter';
 
-export const PROJECTS = [
-  {
-    id: 'stock-trading-app',
-    category: 'fintech',
-    title: 'STOCK TRADING APP',
-    description: 'End-to-end mobile trading experience engineered for high-frequency precision and zero latency.',
-    image: '/editorial/project1.png',
-    imageAlt: 'Stock Trading App interface mockup showing candlestick charts and trade orders',
-    stats: [
-      { value: '3 mo', label: 'DURATION' },
-      { value: 'Mobile', label: 'PLATFORM' },
-      { value: 'UI/UX', label: 'ROLE' },
-      { value: '6', label: 'SCREENS' }
-    ],
-    company: '',
-    year: '',
-    caseUrl: '?project=stock-trading-app',
-    tag: 'FINTECH',
-    tagline: 'End-to-end mobile trading experience engineered for high-frequency precision and zero latency.'
-  },
-  {
-    id: 'investment-modules',
-    category: 'fintech',
-    title: 'INVESTMENT MODULES',
-    description: 'Mutual Funds discovery, Option Chain terminal, and WealthBasket thematic investment journeys.',
-    image: '/editorial/project2.png',
-    imagePosition: 'left top',
-    imageAlt: 'Investment Modules dashboard mockup with analytics and SIP calculators',
-    stats: [
-      { value: '3', label: 'MODULES' },
-      { value: 'Web/App', label: 'PLATFORM' },
-      { value: '+266%', label: 'CONVERSION' },
-      { value: 'BP Equities', label: 'CLIENT' }
-    ],
-    company: '',
-    year: '',
-    caseUrl: '?project=investment-modules',
-    tag: 'FINTECH',
-    tagline: 'Mutual Funds discovery, Option Chain terminal, and WealthBasket thematic investment journeys.'
-  },
-  {
-    id: 'markets-overview',
-    category: 'design-system',
-    title: 'DESIGN SYSTEM & INFRASTRUCTURE',
-    description: 'Unified multi-platform financial data visualization architecture powering 4 distinct investor applications.',
-    image: '/editorial/project3.png',
-    imageAlt: 'Design System & Infrastructure component library and token explorer mockup',
-    stats: [
-      { value: '20', label: 'VARIANTS' },
-      { value: 'FII/DII', label: 'DATA' },
-      { value: '4', label: 'APPS SYNCED' },
-      { value: '140+', label: 'DESIGN TOKENS' }
-    ],
-    company: '',
-    year: '',
-    caseUrl: '?project=markets-overview',
-    tag: 'DESIGN SYSTEM',
-    tagline: 'Unified multi-platform financial data visualization architecture powering 4 distinct investor applications.'
-  },
-  {
-    id: 'internal-ai-chatbot',
-    category: 'ai',
-    title: 'INTERNAL AI CHATBOT & COPILOT',
-    description: 'Conversational AI assistant for automated portfolio health checkups, intent mapping, and support escalation.',
-    image: '/editorial/project1.png',
-    imageAlt: 'Internal AI Chatbot conversational UI mockup with streaming responses',
-    stats: [
-      { value: '94%', label: 'INTENT ACCURACY' },
-      { value: '-42%', label: 'ESCALATION' },
-      { value: '<200ms', label: 'STREAMING' },
-      { value: 'Neo', label: 'LOCATION' }
-    ],
-    company: '',
-    year: '',
-    caseUrl: '?project=internal-ai-chatbot',
-    tag: 'AI',
-    tagline: 'Conversational AI assistant for automated portfolio health checkups, intent mapping, and support escalation.'
-  },
-  {
-    id: 'distributor-dashboard',
-    category: 'fintech',
-    title: 'DISTRIBUTOR INVOICING DASHBOARD',
-    description: 'Institutional commission tracking, automated partner invoicing, and client onboarding MIS analytics.',
-    image: '/editorial/project2.png',
-    imagePosition: 'left top',
-    imageAlt: 'Distributor Invoicing Dashboard financial data grid mockup',
-    stats: [
-      { value: '1,200+', label: 'PARTNERS' },
-      { value: '24h', label: 'INVOICE CYCLE' },
-      { value: 'MIS', label: 'ANALYTICS' },
-      { value: 'Desktop', label: 'PLATFORM' }
-    ],
-    company: '',
-    year: '',
-    caseUrl: '?project=distributor-dashboard',
-    tag: 'FINTECH',
-    tagline: 'Institutional commission tracking, automated partner invoicing, and client onboarding MIS analytics.'
-  },
-  {
-    id: 'skydreams-portfolio',
-    category: 'web',
-    title: 'SKYDREAMS CLIENT PORTFOLIO',
-    description: 'Five end-to-end web applications and consumer platforms delivered with 100% first-launch client approval.',
-    image: '/editorial/project3.png',
-    imageAlt: 'Skydreams Client Portfolio responsive web interface mockup',
-    stats: [
-      { value: '5', label: 'CLIENTS' },
-      { value: '100%', label: 'APPROVAL' },
-      { value: '3 Weeks', label: 'AVG CYCLE' },
-      { value: 'Full-Cycle', label: 'ROLE' }
-    ],
-    company: '',
-    year: '',
-    caseUrl: '?project=skydreams-portfolio',
-    tag: 'WEB',
-    tagline: 'Five end-to-end web applications and consumer platforms delivered with 100% first-launch client approval.'
-  },
-  {
-    id: 'pigeon-edu',
-    category: 'web',
-    title: 'PIGEON EDU PLATFORM REVAMP',
-    description: 'Educational software interface, interactive learning components, and student analytics dashboard.',
-    image: '/editorial/project1.png',
-    imageAlt: 'Pigeon Edu Platform Revamp learning portal interface mockup',
-    stats: [
-      { value: '+32%', label: 'RETENTION' },
-      { value: '12+', label: 'MODULES' },
-      { value: 'Web', label: 'PLATFORM' },
-      { value: 'EdTech', label: 'DOMAIN' }
-    ],
-    company: '',
-    year: '',
-    caseUrl: '?project=pigeon-edu',
-    tag: 'WEB',
-    tagline: 'Educational software interface, interactive learning components, and student analytics dashboard.'
-  },
-  {
-    id: 'ipo-application-flow',
-    category: 'fintech',
-    title: 'IPO APPLICATION FLOW',
-    description: 'Streamlined retail IPO bidding pipeline eliminating UPI mandate friction and investor drop-offs.',
-    image: '/editorial/project2.png',
-    imagePosition: 'left top',
-    imageAlt: 'IPO Application Flow progressive disclosure wizard mockup',
-    stats: [
-      { value: '6', label: 'SCREENS' },
-      { value: 'JS', label: 'STACK' },
-      { value: '3', label: 'CTA STATES' },
-      { value: '100%', label: 'APPROVAL' }
-    ],
-    company: '',
-    year: '',
-    caseUrl: '?project=ipo-application-flow',
-    tag: 'FINTECH',
-    tagline: 'Streamlined retail IPO bidding pipeline eliminating UPI mandate friction and investor drop-offs.'
-  }
-];
+import { PROJECTS } from "../../../data/projectsData";
+export { PROJECTS };
 
 const FILTER_CHIPS = [
   { id: 'all', label: 'ALL' },
@@ -182,9 +27,13 @@ export default function EditorialWorkPage({
 
   // Filter projects by category
   const filteredProjects = useMemo(() => {
-    if (activeFilter === 'all') return PROJECTS;
-    return PROJECTS.filter((p) => p.category === activeFilter);
-  }, [activeFilter]);
+    if (activeFilter === 'all') return projects;
+    return projects.filter((p) => {
+      const cat = (p.category || '').toLowerCase();
+      const cats = (p.categories || []).map((c) => c.toLowerCase());
+      return cat === activeFilter.toLowerCase() || cats.includes(activeFilter.toLowerCase());
+    });
+  }, [activeFilter, projects]);
 
   const handleCopyEmail = () => {
     editorialAudio.playClick();
@@ -259,10 +108,15 @@ export default function EditorialWorkPage({
             >
               <article
                 id={project.id}
-                className={`editorial-project-card ${project.caseUrl ? 'interactive has-case-url' : ''}`}
-                tabIndex={project.caseUrl ? 0 : undefined}
+                className={`editorial-project-card ${project.hasCaseStudy || project.caseUrl ? 'interactive has-case-url' : ''}`}
+                tabIndex={project.hasCaseStudy || project.caseUrl ? 0 : undefined}
+                onClick={() => {
+                  if (project.hasCaseStudy && onOpenFullCaseStudy) {
+                    onOpenFullCaseStudy(project);
+                  }
+                }}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter' && e.target === e.currentTarget && project.caseUrl) {
+                  if (e.key === 'Enter' && e.target === e.currentTarget && (project.hasCaseStudy || project.caseUrl)) {
                     if (onOpenFullCaseStudy) {
                       onOpenFullCaseStudy(project);
                     } else if (onOpenCaseStudy) {
@@ -277,21 +131,23 @@ export default function EditorialWorkPage({
                     {project.category ? project.category.toUpperCase().replace('-', ' ') : project.tag}
                   </span>
                   <div className="editorial-card-header-actions">
-                    <button
-                      type="button"
-                      className="editorial-card-preview-btn"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        editorialAudio.playClick();
-                        onOpenCaseStudy(project);
-                      }}
-                      aria-label={`Preview ${project.title}`}
-                    >
-                      PREVIEW <IconArrow size={9} />
-                    </button>
-                    {project.caseUrl ? (
+                    {!project.hasCaseStudy && (
+                      <button
+                        type="button"
+                        className="editorial-card-preview-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          editorialAudio.playClick();
+                          onOpenCaseStudy(project);
+                        }}
+                        aria-label={`Preview ${project.title}`}
+                      >
+                        PREVIEW <IconArrow size={9} />
+                      </button>
+                    )}
+                    {project.hasCaseStudy ? (
                       <span className="editorial-card-full-btn" aria-hidden="true">
-                        View case study <IconArrow size={9} />
+                        VIEW CASE STUDY <IconArrow size={9} />
                       </span>
                     ) : (
                       <span className="editorial-card-coming-soon">Case study coming soon</span>
@@ -308,13 +164,16 @@ export default function EditorialWorkPage({
                     width="800"
                     height="450"
                     style={{ objectPosition: project.imagePosition || (project.image === '/editorial/project2.png' ? 'left top' : 'center top') }}
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
                   />
                 </div>
 
                 <div className="editorial-card-title-block">
-                  {project.company && project.year ? (
+                  {project.company ? (
                     <div className="editorial-card-company-year">
-                      {project.company} · {project.year}
+                      {project.company}{project.year ? ` · ${project.year}` : ''}
                     </div>
                   ) : null}
 
@@ -341,31 +200,38 @@ export default function EditorialWorkPage({
                     )}
                   </h3>
                   <p className="editorial-card-tagline">{project.description}</p>
+                  {project.problemLine && (
+                    <p className="editorial-card-problem-line" style={{ fontStyle: 'italic', fontSize: '13px', opacity: 0.8, margin: '6px 0 0 0' }}>
+                      {project.problemLine}
+                    </p>
+                  )}
                 </div>
 
-                <div className="editorial-stats-grid">
-                  <div className="editorial-stats-row">
-                    <div className="editorial-stat-box border-right headline-stat">
-                      <span className="editorial-stat-val">{project.stats[0]?.value ?? project.stats[0]?.val}</span>
-                      <span className="editorial-stat-lbl">{project.stats[0]?.label ?? project.stats[0]?.lbl}</span>
+                {project.stats && project.stats.length >= 4 && (
+                  <div className="editorial-stats-grid">
+                    <div className="editorial-stats-row">
+                      <div className="editorial-stat-box border-right headline-stat">
+                        <span className="editorial-stat-val">{project.stats[0]?.value ?? project.stats[0]?.val}</span>
+                        <span className="editorial-stat-lbl">{project.stats[0]?.label ?? project.stats[0]?.lbl}</span>
+                      </div>
+                      <div className="editorial-stat-box">
+                        <span className="editorial-stat-val">{project.stats[1]?.value ?? project.stats[1]?.val}</span>
+                        <span className="editorial-stat-lbl">{project.stats[1]?.label ?? project.stats[1]?.lbl}</span>
+                      </div>
                     </div>
-                    <div className="editorial-stat-box">
-                      <span className="editorial-stat-val">{project.stats[1]?.value ?? project.stats[1]?.val}</span>
-                      <span className="editorial-stat-lbl">{project.stats[1]?.label ?? project.stats[1]?.lbl}</span>
-                    </div>
-                  </div>
 
-                  <div className="editorial-stats-row row-bottom">
-                    <div className="editorial-stat-box border-right">
-                      <span className="editorial-stat-val">{project.stats[2]?.value ?? project.stats[2]?.val}</span>
-                      <span className="editorial-stat-lbl">{project.stats[2]?.label ?? project.stats[2]?.lbl}</span>
-                    </div>
-                    <div className="editorial-stat-box">
-                      <span className="editorial-stat-val">{project.stats[3]?.value ?? project.stats[3]?.val}</span>
-                      <span className="editorial-stat-lbl">{project.stats[3]?.label ?? project.stats[3]?.lbl}</span>
+                    <div className="editorial-stats-row row-bottom">
+                      <div className="editorial-stat-box border-right">
+                        <span className="editorial-stat-val">{project.stats[2]?.value ?? project.stats[2]?.val}</span>
+                        <span className="editorial-stat-lbl">{project.stats[2]?.label ?? project.stats[2]?.lbl}</span>
+                      </div>
+                      <div className="editorial-stat-box">
+                        <span className="editorial-stat-val">{project.stats[3]?.value ?? project.stats[3]?.val}</span>
+                        <span className="editorial-stat-lbl">{project.stats[3]?.label ?? project.stats[3]?.lbl}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
               </article>
             </EditorialTiltCard>
           ))

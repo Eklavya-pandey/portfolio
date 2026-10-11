@@ -15,6 +15,7 @@ export default function MadeWindow({
   onMaximize,
   onClose,
   onOpenNova,
+  onOpenOneStepPrint,
 }) {
   const { projects } = portfolioData;
   const { playSound } = useSound();
@@ -70,6 +71,12 @@ export default function MadeWindow({
       platform: 'Responsive Web',
       focus: ['Brand Identity', 'Marketing Websites', 'Design Systems', 'Animation', 'SEO'],
     },
+    {
+      title: 'OneStepPrint website redesign',
+      role: 'UI design and prototyping',
+      platform: 'Responsive Web',
+      focus: ['Scroll Storytelling', 'CMYK Print Concept', 'Prototyping', 'Figma', 'Developer Build'],
+    },
   ];
 
   const currentMeta = projectMetadata[selectedIndex] || projectMetadata[0];
@@ -100,7 +107,7 @@ export default function MadeWindow({
 
   const handleScrollDown = () => {
     if (rowsContainerRef.current) {
-      rowsContainerRef.current.scrollTop += 30;
+      rowsContainerRef.current.scrollTop -= 30;
     }
   };
 
@@ -110,14 +117,22 @@ export default function MadeWindow({
   };
 
   const handleRowDoubleClick = (idx) => {
-    if (idx === 0 && onOpenNova) {
+    const proj = projects[idx];
+    if (proj?.id === 'onestepprint' || proj?.deepDiveKey === 'onestepprint') {
+      if (onOpenOneStepPrint) onOpenOneStepPrint();
+    } else if (idx === 0 && onOpenNova) {
       onOpenNova();
     }
   };
 
   const handleRowTouchEnd = (idx) => {
-    if (window.innerWidth <= 768 && idx === 0 && onOpenNova) {
-      onOpenNova();
+    if (window.innerWidth <= 768) {
+      const proj = projects[idx];
+      if (proj?.id === 'onestepprint' || proj?.deepDiveKey === 'onestepprint') {
+        if (onOpenOneStepPrint) onOpenOneStepPrint();
+      } else if (idx === 0 && onOpenNova) {
+        onOpenNova();
+      }
     }
   };
 

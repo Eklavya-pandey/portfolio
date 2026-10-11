@@ -1,5 +1,6 @@
 // Centralized, theme-agnostic portfolio data for Naveen Kumar Pandey
 // Can power Windows 98, Editorial, and Gaming themes without duplication.
+import { CASE_STUDIES } from './projectsData';
 
 export const portfolioData = {
   profile: {
@@ -225,10 +226,22 @@ export const portfolioData = {
       role: 'UI/UX Designer',
       platform: 'Responsive Web',
       focus: 'Brand Sites, E-commerce, Conversion Optimization'
+    },
+    {
+      id: 'onestepprint',
+      name: 'OneStepPrint website redesign',
+      type: 'Web',
+      location: 'Viraj Patel',
+      role: 'UI design and prototyping',
+      platform: 'Responsive Web',
+      focus: 'Scroll-led storytelling, Prototyping, CMYK print concept',
+      hasDeepDive: true,
+      deepDiveKey: 'onestepprint'
     }
   ],
 
   caseStudies: {
+    ...CASE_STUDIES,
     nova: {
       id: 'nova',
       badge: 'PORTFOLIO CONCEPT',

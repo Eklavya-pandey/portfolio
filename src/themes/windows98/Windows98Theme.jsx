@@ -25,6 +25,7 @@ import RecycleBinWindow from './windows/RecycleBinWindow';
 import MyComputerWindow from './windows/MyComputerWindow';
 import MadeWindow from './windows/MadeWindow';
 import NovaInvestWindow from './windows/NovaInvestWindow';
+import OneStepPrintWindow from './windows/OneStepPrintWindow';
 import DesktopContextMenu from './components/DesktopContextMenu';
 
 import { useSound } from '../../context/SoundContext';
@@ -182,6 +183,16 @@ const INITIAL_WINDOWS = {
     position: { x: 200, y: 30 },
     zIndex: 30,
   },
+  onestepprint: {
+    id: 'onestepprint',
+    title: 'OneStepPrint website redesign - Case Study',
+    icon: <FolderIconSmall />,
+    isOpen: false,
+    isMinimized: false,
+    isMaximized: false,
+    position: { x: 220, y: 40 },
+    zIndex: 30,
+  },
 };
 
 export default function Windows98Theme() {
@@ -189,6 +200,8 @@ export default function Windows98Theme() {
 
   const [biosDone, setBiosDone] = useState(() => {
     try {
+      const search = new URLSearchParams(window.location.search);
+      if (search.get('skip_bios') === '1' || search.get('skip_bios') === 'true' || search.get('project')) return true;
       return sessionStorage.getItem('win98_bios_done') === 'true';
     } catch {
       return false;
@@ -293,6 +306,12 @@ export default function Windows98Theme() {
       });
 
       setActiveWindowId(winKey);
+
+      if (winKey === 'onestepprint') {
+        try {
+          window.history.pushState(null, '', '/work/onestepprint');
+        } catch {}
+      }
     },
     [getNextCascadePosition, playSound, unlockAudio]
   );
@@ -313,6 +332,12 @@ export default function Windows98Theme() {
           },
         };
       });
+
+      if (winKey === 'onestepprint' && window.location.pathname.includes('/work/onestepprint')) {
+        try {
+          window.history.pushState(null, '', '/work.html');
+        } catch {}
+      }
 
       if (activeWindowId === winKey) {
         // Find remaining highest open window to focus
@@ -393,12 +418,19 @@ export default function Windows98Theme() {
       playSound('startup');
     }, 450);
 
-    // Check URL parameters for direct window launch (?screen=skills, etc.)
+    // Check URL parameters and deep links for direct window launch (?screen=skills, /work/onestepprint, etc.)
     const params = new URLSearchParams(window.location.search);
     const screenParam = params.get('screen');
+    const path = window.location.pathname.toLowerCase();
+    const hash = window.location.hash.toLowerCase();
 
-    // Auto open ABOUT_ME.EXE after ~1400ms delay, unless a specific screen was requested
+    // Auto open requested window or ABOUT_ME.EXE after delay
     setTimeout(() => {
+      if (path.includes('onestepprint') || hash.includes('onestepprint') || params.get('project') === 'onestepprint') {
+        openWindow('onestepprint');
+        return;
+      }
+
       if (screenParam) {
         const paramMap = {
           about: 'about',
@@ -413,6 +445,7 @@ export default function Windows98Theme() {
           made: 'made',
           projects: 'made',
           nova: 'nova',
+          onestepprint: 'onestepprint',
           mycomputer: 'myComputer',
         };
         const target = paramMap[screenParam.toLowerCase()];
@@ -447,11 +480,23 @@ export default function Windows98Theme() {
     if (biosDone) {
       document.body.classList.remove('bios-mode');
       document.body.classList.add('desktop-mode');
+
+      // Check if user deep-linked directly to case study while BIOS was already skipped
+      const path = window.location.pathname.toLowerCase();
+      const hash = window.location.hash.toLowerCase();
+      const search = new URLSearchParams(window.location.search);
+      if (
+        path.includes('onestepprint') ||
+        hash.includes('onestepprint') ||
+        search.get('project') === 'onestepprint'
+      ) {
+        openWindow('onestepprint');
+      }
     } else {
       document.body.classList.remove('desktop-mode');
       document.body.classList.add('bios-mode');
     }
-  }, [biosDone]);
+  }, [biosDone, openWindow]);
 
   // Global click-outside listener
   useEffect(() => {
@@ -743,6 +788,7 @@ export default function Windows98Theme() {
             onMaximize={() => toggleMaximize('made')}
             onClose={() => closeWindow('made')}
             onOpenNova={() => openWindow('nova')}
+            onOpenOneStepPrint={() => openWindow('onestepprint')}
           />
 
           {/* Window 8: NOVA_INVEST.EXE */}
@@ -757,6 +803,21 @@ export default function Windows98Theme() {
             onMaximize={() => toggleMaximize('nova')}
             onClose={() => closeWindow('nova')}
           />
+
+          {/* Window 9: ONESTEPPRINT CASE STUDY */}
+          {windows.onestepprint && (
+            <OneStepPrintWindow
+              isOpen={windows.onestepprint.isOpen && !windows.onestepprint.isMinimized}
+              isActive={activeWindowId === 'onestepprint'}
+              isMaximized={windows.onestepprint.isMaximized}
+              zIndex={windows.onestepprint.zIndex}
+              position={windows.onestepprint.position}
+              onFocus={() => focusWindow('onestepprint')}
+              onMinimize={() => minimizeWindow('onestepprint')}
+              onMaximize={() => toggleMaximize('onestepprint')}
+              onClose={() => closeWindow('onestepprint')}
+            />
+          )}
         </div>
 
         {/* Start Menu */}
@@ -782,6 +843,8 @@ export default function Windows98Theme() {
               openWindow('hello');
             } else if (key === 'nova') {
               openWindow('nova');
+            } else if (key === 'onestepprint') {
+              openWindow('onestepprint');
             } else if (key === 'recycle') {
               openWindow('recycle');
             } else if (key === 'help') {

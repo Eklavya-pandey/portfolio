@@ -86,6 +86,12 @@ export default function CommandPalette({
       icon: '❖',
       action: () => {
         onNavigateTo('work');
+        if (p.hasCaseStudy || p.slug === 'onestepprint') {
+          try {
+            window.history.pushState(null, '', `/work/${p.slug || p.id}`);
+            window.dispatchEvent(new Event('editorial_navigate'));
+          } catch {}
+        }
       }
     }))
   ];

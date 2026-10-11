@@ -24,14 +24,38 @@ export function getCurrentPage() {
 }
 
 /**
- * Hook to track current page and listen to popstate / pushState.
+ * Detect active case study slug from route /work/:slug or ?project=:slug.
+ */
+export function getActiveCaseStudySlug() {
+  if (typeof window === 'undefined') return null;
+  try {
+    const search = new URLSearchParams(window.location.search);
+    const p = search.get('project');
+    if (p) return p.toLowerCase();
+    const path = window.location.pathname.toLowerCase();
+    const match = path.match(/\/work\/([^/?#]+)/);
+    if (match && match[1] && match[1] !== 'work.html') {
+      return match[1];
+    }
+    const hash = window.location.hash.toLowerCase().replace('#', '');
+    if (hash.startsWith('work/')) {
+      return hash.replace('work/', '');
+    }
+  } catch {}
+  return null;
+}
+
+/**
+ * Hook to track current page and active case study slug, listening to popstate / pushState.
  */
 export function useEditorialPage() {
   const [currentPage, setCurrentPage] = useState(getCurrentPage);
+  const [activeCaseStudySlug, setActiveCaseStudySlug] = useState(getActiveCaseStudySlug);
 
   useEffect(() => {
     const handlePopState = () => {
       setCurrentPage(getCurrentPage());
+      setActiveCaseStudySlug(getActiveCaseStudySlug());
     };
 
     window.addEventListener('popstate', handlePopState);
@@ -48,13 +72,14 @@ export function useEditorialPage() {
     try {
       window.history.pushState(null, '', targetUrl);
       setCurrentPage(getCurrentPage());
+      setActiveCaseStudySlug(getActiveCaseStudySlug());
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch {
       window.location.href = targetUrl;
     }
   }, []);
 
-  return { currentPage, navigateTo };
+  return { currentPage, activeCaseStudySlug, navigateTo };
 }
 
 /**

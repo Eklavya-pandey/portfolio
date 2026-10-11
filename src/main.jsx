@@ -16,6 +16,9 @@ import './themes/editorial/editorialBoot.js';
 import './themes/editorial/editorialAnim.css';
 import './themes/editorial/editorialAnim.js';
 
+// Import Universal Case Study Styles
+import './styles/caseStudy.css';
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <ThemeProvider>

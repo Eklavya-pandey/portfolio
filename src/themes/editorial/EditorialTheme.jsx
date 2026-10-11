@@ -3,7 +3,7 @@ import { useTheme, THEMES } from '../../context/ThemeContext';
 import { PROJECTS } from './editorialData';
 import { editorialAudio } from './editorialAudio';
 
-import { useEditorialPage, EditorialLink } from './editorialRouter';
+import { useEditorialPage, EditorialLink, getActiveCaseStudySlug } from './editorialRouter';
 import EditorialHomePage from './pages/EditorialHomePage';
 import EditorialWorkPage from './pages/EditorialWorkPage';
 import EditorialAboutPage from './pages/EditorialAboutPage';
@@ -64,7 +64,7 @@ export default function EditorialTheme() {
   const { theme, setTheme } = useTheme();
 
   // Multi-Page Client Router
-  const { currentPage } = useEditorialPage();
+  const { currentPage, activeCaseStudySlug, navigateTo } = useEditorialPage();
 
   // State
   const [activeFilter, setActiveFilter] = useState('ALL');
@@ -116,18 +116,29 @@ export default function EditorialTheme() {
   // Full-page case study view
   const [fullPageProject, setFullPageProject] = useState(() => {
     try {
-      const params = new URLSearchParams(window.location.search);
-      const projId = params.get('project');
-      if (projId) {
-        return PROJECTS.find(p => p.id === projId) || null;
+      const slug = getActiveCaseStudySlug();
+      if (slug) {
+        return PROJECTS.find(p => p.id === slug || p.slug === slug) || null;
       }
     } catch {}
     return null;
   });
 
+  useEffect(() => {
+    if (activeCaseStudySlug) {
+      const found = PROJECTS.find(p => p.id === activeCaseStudySlug || p.slug === activeCaseStudySlug);
+      setFullPageProject(found || null);
+    } else {
+      setFullPageProject(null);
+    }
+  }, [activeCaseStudySlug]);
+
   // Dark / Blueprint mode
   const [mode, setMode] = useState(() => {
     try {
+      const params = new URLSearchParams(window.location.search);
+      const urlMode = params.get('mode');
+      if (urlMode) return urlMode;
       return localStorage.getItem('editorial_mode') || 'paper';
     } catch {
       return 'paper';
@@ -155,29 +166,22 @@ export default function EditorialTheme() {
 
   const openFullPageCaseStudy = useCallback((project) => {
     if (!project) return;
-    editorialAudio.playOpen();
+    editorialAudio?.playOpen?.();
     setActiveCaseStudy(null);
     setFullPageProject(project);
     document.body.style.overflow = '';
     window.scrollTo({ top: 0, behavior: 'instant' });
-    try {
-      const url = new URL(window.location.href);
-      url.searchParams.set('project', project.id);
-      window.history.pushState({ projectId: project.id }, '', url.toString());
-    } catch {}
-  }, []);
+    const slug = project.slug || project.id;
+    navigateTo(`/work/${slug}`);
+  }, [navigateTo]);
 
   const closeFullPageCaseStudy = useCallback(() => {
-    editorialAudio.playClose();
+    editorialAudio?.playClose?.();
     setFullPageProject(null);
     document.body.style.overflow = '';
-    try {
-      const url = new URL(window.location.href);
-      url.searchParams.delete('project');
-      window.history.pushState({}, '', url.toString());
-    } catch {}
+    navigateTo('/work.html');
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
+  }, [navigateTo]);
 
   // Sync document.body background color and data-mode attribute with editorial mode
   useEffect(() => {
@@ -521,18 +525,7 @@ export default function EditorialTheme() {
         <div className="editorial-cad-crosshair ch-bl" aria-hidden="true">+</div>
         <div className="editorial-cad-crosshair ch-br" aria-hidden="true">+</div>
 
-        {fullPageProject ? (
-          <EditorialCaseStudyPage
-            project={fullPageProject}
-            allProjects={PROJECTS}
-            onBack={closeFullPageCaseStudy}
-            onSelectProject={openFullPageCaseStudy}
-            mode={mode}
-            toggleMode={toggleMode}
-            showToast={showToast}
-          />
-        ) : (
-          <>
+
             {/* Reading Progress Indicator */}
             <div
               className="editorial-reading-progress"
@@ -1042,12 +1035,24 @@ export default function EditorialTheme() {
           )}
 
           {currentPage === 'work' && (
-            <EditorialWorkPage
-              projects={PROJECTS}
-              onOpenCaseStudy={setActiveCaseStudy}
-              onOpenFullCaseStudy={openFullPageCaseStudy}
-              onCopyEmail={handleCopyEmail}
-            />
+            fullPageProject ? (
+              <EditorialCaseStudyPage
+                project={fullPageProject}
+                allProjects={PROJECTS}
+                onBack={closeFullPageCaseStudy}
+                onSelectProject={openFullPageCaseStudy}
+                mode={mode}
+                toggleMode={toggleMode}
+                showToast={showToast}
+              />
+            ) : (
+              <EditorialWorkPage
+                projects={PROJECTS}
+                onOpenCaseStudy={setActiveCaseStudy}
+                onOpenFullCaseStudy={openFullPageCaseStudy}
+                onCopyEmail={handleCopyEmail}
+              />
+            )
           )}
 
           {currentPage === 'about' && (
@@ -1071,16 +1076,13 @@ export default function EditorialTheme() {
             />
           )}
         </main>
-
-          </>
-        )}
       </div>
 
       {/* 4. Footer */}
       <footer className="editorial-footer">
         <div className="editorial-footer-content">
           <p className="editorial-footer-text">
-            © 2026 Naveen Kumar Pandey
+            © 2026 · Goa, India
           </p>
           <div className="editorial-footer-links">
             <button
