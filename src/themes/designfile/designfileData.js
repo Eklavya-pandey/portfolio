@@ -102,7 +102,11 @@ export const PAGE_LAYERS = {
           fullName: 'Worked With Client Strip (6 Cells)',
           type: 'frame',
           children: [
-            { id: 'worked-with-lbl', label: 'Label: WORKED WITH', fullName: 'Worked With Yellow Label', type: 'text' }
+            { id: 'worked-with-01', label: 'Neo Wealth', fullName: 'Client: Neo Wealth', type: 'text' },
+            { id: 'worked-with-02', label: 'BP Equities', fullName: 'Client: BP Equities', type: 'text' },
+            { id: 'worked-with-03', label: 'Skydreams', fullName: 'Client: Skydreams', type: 'text' },
+            { id: 'worked-with-04', label: 'Pigeon Edu', fullName: 'Client: Pigeon Edu', type: 'text' },
+            { id: 'worked-with-05', label: 'The Souled Store', fullName: 'Client: The Souled Store', type: 'text' }
           ]
         },
         {
@@ -282,8 +286,8 @@ export const PAGE_LAYERS = {
           fullName: 'Hero & Availability Grid',
           type: 'frame',
           children: [
-            { id: 'contact-headline', label: 'Headline: HIRING A FINTECH DESIGNER?', fullName: 'Contact Display Headline', type: 'text' },
-            { id: 'contact-open-cell', label: 'Yellow Cell: OPEN TO', fullName: 'Availability & What to Expect', type: 'component' }
+            { id: 'contact-headline', label: 'Headline: HIRING A FINTECH DESIGNER? TALK TO ME.', fullName: 'Contact Display Headline', type: 'text' },
+            { id: 'contact-open-cell', label: 'Yellow Cell: AVAILABILITY', fullName: 'Availability & What to Expect', type: 'component' }
           ]
         },
         {

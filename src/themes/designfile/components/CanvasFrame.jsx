@@ -1493,21 +1493,21 @@ export default function CanvasFrame({
                   <div className="fact-item">
                     <span className="fact-no">01</span>
                     <div className="fact-text">
-                      <b>HIGH-FREQUENCY FINTECH</b>
-                      <span>Trading terminals, option chains &amp; multi-market execution</span>
+                      <b>TRADING AND WEALTH APPS</b>
+                      <span>Stock trading app and mutual fund modules</span>
                     </div>
                   </div>
                   <div className="fact-item">
                     <span className="fact-no">02</span>
                     <div className="fact-text">
-                      <b>MULTI-PLATFORM SYSTEMS</b>
-                      <span>Unified architecture powering 4 distinct investor apps</span>
+                      <b>DESIGN SYSTEMS</b>
+                      <span>One system across 4 investor apps</span>
                     </div>
                   </div>
                   <div className="fact-item">
                     <span className="fact-no">03</span>
                     <div className="fact-text">
-                      <b>MEASURED OUTCOMES</b>
+                      <b>RESULT</b>
                       <span>Lifted conversion from 1.2% to 4.4% at BP Equities</span>
                     </div>
                   </div>
@@ -1592,7 +1592,7 @@ export default function CanvasFrame({
               id="worked-with-group"
               onClick={(e) => handleAction('worked-with-group', e)}
             >
-              <div className="cell worked-with-lbl" id="worked-with-lbl">WORKED WITH</div>
+              <div className="cell worked-with-lbl">WORKED WITH</div>
               <div className="cell worked-with-item">NEO WEALTH</div>
               <div className="cell worked-with-item">BP EQUITIES</div>
               <div className="cell worked-with-item">SKYDREAMS</div>
@@ -1611,7 +1611,7 @@ export default function CanvasFrame({
                   <b>SELECTED WORK</b>
                   <span className="ar" aria-hidden="true">↓</span>
                   <p className="wl-intro">
-                    Data-dense execution interfaces, thematic investment modules, and multi-tier design systems engineered for active investors.
+                    Trading apps, investment modules and design systems for wealth platforms.
                   </p>
                 </div>
                 <a
@@ -1699,7 +1699,7 @@ export default function CanvasFrame({
                   <div className="mockup-frame">
                     <img
                       src="/editorial/project3.png"
-                      alt="Design System Mockup"
+                      alt="Design System & Infrastructure Mockup"
                       className="proj-img-03"
                       loading="lazy"
                     />
@@ -2195,8 +2195,7 @@ export default function CanvasFrame({
                 onClick={(e) => handleAction('exp-row-freelance', e)}
               >
                 <div className="exp-left">
-                  <b className="exp-date">FREELANCE</b>
-                  <span className="exp-role" style={{ marginTop: 2 }}>PRODUCT DESIGNER</span>
+                  <span className="exp-role">PRODUCT DESIGNER</span>
                 </div>
                 <div className="exp-detail">
                   <div className="exp-header">
@@ -2434,7 +2433,7 @@ export default function CanvasFrame({
                 id="contact-headline"
                 onClick={(e) => handleAction('contact-headline', e)}
               >
-                <h1 className="disp xl2">HIRING A FINTECH<br />DESIGNER?</h1>
+                <h1 className="disp xl2">HIRING A FINTECH<br />DESIGNER?<br />TALK TO ME.</h1>
                 <p className="intro" style={{ fontSize: 17, lineHeight: 1.5, textTransform: 'none', fontWeight: 500 }}>
                   Product designer for trading apps, design systems and internal tools. Open to full-time roles and select contracts.
                 </p>
@@ -2445,7 +2444,7 @@ export default function CanvasFrame({
                 onClick={(e) => handleAction('contact-open-cell', e)}
               >
                 <div>
-                  <span className="lbl">OPEN TO</span>
+                  <span className="lbl">AVAILABILITY</span>
                   <h2 className="disp contact-open-hd" style={{ marginTop: 8 }}>
                     OPEN TO FULL-TIME ROLES AND SELECT CONTRACTS.
                   </h2>
