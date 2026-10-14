@@ -109,6 +109,12 @@
     // Unlock body scroll
     document.body.style.overflow = prevOverflow;
 
+    try {
+      if (window.__editorialMusic) {
+        window.__editorialMusic.play({ fallbackMuted: false });
+      }
+    } catch (err) {}
+
     // Clean up DOM after shutter animation (380ms)
     setTimeout(() => {
       if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
@@ -122,8 +128,12 @@
     if (finished) return;
     if (e && e.type === 'keydown') {
       e.preventDefault();
-      e.stopPropagation();
     }
+    try {
+      if (window.__editorialMusic) {
+        window.__editorialMusic.play({ fallbackMuted: false });
+      }
+    } catch (err) {}
     finishShutter(true);
   }
 
