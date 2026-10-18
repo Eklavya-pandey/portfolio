@@ -61,6 +61,7 @@ export default function CommandPalette({
     { id: 'page-playground', label: 'Go to Playground (Lab)', section: 'Navigate', icon: '→', action: () => onNavigateTo('playground') },
 
     // Themes
+    { id: 'thm-meridian', label: 'Switch to Meridian (Cinematic 3D Scroll)', section: 'Themes', icon: '✦', action: () => setTheme(THEMES.MERIDIAN) },
     { id: 'thm-default', label: 'Switch to Futuristic Theme', section: 'Themes', icon: '◆', action: () => setTheme(THEMES.EDITORIAL) },
     { id: 'thm-win98', label: 'Switch to Windows 98 Theme', section: 'Themes', icon: '◆', action: () => setTheme(THEMES.WINDOWS98) },
     { id: 'thm-designfile', label: 'Figma Theme (Active)', section: 'Themes', icon: '✓', action: () => onShowToast && onShowToast('Already viewing Figma theme workspace') },

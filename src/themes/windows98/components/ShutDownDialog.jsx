@@ -28,6 +28,11 @@ export default function ShutDownDialog({ isOpen, onClose, onRestartBios }) {
 
     if (selectedRadio === 'stay') {
       playSound('chord');
+    } else if (selectedRadio === 'meridian') {
+      playSound('logoff');
+      setTimeout(() => {
+        setTheme(THEMES.MERIDIAN);
+      }, 700);
     } else if (selectedRadio === 'editorial') {
       playSound('logoff');
       setTimeout(() => {
@@ -112,6 +117,7 @@ export default function ShutDownDialog({ isOpen, onClose, onRestartBios }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingLeft: '8px' }}>
           {[
             { id: 'stay', label: 'Stay here a little longer (Recommended)' },
+            { id: 'meridian', label: 'Switch to Meridian Theme (Cinematic 3D Scroll)' },
             { id: 'editorial', label: 'Switch to Futuristic Theme' },
             { id: 'designfile', label: 'Open NAVEEN_PORTFOLIO.fig (Figma Theme)' },
             { id: 'gaming', label: 'Switch to Gaming Theme (Retro Arcade)' },

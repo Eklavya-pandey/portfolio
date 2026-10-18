@@ -6,7 +6,8 @@ export const THEMES = {
   WINDOWS98: 'windows98',
   EDITORIAL: 'editorial',
   GAMING: 'gaming',
-  DESIGNFILE: 'designfile'
+  DESIGNFILE: 'designfile',
+  MERIDIAN: 'meridian'
 };
 
 export function ThemeProvider({ children }) {

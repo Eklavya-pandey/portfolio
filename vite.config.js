@@ -26,6 +26,12 @@ export default defineConfig({
         about: resolve(__dirname, 'about.html'),
         playground: resolve(__dirname, 'playground.html'),
         contact: resolve(__dirname, 'contact.html')
+      },
+      output: {
+        manualChunks: {
+          'three-vendor': ['three'],
+          'animation-vendor': ['gsap', 'lenis']
+        }
       }
     }
   },

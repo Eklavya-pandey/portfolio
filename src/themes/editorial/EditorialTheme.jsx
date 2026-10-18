@@ -736,6 +736,25 @@ export default function EditorialTheme() {
                       {theme === THEMES.DESIGNFILE ? 'ON' : 'OFF'}
                     </span>
                   </button>
+
+                  {/* Meridian 3D Theme */}
+                  <button
+                    type="button"
+                    role="menuitem"
+                    id="editorial-meridian-toggle"
+                    aria-pressed={theme === THEMES.MERIDIAN}
+                    className={`editorial-nav-tools-item ${theme === THEMES.MERIDIAN ? 'active' : ''}`}
+                    onClick={() => {
+                      setIsNavToolsOpen(false);
+                      setTheme(THEMES.MERIDIAN);
+                    }}
+                  >
+                    <span className="editorial-nav-tools-item-left">
+                      <span className="editorial-nav-tools-item-icon" style={{ fontSize: '13px' }}>✦</span>
+                      <span className="editorial-nav-tools-item-label">MERIDIAN 3D</span>
+                    </span>
+                    <span className="editorial-nav-tools-item-badge" style={{ background: '#FFE000', color: '#000' }}>3D</span>
+                  </button>
                 </div>
               )}
             </div>
@@ -912,6 +931,23 @@ export default function EditorialTheme() {
                     </span>
                     <span className={`editorial-nav-tools-item-badge ${theme === THEMES.DESIGNFILE ? 'active' : ''}`}>
                       {theme === THEMES.DESIGNFILE ? 'ON' : 'OFF'}
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    aria-pressed={theme === THEMES.MERIDIAN}
+                    className={`editorial-nav-mobile-tool-btn ${theme === THEMES.MERIDIAN ? 'active' : ''}`}
+                    onClick={() => {
+                      setIsMobileNavOpen(false);
+                      setTheme(THEMES.MERIDIAN);
+                    }}
+                  >
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                      <span>✦</span>
+                      <span>MERIDIAN 3D</span>
+                    </span>
+                    <span className="editorial-nav-tools-item-badge" style={{ background: '#FFE000', color: '#000' }}>
+                      3D
                     </span>
                   </button>
                 </div>

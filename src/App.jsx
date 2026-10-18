@@ -4,6 +4,7 @@ import Windows98Theme from './themes/windows98/Windows98Theme';
 import EditorialTheme from './themes/editorial/EditorialTheme';
 import GamingTheme from './themes/gaming/GamingTheme';
 import DesignFileTheme from './themes/designfile/DesignFileTheme';
+import MeridianTheme from './themes/meridian/MeridianTheme';
 
 export default function App() {
   const { currentTheme, theme } = useTheme();
@@ -11,7 +12,7 @@ export default function App() {
 
   useEffect(() => {
     document.body.setAttribute('data-theme', activeTheme);
-    // Allow scrolling on editorial/gaming themes, lock on win98 and designfile
+    // Allow scrolling on editorial/gaming/meridian themes, lock on win98 and designfile
     if (activeTheme === THEMES.WINDOWS98 || activeTheme === THEMES.DESIGNFILE) {
       document.documentElement.style.overflow = 'hidden';
       document.body.style.overflow = 'hidden';
@@ -25,6 +26,8 @@ export default function App() {
   }, [activeTheme]);
 
   switch (activeTheme) {
+    case THEMES?.MERIDIAN:
+      return <MeridianTheme />;
     case THEMES?.EDITORIAL:
       return <EditorialTheme />;
     case THEMES?.GAMING:
