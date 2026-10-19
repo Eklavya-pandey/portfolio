@@ -7,7 +7,7 @@ import EditorialScrambleText from '../components/EditorialScrambleText';
 import { EditorialLink } from '../editorialRouter';
 import { PROJECTS as WORK_PROJECTS } from './EditorialWorkPage';
 
-const PORTRAIT_SRC = '/assets/me.jpg';
+const PORTRAIT_SRC = '/assets/me.webp';
 
 export default function EditorialHomePage({
   projects = WORK_PROJECTS,
@@ -144,7 +144,7 @@ export default function EditorialHomePage({
                 className="editorial-hero-card-img"
                 loading="eager"
                 onError={(e) => {
-                  e.currentTarget.src = '/assets/hero-photo.jpg';
+                  e.currentTarget.src = '/assets/me.webp';
                 }}
               />
             </div>

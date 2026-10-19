@@ -5,7 +5,7 @@ import { EditorialCornerTicks, CadCrossBox, IconArrow } from '../components/Edit
 import EditorialScrambleText from '../components/EditorialScrambleText';
 import { EditorialLink } from '../editorialRouter';
 
-const PORTRAIT_SRC = '/assets/me.jpg';
+const PORTRAIT_SRC = '/assets/about-portrait.jpg';
 
 export default function EditorialAboutPage() {
   // Default state: only the first (most recent) role is expanded. All other roles are collapsed.
@@ -147,11 +147,14 @@ export default function EditorialAboutPage() {
                   alt="Portrait of Naveen Pandey"
                   className="editorial-portrait-img"
                   loading="lazy"
+                  onError={(e) => {
+                    e.currentTarget.src = '/assets/about-portrait.jpg';
+                  }}
                 />
               </div>
               <div className="editorial-portrait-caption">
                 <span className="editorial-portrait-caption-tag">//</span>
-                <span>PHOTO_PLACEHOLDER</span>
+                <span>PORTRAIT_IMG</span>
               </div>
             </div>
           </div>

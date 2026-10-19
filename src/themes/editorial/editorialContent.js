@@ -39,7 +39,7 @@ export const EDITORIAL_CONTENT = {
     photo: {
       tag: 'PROFILE.IMG',
       scale: '1:1',
-      src: '/assets/hero-photo.jpg',
+      src: '/assets/me.webp',
       name: 'NAVEEN_KUMAR_PANDEY',
       loc: 'LOC: GOA, IN'
     }

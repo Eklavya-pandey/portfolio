@@ -54,7 +54,7 @@ export const HERO_CONFIG = {
   projectsCount: '10+',                   // <-- Replace Projects Shipped count here
   yearsExperience: '04',                  // <-- Years of experience
   primaryDomain: 'FINTECH',               // <-- Primary domain
-  photoSrc: '/assets/hero-photo.jpg',     // <-- Replace hero photo path here
+  photoSrc: '/assets/me.webp',     // <-- Replace hero photo path here
   designerName: 'NAVEEN KUMAR PANDEY',
   location: 'GOA, IN',
   photoLabel: 'PROFILE.IMG',
