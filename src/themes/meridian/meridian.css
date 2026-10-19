@@ -246,6 +246,46 @@ body[data-theme="meridian"] ::selection {
   color: var(--mr-gold);
 }
 
+.meridian-nav-soundbars {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2.5px;
+  height: 12px;
+  vertical-align: middle;
+}
+
+.meridian-soundbar {
+  display: inline-block;
+  width: 2px;
+  background: var(--mr-gold);
+  border-radius: 1px;
+  animation: meridianSoundWave 0.85s ease-in-out infinite alternate;
+}
+
+.meridian-soundbar.bar-1 {
+  height: 5px;
+  animation-delay: 0s;
+}
+
+.meridian-soundbar.bar-2 {
+  height: 12px;
+  animation-delay: 0.25s;
+}
+
+.meridian-soundbar.bar-3 {
+  height: 7px;
+  animation-delay: 0.5s;
+}
+
+@keyframes meridianSoundWave {
+  0% {
+    height: 3px;
+  }
+  100% {
+    height: 12px;
+  }
+}
+
 .meridian-pill-btn-cv {
   background: var(--mr-gold);
   border-color: var(--mr-gold);

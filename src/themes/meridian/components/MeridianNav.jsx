@@ -8,7 +8,7 @@ export default function MeridianNav({ currentPage = 'home' }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isMusicPlaying, setIsMusicPlaying] = useState(false);
+  const [musicState, setMusicState] = useState(() => editorialMusic.getState());
   const menuRef = useRef(null);
 
   // Monitor scroll for nav blur/compacting
@@ -22,11 +22,13 @@ export default function MeridianNav({ currentPage = 'home' }) {
 
   // Subscribe to background music state
   useEffect(() => {
-    const unsub = editorialMusic.subscribe(({ isPlaying }) => {
-      setIsMusicPlaying(isPlaying);
+    const unsub = editorialMusic.subscribe((state) => {
+      setMusicState(state);
     });
     return unsub;
   }, []);
+
+  const isMusicActive = musicState.isPlaying && !musicState.isMuted;
 
   // Close theme dropdown when clicking outside
   useEffect(() => {
@@ -40,7 +42,7 @@ export default function MeridianNav({ currentPage = 'home' }) {
   }, []);
 
   const toggleMusic = () => {
-    editorialMusic.toggleMute();
+    editorialMusic.toggle();
   };
 
   return (
@@ -90,13 +92,21 @@ export default function MeridianNav({ currentPage = 'home' }) {
       <div className="meridian-nav-actions">
         {/* Audio Ambient Button */}
         <button
-          className={`meridian-pill-btn ${isMusicPlaying ? 'active' : ''}`}
+          className={`meridian-pill-btn ${isMusicActive ? 'active' : ''}`}
           onClick={toggleMusic}
-          title="Toggle Ambient Audio"
-          aria-label="Toggle Ambient Audio"
+          title={isMusicActive ? "Mute Background Music" : "Play Background Music"}
+          aria-label={isMusicActive ? "Mute Background Music" : "Play Background Music"}
         >
-          <span style={{ fontSize: '0.9rem' }}>{isMusicPlaying ? '♪' : '✕'}</span>
-          <span>{isMusicPlaying ? 'Audio ON' : 'Audio OFF'}</span>
+          {isMusicActive ? (
+            <span className="meridian-nav-soundbars" aria-hidden="true">
+              <span className="meridian-soundbar bar-1" />
+              <span className="meridian-soundbar bar-2" />
+              <span className="meridian-soundbar bar-3" />
+            </span>
+          ) : (
+            <span style={{ fontSize: '0.85rem' }}>✕</span>
+          )}
+          <span>{isMusicActive ? 'Audio ON' : 'Audio OFF'}</span>
         </button>
 
         {/* Theme Switcher */}

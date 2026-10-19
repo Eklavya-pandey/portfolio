@@ -1,12 +1,14 @@
 /**
- * Editorial Background Music Manager
- * Single background music track, loop at volume 0.4.
- * Starts automatically on arrival with robust browser autoplay policy handling:
- * 1. Immediate play attempt (unmuted first; muted fallback to buffer/stream).
- * 2. Unmutes/plays on the very first user interaction (click, keydown, touch, tap) anywhere.
- * 3. Keeps gesture listeners active until audio is confirmed playing audibly.
- * 4. Integrates with boot screen click/keypress skip so the first interaction with the site triggers playback immediately.
- * 5. Handles AbortError and NotAllowedError gracefully without disabling the audio widget.
+ * Editorial & Futuristic Background Music Manager
+ * Single background music track, loops at volume 0.4.
+ *
+ * Provides:
+ * 1. Immediate unmuted play attempt on landing/arrival.
+ * 2. Instant gesture unlock listeners (pointerdown, touchstart, mousedown, keydown, click)
+ *    so the very first touch/click anywhere on the page unlocks unmuted playback immediately.
+ * 3. Immediate cutoff (pause + detach listeners) when the user navigates away or switches themes.
+ * 4. Safe sync with theme switches — direct click gestures unlock audio seamlessly.
+ * 5. Accurate state synchronization so buttons never show "Audio ON" when sound is actually silent or blocked.
  */
 
 export const BG_MUSIC_SRC = "/assets/bg-music.mp3";
@@ -20,14 +22,14 @@ class EditorialMusicManager {
     this.userExplicitMuted = false;
     this.listeners = new Set();
     this.hasUnlocked = false;
-    this.autoStarted = false;
+    this.isPendingAutoplay = false;
+    this._unlockHandler = null;
   }
 
   getAudio() {
     if (typeof window === 'undefined') return null;
     if (!this.audio) {
       try {
-        // Look for preloaded element from DOM or create one
         let audio = document.getElementById('editorial-bg-audio');
         if (!audio) {
           audio = document.createElement('audio');
@@ -75,6 +77,7 @@ class EditorialMusicManager {
       isPlaying: this.isPlaying,
       isUnavailable: this.isUnavailable,
       isMuted: this.isMuted,
+      isPendingAutoplay: this.isPendingAutoplay,
       volume: this.audio ? this.audio.volume : 0.4
     };
   }
@@ -96,7 +99,33 @@ class EditorialMusicManager {
     });
   }
 
+  detachActivationListeners() {
+    if (this._unlockHandler && typeof window !== 'undefined') {
+      const activationEvents = [
+        'pointerdown',
+        'mousedown',
+        'mouseup',
+        'touchstart',
+        'touchend',
+        'click',
+        'keydown'
+      ];
+      activationEvents.forEach((evt) => {
+        window.removeEventListener(evt, this._unlockHandler, true);
+        document.removeEventListener(evt, this._unlockHandler, true);
+      });
+      window.removeEventListener('boot:done', this._unlockHandler);
+      this._unlockHandler = null;
+    }
+    this.isPendingAutoplay = false;
+  }
+
   async play(options = {}) {
+    if (typeof window === 'undefined') return false;
+    if (this.userExplicitMuted && !options.overrideMute) {
+      return false;
+    }
+
     const audio = this.getAudio();
     if (!audio) {
       this.isUnavailable = true;
@@ -107,11 +136,7 @@ class EditorialMusicManager {
     try {
       audio.loop = true;
 
-      // Handle muting logic
       if (this.userExplicitMuted) {
-        audio.muted = true;
-        this.isMuted = true;
-      } else if (options.forceMuted) {
         audio.muted = true;
         this.isMuted = true;
       } else {
@@ -124,25 +149,19 @@ class EditorialMusicManager {
       if (playPromise !== undefined) {
         await playPromise;
       }
+
       this.isPlaying = true;
       this.isUnavailable = false;
+      this.isPendingAutoplay = false;
       this.notify();
       return true;
     } catch (err) {
       if (err.name === 'NotAllowedError') {
-        // Autoplay policy prevented immediate unmuted playback
+        // Autoplay policy prevented immediate playback without user interaction
         this.isPlaying = false;
-        // Fallback: start muted immediately so audio buffers and runs in the pipeline
-        if (options.fallbackMuted !== false && !this.isPlaying) {
-          try {
-            audio.muted = true;
-            this.isMuted = true;
-            await audio.play();
-            this.isPlaying = true;
-          } catch {}
-        }
+        this.isPendingAutoplay = true;
       } else if (err.name === 'AbortError') {
-        // Playback was interrupted by another call; not a fatal error
+        // Playback was interrupted by pause or another call
       } else {
         console.warn('[BG_MUSIC] Play rejected:', err);
       }
@@ -152,16 +171,19 @@ class EditorialMusicManager {
   }
 
   pause() {
+    this.detachActivationListeners();
     if (this.audio) {
       try {
         this.audio.pause();
       } catch {}
     }
     this.isPlaying = false;
+    this.isPendingAutoplay = false;
     this.notify();
   }
 
   stop() {
+    this.detachActivationListeners();
     if (this.audio) {
       try {
         this.audio.pause();
@@ -169,6 +191,7 @@ class EditorialMusicManager {
       } catch {}
     }
     this.isPlaying = false;
+    this.isPendingAutoplay = false;
     this.notify();
   }
 
@@ -178,6 +201,7 @@ class EditorialMusicManager {
     if (this.audio) {
       this.audio.muted = true;
     }
+    this.detachActivationListeners();
     this.notify();
   }
 
@@ -189,7 +213,7 @@ class EditorialMusicManager {
       this.audio.volume = 0.4;
     }
     if (!this.isPlaying) {
-      this.play({ fallbackMuted: false });
+      this.play({ overrideMute: true });
     } else {
       this.notify();
     }
@@ -209,19 +233,53 @@ class EditorialMusicManager {
       return { isPlaying: false, isUnavailable: true, isMuted: this.isMuted };
     }
     if (this.isPlaying && !this.isMuted) {
+      this.userExplicitMuted = true;
       this.pause();
-      return { isPlaying: false, isUnavailable: false, isMuted: this.isMuted };
+      return { isPlaying: false, isUnavailable: false, isMuted: true };
     } else {
       this.userExplicitMuted = false;
-      const ok = await this.play({ fallbackMuted: false });
-      return { isPlaying: ok, isUnavailable: this.isUnavailable, isMuted: this.isMuted };
+      this.isMuted = false;
+      if (this.audio) {
+        this.audio.muted = false;
+        this.audio.volume = 0.4;
+      }
+      const ok = await this.play({ overrideMute: true });
+      return { isPlaying: ok, isUnavailable: this.isUnavailable, isMuted: false };
     }
   }
 
   autoStart() {
     if (typeof window === 'undefined') return;
+    if (this.userExplicitMuted) return;
 
-    // Direct activation events
+    const audio = this.getAudio();
+    if (!audio) return;
+
+    // Reset previous listeners if any
+    this.detachActivationListeners();
+
+    // Setup global one-time gesture unlock
+    this._unlockHandler = () => {
+      if (this.userExplicitMuted) {
+        this.detachActivationListeners();
+        return;
+      }
+
+      const a = this.getAudio();
+      if (!a) return;
+
+      a.muted = false;
+      a.volume = 0.4;
+      this.isMuted = false;
+
+      this.play({ overrideMute: true }).then((ok) => {
+        if (ok) {
+          this.hasUnlocked = true;
+          this.detachActivationListeners();
+        }
+      }).catch(() => {});
+    };
+
     const activationEvents = [
       'pointerdown',
       'mousedown',
@@ -232,44 +290,17 @@ class EditorialMusicManager {
       'keydown'
     ];
 
-    const unlockHandler = () => {
-      if (this.userExplicitMuted) return;
-
-      const audio = this.getAudio();
-      if (!audio) return;
-
-      // Unmute and ensure playing
-      audio.muted = false;
-      audio.volume = 0.4;
-      this.isMuted = false;
-
-      this.play({ fallbackMuted: false }).then((ok) => {
-        if (ok && !this.isMuted) {
-          this.hasUnlocked = true;
-          detachListeners();
-        }
-      }).catch(() => {});
-    };
-
-    const detachListeners = () => {
-      activationEvents.forEach((evt) => {
-        window.removeEventListener(evt, unlockHandler, true);
-        document.removeEventListener(evt, unlockHandler, true);
-      });
-      window.removeEventListener('boot:done', unlockHandler);
-    };
-
     activationEvents.forEach((evt) => {
-      window.addEventListener(evt, unlockHandler, { passive: true, capture: true });
-      document.addEventListener(evt, unlockHandler, { passive: true, capture: true });
+      window.addEventListener(evt, this._unlockHandler, { passive: true, capture: true });
+      document.addEventListener(evt, this._unlockHandler, { passive: true, capture: true });
     });
-    window.addEventListener('boot:done', unlockHandler, { once: true });
+    window.addEventListener('boot:done', this._unlockHandler, { once: true });
 
-    // 1. Attempt immediate unmuted play on arrival
-    this.play({ fallbackMuted: true }).then((started) => {
-      if (started && !this.isMuted) {
+    // Attempt immediate unmuted play on arrival
+    this.play().then((started) => {
+      if (started) {
         this.hasUnlocked = true;
-        detachListeners();
+        this.detachActivationListeners();
       }
     }).catch(() => {});
   }

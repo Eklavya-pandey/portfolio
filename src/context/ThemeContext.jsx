@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
+import { editorialMusic } from '../themes/editorial/editorialMusic';
 
 export const ThemeContext = createContext();
 
@@ -38,6 +39,11 @@ export function ThemeProvider({ children }) {
 
   const switchTheme = (newTheme) => {
     if (Object.values(THEMES).includes(newTheme)) {
+      if (newTheme !== THEMES.MERIDIAN && newTheme !== THEMES.EDITORIAL) {
+        editorialMusic.pause();
+      } else {
+        editorialMusic.play();
+      }
       setTheme(newTheme);
       try {
         if (typeof window !== 'undefined') {

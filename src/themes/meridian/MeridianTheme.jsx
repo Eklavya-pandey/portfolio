@@ -4,6 +4,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useMeridianPage } from './meridianRouter';
 import { MeridianNav, MeridianScene3D, MeridianCaseStudyModal } from './components';
+import { editorialMusic } from '../editorial/editorialMusic';
 import MeridianHomePage from './pages/MeridianHomePage';
 import MeridianWorkPage from './pages/MeridianWorkPage';
 import MeridianAboutPage from './pages/MeridianAboutPage';
@@ -19,6 +20,14 @@ export default function MeridianTheme() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [selectedCaseStudy, setSelectedCaseStudy] = useState(activeCaseStudySlug);
   const [toastMessage, setToastMessage] = useState(null);
+
+  // Background ambient music: auto-start on arrival, pause on theme switch/unmount
+  useEffect(() => {
+    editorialMusic.autoStart();
+    return () => {
+      editorialMusic.pause();
+    };
+  }, []);
 
   // Custom magnetic cursor position
   const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 });

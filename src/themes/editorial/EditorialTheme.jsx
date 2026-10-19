@@ -82,10 +82,14 @@ export default function EditorialTheme() {
   // Background music auto-start on arrival & state subscription
   useEffect(() => {
     editorialMusic.autoStart();
-    return editorialMusic.subscribe(({ isPlaying, isUnavailable }) => {
+    const unsub = editorialMusic.subscribe(({ isPlaying, isUnavailable }) => {
       setIsMusicPlaying(isPlaying);
       setIsMusicUnavailable(isUnavailable);
     });
+    return () => {
+      unsub();
+      editorialMusic.pause();
+    };
   }, []);
 
   // Top nav tools dropdown & mobile drawer state

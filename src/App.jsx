@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useTheme, THEMES } from './context/ThemeContext';
+import { editorialMusic } from './themes/editorial/editorialMusic';
 import Windows98Theme from './themes/windows98/Windows98Theme';
 import EditorialTheme from './themes/editorial/EditorialTheme';
 import GamingTheme from './themes/gaming/GamingTheme';
@@ -12,6 +13,12 @@ export default function App() {
 
   useEffect(() => {
     document.body.setAttribute('data-theme', activeTheme);
+
+    // Audio theme sync: Stop bg music when switching to themes without bg music
+    if (activeTheme !== THEMES.MERIDIAN && activeTheme !== THEMES.EDITORIAL) {
+      editorialMusic.pause();
+    }
+
     // Allow scrolling on editorial/gaming/meridian themes, lock on win98 and designfile
     if (activeTheme === THEMES.WINDOWS98 || activeTheme === THEMES.DESIGNFILE) {
       document.documentElement.style.overflow = 'hidden';
