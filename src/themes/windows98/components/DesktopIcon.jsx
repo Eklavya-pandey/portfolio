@@ -52,7 +52,7 @@ export default function DesktopIcon({
       }
       if (hasMoved && onPositionChange) {
         // Constrain strictly within usable desktop (taskbar is 28px)
-        const nextX = Math.max(0, Math.min(window.innerWidth - 65, origX + dx));
+        const nextX = Math.max(0, Math.min(window.innerWidth - 86, origX + dx));
         const nextY = Math.max(0, Math.min(window.innerHeight - 28 - 75, origY + dy));
         onPositionChange({ x: nextX, y: nextY });
       }
@@ -106,7 +106,7 @@ export default function DesktopIcon({
         position: 'absolute',
         left: `${position.x}px`,
         top: `${position.y}px`,
-        width: '64px',
+        width: '84px',
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
@@ -155,11 +155,11 @@ export default function DesktopIcon({
           onClick={(e) => e.stopPropagation()}
           onMouseDown={(e) => e.stopPropagation()}
           style={{
-            width: '74px',
+            width: '80px',
             background: 'white',
             color: 'black',
             fontSize: '11px',
-            fontFamily: "'MS W98 UI', 'Segoe UI', Tahoma, sans-serif",
+            fontFamily: "var(--win-font, 'W95FA', 'MS Sans Serif', Tahoma, sans-serif)",
             border: '1px dotted black',
             textAlign: 'center',
             padding: '1px 2px',
@@ -171,17 +171,27 @@ export default function DesktopIcon({
         <div
           className="Label"
           style={{
-            alignSelf: 'stretch',
+            width: '84px',
+            maxWidth: '84px',
             textAlign: 'center',
             color: 'white',
             fontSize: '11px',
-            fontFamily: "'MS W98 UI', 'Segoe UI', Tahoma, sans-serif",
+            fontFamily: "var(--win-font, 'W95FA', 'MS Sans Serif', Tahoma, sans-serif)",
             fontWeight: 400,
-            lineHeight: '12px',
-            wordWrap: 'break-word',
+            lineHeight: '13px',
+            maxHeight: '26px',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+            wordBreak: 'normal',
+            overflowWrap: 'normal',
+            whiteSpace: 'normal',
+            hyphens: 'none',
             background: isSelected ? '#000080' : 'transparent',
             border: isSelected ? '1px dotted #FFFF00' : '1px solid transparent',
             padding: '1px 2px',
+            boxSizing: 'border-box',
           }}
         >
           {label}

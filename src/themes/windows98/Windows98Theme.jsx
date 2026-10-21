@@ -56,8 +56,10 @@ import {
 
 import { useSound } from '../../context/SoundContext';
 
+import WelcomeDialog from './components/WelcomeDialog';
+
 const INITIAL_DESKTOP_ICONS = [
-  // Column 1 (x: 24) - Core
+  // Column 1 (x: 16) - Portfolio
   {
     id: 'me',
     domId: 'icon-me',
@@ -65,8 +67,8 @@ const INITIAL_DESKTOP_ICONS = [
     defaultName: 'Me.exe',
     iconType: 'myComputer',
     windowKey: 'myComputer',
-    x: 24,
-    y: 20,
+    x: 16,
+    y: 16,
   },
   {
     id: 'made',
@@ -75,8 +77,8 @@ const INITIAL_DESKTOP_ICONS = [
     defaultName: 'Made',
     iconType: 'made',
     windowKey: 'made',
-    x: 24,
-    y: 104,
+    x: 16,
+    y: 92,
   },
   {
     id: 'proof',
@@ -85,8 +87,8 @@ const INITIAL_DESKTOP_ICONS = [
     defaultName: 'Proof',
     iconType: 'proof',
     windowKey: 'resume',
-    x: 24,
-    y: 188,
+    x: 16,
+    y: 168,
   },
   {
     id: 'skills',
@@ -95,8 +97,8 @@ const INITIAL_DESKTOP_ICONS = [
     defaultName: 'Skills',
     iconType: 'skills',
     windowKey: 'skills',
-    x: 24,
-    y: 272,
+    x: 16,
+    y: 244,
   },
   {
     id: 'hello',
@@ -105,8 +107,8 @@ const INITIAL_DESKTOP_ICONS = [
     defaultName: 'Hello',
     iconType: 'hello',
     windowKey: 'hello',
-    x: 24,
-    y: 356,
+    x: 16,
+    y: 320,
   },
   {
     id: 'oops',
@@ -115,11 +117,11 @@ const INITIAL_DESKTOP_ICONS = [
     defaultName: 'Oops',
     iconType: 'oops',
     windowKey: 'recycle',
-    x: 24,
-    y: 440,
+    x: 16,
+    y: 396,
   },
 
-  // Column 2 (x: 104) - Shell Apps
+  // Column 2 (x: 108) - Apps
   {
     id: 'ie',
     domId: 'icon-ie',
@@ -127,8 +129,8 @@ const INITIAL_DESKTOP_ICONS = [
     defaultName: 'Internet Explorer',
     iconType: 'internetExplorer',
     windowKey: 'internetExplorer',
-    x: 104,
-    y: 20,
+    x: 108,
+    y: 16,
   },
   {
     id: 'paint',
@@ -137,8 +139,8 @@ const INITIAL_DESKTOP_ICONS = [
     defaultName: 'Paint',
     iconType: 'paint',
     windowKey: 'paint',
-    x: 104,
-    y: 104,
+    x: 108,
+    y: 92,
   },
   {
     id: 'notepad',
@@ -147,8 +149,8 @@ const INITIAL_DESKTOP_ICONS = [
     defaultName: 'Notepad',
     iconType: 'notepad',
     windowKey: 'notepad',
-    x: 104,
-    y: 188,
+    x: 108,
+    y: 168,
   },
   {
     id: 'calculator',
@@ -157,8 +159,8 @@ const INITIAL_DESKTOP_ICONS = [
     defaultName: 'Calculator',
     iconType: 'calculator',
     windowKey: 'calculator',
-    x: 104,
-    y: 272,
+    x: 108,
+    y: 244,
   },
   {
     id: 'mediaPlayer',
@@ -167,8 +169,8 @@ const INITIAL_DESKTOP_ICONS = [
     defaultName: 'Media Player',
     iconType: 'mediaPlayer',
     windowKey: 'mediaPlayer',
-    x: 104,
-    y: 356,
+    x: 108,
+    y: 320,
   },
   {
     id: 'winamp',
@@ -177,11 +179,11 @@ const INITIAL_DESKTOP_ICONS = [
     defaultName: 'Winamp',
     iconType: 'winamp',
     windowKey: 'winamp',
-    x: 104,
-    y: 440,
+    x: 108,
+    y: 396,
   },
 
-  // Column 3 (x: 184) - Games
+  // Column 3 (x: 200) - Games
   {
     id: 'minesweeper',
     domId: 'icon-minesweeper',
@@ -189,8 +191,8 @@ const INITIAL_DESKTOP_ICONS = [
     defaultName: 'Minesweeper',
     iconType: 'minesweeper',
     windowKey: 'minesweeper',
-    x: 184,
-    y: 20,
+    x: 200,
+    y: 16,
   },
   {
     id: 'solitaire',
@@ -199,8 +201,8 @@ const INITIAL_DESKTOP_ICONS = [
     defaultName: 'Solitaire',
     iconType: 'solitaire',
     windowKey: 'solitaire',
-    x: 184,
-    y: 104,
+    x: 200,
+    y: 92,
   },
   {
     id: 'freecell',
@@ -209,8 +211,8 @@ const INITIAL_DESKTOP_ICONS = [
     defaultName: 'FreeCell',
     iconType: 'freecell',
     windowKey: 'freecell',
-    x: 184,
-    y: 188,
+    x: 200,
+    y: 168,
   },
   {
     id: 'chess',
@@ -219,8 +221,8 @@ const INITIAL_DESKTOP_ICONS = [
     defaultName: 'Chess',
     iconType: 'chess',
     windowKey: 'chess',
-    x: 184,
-    y: 272,
+    x: 200,
+    y: 244,
   },
 ];
 
@@ -296,8 +298,8 @@ const INITIAL_WINDOWS = {
   },
   myComputer: {
     id: 'myComputer',
-    title: 'System Properties',
-    icon: <ProgramIconSmall />,
+    title: 'Me.exe',
+    icon: <MyComputerIcon />,
     isOpen: false,
     isMinimized: false,
     isMaximized: false,
@@ -306,7 +308,7 @@ const INITIAL_WINDOWS = {
   },
   made: {
     id: 'made',
-    title: 'MADE',
+    title: 'Made',
     icon: <FolderIconSmall />,
     isOpen: false,
     isMinimized: false,
@@ -460,34 +462,61 @@ export default function Windows98Theme() {
   const [contextMenu, setContextMenu] = useState(null);
 
   const highestZRef = useRef(35);
-  const cascadeOffsetRef = useRef({ x: 0, y: 0 });
-  const cascadeStep = 28;
+  const lastWindowPosRef = useRef({ x: 180, y: 50 });
+  const cascadeStep = 24;
 
-  // Calculate next cascading position for desktop window
-  const getNextCascadePosition = useCallback((defaultPos = { x: 100, y: 100 }) => {
-    if (window.innerWidth <= 768) {
+  const [showWelcome, setShowWelcome] = useState(() => {
+    try {
+      if (typeof window === 'undefined') return false;
+      const sessionSeen = sessionStorage.getItem('win98_welcome_shown');
+      const localShow = localStorage.getItem('win98_show_welcome');
+      if (sessionSeen === '1') return false;
+      if (localShow === 'false') return false;
+      return true;
+    } catch {
+      return true;
+    }
+  });
+
+  const handleCloseWelcome = (showNextTime) => {
+    setShowWelcome(false);
+    try {
+      sessionStorage.setItem('win98_welcome_shown', '1');
+      localStorage.setItem('win98_show_welcome', showNextTime ? 'true' : 'false');
+    } catch {}
+  };
+
+  // Calculate next cascading position (+24px clamped inside viewport above taskbar)
+  const getNextCascadePosition = useCallback((winKey, defaultPos = { x: 180, y: 50 }) => {
+    if (typeof window === 'undefined' || window.innerWidth <= 768) {
       return { x: 0, y: 0 };
     }
     const maxW = window.innerWidth;
-    const maxH = window.innerHeight - 44;
-    const winW = 600;
-    const winH = 460;
+    const maxH = window.innerHeight - 28 - 8;
 
-    let x = defaultPos.x + cascadeOffsetRef.current.x;
-    let y = defaultPos.y + cascadeOffsetRef.current.y;
-
-    if (x + winW > maxW - 20 || y + winH > maxH - 20) {
-      cascadeOffsetRef.current = { x: 0, y: 0 };
-      x = defaultPos.x;
-      y = defaultPos.y;
+    if (winKey === 'myComputer') {
+      const winW = 620;
+      const winH = 490;
+      const x = Math.max(8, Math.floor((maxW - winW) / 2));
+      const y = Math.max(8, Math.floor((maxH - winH) / 2) - 30);
+      return { x, y };
     }
 
-    cascadeOffsetRef.current.x += cascadeStep;
-    cascadeOffsetRef.current.y += cascadeStep;
+    const winW = winKey === 'made' ? 640 : 640;
+    const winH = winKey === 'made' ? 420 : 440;
 
-    x = Math.max(4, Math.min(x, Math.max(4, maxW - winW - 4)));
-    y = Math.max(4, Math.min(y, Math.max(4, maxH - winH - 4)));
+    let x = lastWindowPosRef.current.x + cascadeStep;
+    let y = lastWindowPosRef.current.y + cascadeStep;
 
+    if (x + winW > maxW - 8 || y + winH > maxH) {
+      x = 80;
+      y = 40;
+    }
+
+    x = Math.max(8, Math.min(x, Math.max(8, maxW - winW - 8)));
+    y = Math.max(8, Math.min(y, Math.max(8, maxH - winH)));
+
+    lastWindowPosRef.current = { x, y };
     return { x, y };
   }, []);
 
@@ -525,7 +554,7 @@ export default function Windows98Theme() {
 
         let nextPos = current.position;
         if (isNewlyOpening && !current.isMaximized) {
-          nextPos = getNextCascadePosition(current.position);
+          nextPos = getNextCascadePosition(winKey, current.position);
         }
 
         if (isNewlyOpening) {
@@ -677,7 +706,7 @@ export default function Windows98Theme() {
       if (screenParam) {
         const paramMap = {
           about: 'about',
-          me: 'about',
+          me: 'myComputer',
           skills: 'skills',
           resume: 'resume',
           proof: 'resume',
@@ -697,9 +726,6 @@ export default function Windows98Theme() {
           return;
         }
       }
-
-      // Default: auto open ABOUT_ME.EXE. NOVA_INVEST.EXE must NOT auto open.
-      openWindow('about');
     }, 1400);
   }, [openWindow, playSound]);
 
@@ -1032,6 +1058,7 @@ export default function Windows98Theme() {
             onMinimize={() => minimizeWindow('myComputer')}
             onMaximize={() => toggleMaximize('myComputer')}
             onClose={() => closeWindow('myComputer')}
+            onOpenHello={() => openWindow('hello')}
           />
 
           {/* Window 7: MADE (Projects) */}
@@ -1286,6 +1313,12 @@ export default function Windows98Theme() {
           isOpen={isShutDownOpen}
           onClose={() => setIsShutDownOpen(false)}
           onRestart={handleRestartBios}
+        />
+
+        {/* Welcome Dialog */}
+        <WelcomeDialog
+          isOpen={biosDone && showWelcome}
+          onClose={handleCloseWelcome}
         />
 
         {/* Taskbar */}

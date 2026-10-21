@@ -18,6 +18,10 @@ export default function Window({
   menuItems,
   hasStatusBar = false,
   statusText = '',
+  showMinimize = true,
+  showMaximize = true,
+  showClose = true,
+  isDialog = false,
   onFocus,
   onMinimize,
   onMaximize,
@@ -140,11 +144,16 @@ export default function Window({
     left: isMaximized ? '0px' : `${pos.x}px`,
     top: isMaximized ? '0px' : `${pos.y}px`,
     width: isMaximized ? '100vw' : `${defaultWidth}px`,
-    height: isMaximized ? 'calc(100vh - 28px)' : `${defaultHeight}px`,
-    padding: '4px',
+    height: isMaximized
+      ? 'calc(100vh - 28px)'
+      : defaultHeight === 'auto'
+      ? 'auto'
+      : `${defaultHeight}px`,
+    maxHeight: 'calc(100vh - 36px)',
+    padding: '3px',
     background: '#C0C0C0',
     boxShadow:
-      '2px 2px 0px #DFDFDF inset, -2px -2px 0px #7F7F7F inset, 1px 1px 0px white inset, -1px -1px 0px black inset',
+      '1px 1px 0px #FFFFFF inset, -1px -1px 0px #000000 inset, 2px 2px 0px #DFDFDF inset, -2px -2px 0px #808080 inset',
     flexDirection: 'column',
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
@@ -160,7 +169,7 @@ export default function Window({
     <div
       ref={windowRef}
       id={id}
-      className={`win95-window ${isMaximized ? 'maximized' : ''} ${isActive ? 'active-win' : ''} ${className}`}
+      className={`win95-window ${isMaximized ? 'maximized' : ''} ${isActive ? 'active-win' : ''} ${isDialog ? 'win-dialog' : ''} ${className}`}
       style={windowStyle}
       onMouseDown={() => {
         if (onFocus) onFocus();
@@ -177,6 +186,9 @@ export default function Window({
         onMinimize={onMinimize}
         onMaximize={onMaximize}
         onClose={onClose}
+        showMinimize={isDialog ? false : showMinimize}
+        showMaximize={isDialog ? false : showMaximize}
+        showClose={showClose}
         onMouseDown={(e) => handleStartDrag(e.clientX, e.clientY, e.target)}
         onTouchStart={handleTouchStart}
       />

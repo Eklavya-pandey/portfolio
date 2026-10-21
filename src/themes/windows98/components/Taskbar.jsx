@@ -32,12 +32,14 @@ export default function Taskbar({
       style={{
         position: 'fixed',
         left: 0,
+        right: 0,
         bottom: 0,
         width: '100%',
         height: '28px',
         background: '#C0C0C0',
         boxShadow: '0 -1px 0 0 white, 0 -2px 0 0 #DFDFDF',
         borderTop: '1px solid #FFFFFF',
+        borderRadius: 0,
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -75,6 +77,7 @@ export default function Taskbar({
             paddingRight: '8px',
             paddingTop: '3px',
             paddingBottom: '3px',
+            borderRadius: 0,
             background: '#C0C0C0',
             boxShadow: isStartMenuOpen
               ? '1px 1px 0px black inset, -1px -1px 0px white inset, 2px 2px 0px #808080 inset, -2px -2px 0px #DFDFDF inset'
@@ -99,7 +102,7 @@ export default function Taskbar({
             style={{
               color: 'black',
               fontSize: '11px',
-              fontFamily: "'MS W98 UI', 'Segoe UI', Tahoma, sans-serif",
+              fontFamily: "var(--win-font, 'W95FA', 'MS Sans Serif', Tahoma, sans-serif)",
               fontWeight: 700,
               lineHeight: '10px',
             }}
@@ -143,6 +146,7 @@ export default function Taskbar({
                   paddingRight: '4px',
                   paddingTop: '3px',
                   paddingBottom: '3px',
+                  borderRadius: 0,
                   background: isActive ? '#DFDFDF' : '#C0C0C0',
                   boxShadow: tabShadow,
                   overflow: 'hidden',
@@ -171,7 +175,7 @@ export default function Taskbar({
                     height: '10px',
                     color: 'black',
                     fontSize: '11px',
-                    fontFamily: "'MS W98 UI', 'Segoe UI', Tahoma, sans-serif",
+                    fontFamily: "var(--win-font, 'W95FA', 'MS Sans Serif', Tahoma, sans-serif)",
                     fontWeight: isActive ? 700 : 400,
                     lineHeight: '10px',
                     wordWrap: 'break-word',
@@ -206,7 +210,7 @@ export default function Taskbar({
           boxSizing: 'border-box',
         }}
       >
-        <div style={{ width: '14px', height: '14px', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ width: '16px', height: '16px', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <SpeakerIcon />
         </div>
         <div
@@ -216,7 +220,7 @@ export default function Taskbar({
           style={{
             color: 'black',
             fontSize: '11px',
-            fontFamily: "'MS W98 UI', 'Segoe UI', Tahoma, sans-serif",
+            fontFamily: "var(--win-font, 'W95FA', 'MS Sans Serif', Tahoma, sans-serif)",
             fontWeight: 400,
             lineHeight: '10px',
             wordWrap: 'break-word',

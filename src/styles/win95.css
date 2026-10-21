@@ -1,5 +1,13 @@
 /* Windows 95 Design System & Reusable Components */
 
+@font-face {
+  font-family: 'W95FA';
+  src: url('/fonts/w95fa.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --win-bg: #008080;
   --win-gray: #C0C0C0;
@@ -9,31 +17,62 @@
   --win-blue: #000080;
   --win-white: #FFFFFF;
   --win-black: #000000;
-  --win-font: 'MS Sans Serif', 'Microsoft Sans Serif', Tahoma, 'Segoe UI', Arial, sans-serif;
+  --win-font: 'W95FA', 'MS Sans Serif', 'Microsoft Sans Serif', Tahoma, sans-serif;
   --win-titlebar-height: 22px;
   --win-menubar-height: 20px;
 }
 
-/* Authentic Windows 98 UI font — use the real MS Sans Serif if available, else Tahoma */
+/* Authentic Windows 98 UI font - self-hosted W95FA font */
 @font-face {
   font-family: 'MS Sans Serif';
-  src: local('MS Sans Serif'), local('Microsoft Sans Serif'), local('Tahoma');
+  src: url('/fonts/w95fa.woff') format('woff'), local('MS Sans Serif'), local('Microsoft Sans Serif'), local('Tahoma');
 }
 @font-face {
   font-family: 'MS W98 UI';
-  src: local('MS Sans Serif'), local('Microsoft Sans Serif'), local('Tahoma'), local('Segoe UI');
+  src: url('/fonts/w95fa.woff') format('woff'), local('MS Sans Serif'), local('Microsoft Sans Serif'), local('Tahoma'), local('Segoe UI');
 }
 
 /* Base Desktop container */
-#desktop-environment {
+html[data-theme="windows98"],
+body[data-theme="windows98"] {
   width: 100vw;
   height: 100vh;
-  height: 100dvh;
-  position: absolute;
-  left: 0;
-  top: 0;
-  background: var(--win-bg);
-  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  overflow: hidden !important;
+  position: fixed;
+  inset: 0;
+}
+
+.Windows98Experience,
+.Windows98Experience * {
+  -webkit-font-smoothing: none !important;
+  -moz-osx-font-smoothing: grayscale !important;
+  font-smooth: never !important;
+  text-rendering: pixelated;
+  font-family: var(--win-font);
+}
+
+.Windows98Experience {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  overflow: hidden !important;
+  background: var(--win-bg) !important;
+  user-select: none;
+  font-family: var(--win-font);
+  font-size: 11px;
+}
+
+#desktop-environment {
+  width: 100vw !important;
+  height: 100vh !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  background: var(--win-bg) !important;
+  overflow: hidden !important;
   font-family: var(--win-font);
   font-size: 11px;
 }
@@ -41,7 +80,6 @@
 .Screen1Desktop, .Screen3Skills, .Screen4Proof, .Screen5Hello, .Screen6Oops, .Screen7Me, .Screen8Made, .Screen9NovaInvest {
   width: 100vw;
   height: 100vh;
-  height: 100dvh;
   background: var(--win-bg);
   overflow: hidden;
   position: relative;
@@ -49,13 +87,15 @@
 }
 
 .DesktopArea {
-  width: 100%;
-  height: calc(100% - 40px);
-  left: 0px;
-  top: 0px;
-  position: absolute;
-  background: var(--win-bg);
-  overflow: hidden;
+  width: 100vw !important;
+  height: calc(100vh - 28px) !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 28px !important;
+  background: var(--win-bg) !important;
+  overflow: hidden !important;
 }
 
 /* Desktop Icons Column */
@@ -113,7 +153,7 @@
 }
 
 /* ============================================================
-   GLOBAL WINDOW CHROME — all application windows share this
+   GLOBAL WINDOW CHROME - all application windows share this
    ============================================================ */
 
 .AboutMeWindow, .SkillsWindow, .ResumeWindow, .HelloWindow,
@@ -135,7 +175,7 @@
   font-family: var(--win-font);
 }
 
-/* Default Window Dimensions — slightly smaller to keep desktop visible, overrides Figma inline sizes */
+/* Default Window Dimensions - slightly smaller to keep desktop visible, overrides Figma inline sizes */
 @media (min-width: 769px) {
   .AboutMeWindow:not(.maximized) {
     width: 560px !important;
@@ -250,7 +290,7 @@
 }
 
 /* ============================================================
-   TITLEBAR — globally consistent, authentic Win95/98
+   TITLEBAR - globally consistent, authentic Win95/98
    ============================================================ */
 .Titlebar {
   flex-shrink: 0;
@@ -311,7 +351,7 @@
   text-overflow: ellipsis;
 }
 
-/* Window Control Buttons — Min/Max/Close at top-right */
+/* Window Control Buttons - Min/Max/Close at top-right */
 .WindowButtons {
   justify-content: flex-end;
   align-items: center;
@@ -342,7 +382,7 @@
 }
 
 /* ============================================================
-   MENU BAR — File | Edit | View | Help — below titlebar
+   MENU BAR - File | Edit | View | Help - below titlebar
    ============================================================ */
 .WindowMenu {
   flex-shrink: 0;
@@ -406,7 +446,7 @@
 }
 
 /* ============================================================
-   3D DIVIDER — replaces stray "- - - -" dash characters
+   3D DIVIDER - replaces stray "- - - -" dash characters
    ============================================================ */
 .DDivider {
   align-self: stretch;
@@ -442,6 +482,14 @@
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   touch-action: pan-y;
+}
+
+#my-computer-window .WindowClientArea,
+.MyComputerWindow .WindowClientArea,
+.win-dialog .WindowClientArea,
+.win-dialog-client {
+  box-shadow: none !important;
+  border: none !important;
 }
 
 /* ============================================================
@@ -638,29 +686,35 @@
 }
 
 /* ============================================================
-   TASKBAR / NAVBAR — anchored to bottom of viewport
+   TASKBAR / NAVBAR - anchored to bottom of viewport
    Matches reference: 28px height, 22px body elements, authentic 3D bevels
    ============================================================ */
 .DesktopTaskbar,
 .Navbar {
-  width: 100%;
-  height: 28px;
-  left: 0px;
-  bottom: 0px;
-  top: auto;
-  position: absolute;
-  background: #C0C0C0;
-  box-shadow: 0px -1px 0px white, 0px -2px 0px #DFDFDF;
-  border-top: 1px solid #FFFFFF;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 2px 3px;
-  overflow: hidden;
-  z-index: 10000;
-  user-select: none;
-  box-sizing: border-box;
-  font-family: 'MS W98 UI', 'MS Sans Serif', Tahoma, sans-serif;
+  width: 100% !important;
+  height: 28px !important;
+  left: 0px !important;
+  right: 0px !important;
+  bottom: 0px !important;
+  top: auto !important;
+  position: fixed !important;
+  background: #C0C0C0 !important;
+  box-shadow: 0px -1px 0px white, 0px -2px 0px #DFDFDF !important;
+  border-top: 1px solid #FFFFFF !important;
+  border-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 2px 3px !important;
+  overflow: hidden !important;
+  z-index: 10000 !important;
+  user-select: none !important;
+  box-sizing: border-box !important;
+  font-family: var(--win-font) !important;
 }
 
 .TaskbarLeft,
@@ -1012,7 +1066,7 @@
 }
 
 /* ============================================================
-   START MENU — anchored directly above taskbar
+   START MENU - anchored directly above taskbar
    ============================================================ */
 .StartMenu {
   box-sizing: border-box;
@@ -1099,7 +1153,7 @@
 }
 
 /* ============================================================
-   SHUT DOWN DIALOG — centered in viewport
+   SHUT DOWN DIALOG - centered in viewport
    ============================================================ */
 .ShutDownDialog {
   width: 360px;

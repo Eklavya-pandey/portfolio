@@ -1,8 +1,19 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import Window from '../components/Window';
-import { FolderIconSmall, MadeIcon } from '../components/Icons';
+import { FolderIconSmall, GearFileIconSmall, GlobeFileIconSmall } from '../components/Icons';
 import { portfolioData } from '../../../data/portfolioData';
 import { useSound } from '../../../context/SoundContext';
+
+const PROJECT_NOTES = {
+  'Stock Trading App': 'Buy high, sell low is not a feature. Everything else is.',
+  'Mutual Funds': 'Making SIPs less scary than they sound.',
+  'Option Chain': 'A wall of numbers, made readable. Yes, really.',
+  'WealthBasket': 'A basket that holds wealth. Eggs not included.',
+  'Distributor Dashboard': 'A dashboard for people who live in dashboards.',
+  'AI Support Chatbot': "Teaching a bot to say 'I understand your frustration' convincingly.",
+  'Client Web Projects': 'Pixels for clients. Revisions not included. Revisions were included.',
+  'OneStepPrint website redesign': 'Print, but make it scroll.',
+};
 
 export default function MadeWindow({
   isOpen,
@@ -21,13 +32,8 @@ export default function MadeWindow({
   const { playSound } = useSound();
   const [selectedIndex, setSelectedIndex] = useState(0);
 
-  const rowsContainerRef = useRef(null);
-  const trackRef = useRef(null);
-  const [thumbTop, setThumbTop] = useState(4);
-
   const selectedProject = projects[selectedIndex] || projects[0];
 
-  // Details metadata matching vanilla implementation
   const projectMetadata = [
     {
       title: 'Stock Trading App',
@@ -80,36 +86,7 @@ export default function MadeWindow({
   ];
 
   const currentMeta = projectMetadata[selectedIndex] || projectMetadata[0];
-
-  const updateThumbPosition = () => {
-    if (!rowsContainerRef.current || !trackRef.current) return;
-    const container = rowsContainerRef.current;
-    const track = trackRef.current;
-    const scrollMax = container.scrollHeight - container.clientHeight;
-    if (scrollMax <= 0) {
-      setThumbTop(4);
-      return;
-    }
-    const trackHeight = track.clientHeight;
-    const thumbHeight = 52;
-    const availableTrack = trackHeight - thumbHeight;
-    if (availableTrack <= 0) return;
-
-    const ratio = container.scrollTop / scrollMax;
-    setThumbTop(4 + ratio * availableTrack);
-  };
-
-  const handleScrollUp = () => {
-    if (rowsContainerRef.current) {
-      rowsContainerRef.current.scrollTop -= 30;
-    }
-  };
-
-  const handleScrollDown = () => {
-    if (rowsContainerRef.current) {
-      rowsContainerRef.current.scrollTop -= 30;
-    }
-  };
+  const currentNote = PROJECT_NOTES[selectedProject?.name] || 'Things I made instead of sleeping.';
 
   const handleRowClick = (idx) => {
     playSound('ding');
@@ -136,21 +113,37 @@ export default function MadeWindow({
     }
   };
 
+  const getItemType = (proj) => {
+    if (proj.name === 'Stock Trading App' || proj.id === 'stock-trading-app') {
+      return 'Product';
+    }
+    return proj.type || 'Product';
+  };
+
+  const getItemIcon = (type) => {
+    if (type === 'Internal Tool') {
+      return <GearFileIconSmall />;
+    }
+    if (type === 'Web') {
+      return <GlobeFileIconSmall />;
+    }
+    return <FolderIconSmall />;
+  };
+
   return (
     <Window
       id="made-window"
-      title="MADE"
+      title="Made"
       icon={<FolderIconSmall />}
       isOpen={isOpen}
       isActive={isActive}
       isMaximized={isMaximized}
       zIndex={zIndex}
       position={position}
-      defaultWidth={820}
-      defaultHeight={620}
+      defaultWidth={640}
+      defaultHeight={420}
       hasMenu={true}
-      hasStatusBar={true}
-      statusText={`${projects.length} object(s)`}
+      hasStatusBar={false}
       onFocus={onFocus}
       onMinimize={onMinimize}
       onMaximize={onMaximize}
@@ -166,9 +159,137 @@ export default function MadeWindow({
           overflow: 'hidden',
           background: '#C0C0C0',
           gap: '2px',
+          fontFamily: "var(--win-font, 'W95FA', 'MS Sans Serif', Tahoma, sans-serif)",
+          fontSize: '11px',
         }}
       >
-        {/* Address Bar */}
+        {/* Explorer Toolbar: Back, Forward, Up, Separator, Views */}
+        <div
+          data-layer="explorer-toolbar"
+          style={{
+            alignSelf: 'stretch',
+            height: '26px',
+            background: '#C0C0C0',
+            borderBottom: '1px solid #808080',
+            boxShadow: '0 1px 0 0 white',
+            display: 'flex',
+            alignItems: 'center',
+            padding: '2px 4px',
+            gap: '2px',
+            boxSizing: 'border-box',
+          }}
+        >
+          {/* Back Button (Disabled/Greyed) */}
+          <button
+            disabled
+            style={{
+              height: '20px',
+              padding: '0 6px',
+              background: '#C0C0C0',
+              border: '1px solid transparent',
+              color: '#808080',
+              fontSize: '11px',
+              fontFamily: "var(--win-font, 'W95FA', 'MS Sans Serif', Tahoma, sans-serif)",
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              cursor: 'default',
+            }}
+          >
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M7 2L3 6L7 10" stroke="#808080" strokeWidth="1.5" />
+            </svg>
+            <span>Back</span>
+          </button>
+
+          {/* Forward Button (Disabled/Greyed) */}
+          <button
+            disabled
+            style={{
+              height: '20px',
+              padding: '0 6px',
+              background: '#C0C0C0',
+              border: '1px solid transparent',
+              color: '#808080',
+              fontSize: '11px',
+              fontFamily: "var(--win-font, 'W95FA', 'MS Sans Serif', Tahoma, sans-serif)",
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              cursor: 'default',
+            }}
+          >
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M5 2L9 6L5 10" stroke="#808080" strokeWidth="1.5" />
+            </svg>
+            <span>Forward</span>
+          </button>
+
+          {/* Up Button (Active) */}
+          <button
+            onClick={() => playSound('ding')}
+            style={{
+              height: '20px',
+              padding: '0 6px',
+              background: '#C0C0C0',
+              boxShadow: '1px 1px 0px #DFDFDF inset, -1px -1px 0px #7F7F7F inset',
+              border: '1px solid #808080',
+              color: '#000000',
+              fontSize: '11px',
+              fontFamily: "var(--win-font, 'W95FA', 'MS Sans Serif', Tahoma, sans-serif)",
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              cursor: 'pointer',
+            }}
+          >
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M2 7L6 3L10 7" stroke="#000000" strokeWidth="1.5" />
+              <line x1="6" y1="3" x2="6" y2="10" stroke="#000000" strokeWidth="1.5" />
+            </svg>
+            <span>Up</span>
+          </button>
+
+          {/* 3D Vertical Separator */}
+          <div
+            style={{
+              width: '2px',
+              height: '18px',
+              borderLeft: '1px solid #808080',
+              borderRight: '1px solid #FFFFFF',
+              margin: '0 2px',
+            }}
+          />
+
+          {/* Views Button */}
+          <button
+            onClick={() => playSound('ding')}
+            style={{
+              height: '20px',
+              padding: '0 6px',
+              background: '#C0C0C0',
+              boxShadow: '1px 1px 0px #DFDFDF inset, -1px -1px 0px #7F7F7F inset',
+              border: '1px solid #808080',
+              color: '#000000',
+              fontSize: '11px',
+              fontFamily: "var(--win-font, 'W95FA', 'MS Sans Serif', Tahoma, sans-serif)",
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              cursor: 'pointer',
+            }}
+          >
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <rect x="1" y="2" width="4" height="3" fill="#000080" />
+              <rect x="7" y="2" width="4" height="3" fill="#000080" />
+              <rect x="1" y="7" width="4" height="3" fill="#000080" />
+              <rect x="7" y="7" width="4" height="3" fill="#000080" />
+            </svg>
+            <span>Views</span>
+          </button>
+        </div>
+
+        {/* Address Bar with proper sunken border */}
         <div
           data-layer="address-bar"
           className="AddressBar"
@@ -181,18 +302,17 @@ export default function MadeWindow({
             background: '#C0C0C0',
             overflow: 'hidden',
             justifyContent: 'flex-start',
-            alignItems: 'flex-start',
+            alignItems: 'center',
             gap: '6px',
-            display: 'inline-flex',
+            display: 'flex',
           }}
         >
           <div
             data-layer="Address:"
             className="Address"
             style={{
-              color: 'black',
+              color: '#000000',
               fontSize: '11px',
-              fontFamily: "'MS W98 UI', 'Segoe UI', Tahoma, sans-serif",
               fontWeight: 400,
             }}
           >
@@ -206,19 +326,19 @@ export default function MadeWindow({
               paddingTop: '2px',
               paddingBottom: '2px',
               paddingLeft: '4px',
-              background: 'white',
-              boxShadow: '1px 1px 0px rgba(0, 0, 0, 0.15) inset',
+              background: '#FFFFFF',
+              border: '1px solid #808080',
+              borderRightColor: '#FFFFFF',
+              borderBottomColor: '#FFFFFF',
+              boxShadow: '1px 1px 0px black inset',
               overflow: 'hidden',
-              outline: '1px #808080 solid',
-              outlineOffset: '-1px',
               display: 'flex',
             }}
           >
             <div
               style={{
-                color: 'black',
+                color: '#000000',
                 fontSize: '11px',
-                fontFamily: "'MS W98 UI', 'Segoe UI', Tahoma, sans-serif",
                 fontWeight: 400,
               }}
             >
@@ -227,22 +347,21 @@ export default function MadeWindow({
           </div>
         </div>
 
-        {/* Subtitle Bar */}
+        {/* Subtitle Bar - Folder Quote */}
         <div
           style={{
             alignSelf: 'stretch',
-            paddingTop: '2px',
+            paddingTop: '1px',
             paddingBottom: '2px',
             paddingLeft: '6px',
             overflow: 'hidden',
-            display: 'inline-flex',
+            display: 'flex',
           }}
         >
           <div
             style={{
-              color: '#808080',
+              color: '#404040',
               fontSize: '10px',
-              fontFamily: 'Inter, sans-serif',
               fontStyle: 'italic',
               fontWeight: 400,
             }}
@@ -251,36 +370,36 @@ export default function MadeWindow({
           </div>
         </div>
 
-        {/* Content Wrapper (File list + scrollbar) */}
+        {/* Content Wrapper: File List (native overflow scrollbar only when content overflows) */}
         <div
           data-layer="content-wrapper"
           className="ContentWrapper"
           style={{
             alignSelf: 'stretch',
             flex: 1,
-            paddingTop: '2px',
-            paddingBottom: '2px',
+            paddingTop: '1px',
+            paddingBottom: '1px',
             paddingLeft: '4px',
+            paddingRight: '4px',
             overflow: 'hidden',
-            display: 'inline-flex',
+            display: 'flex',
+            minHeight: 0,
           }}
         >
-          {/* File List */}
+          {/* File List Container with Sunken Border */}
           <div
-            ref={rowsContainerRef}
-            data-layer="file-list"
-            className="FileList"
             id="made-rows-container"
-            onScroll={updateThumbPosition}
             style={{
               flex: 1,
               alignSelf: 'stretch',
-              background: 'white',
-              boxShadow: '1px 1px 0px rgba(0, 0, 0, 0.15) inset',
+              background: '#FFFFFF',
+              border: '1px solid #808080',
+              borderRightColor: '#FFFFFF',
+              borderBottomColor: '#FFFFFF',
+              boxShadow: '1px 1px 0px black inset',
               overflowY: 'auto',
-              outline: '1px #808080 solid',
               flexDirection: 'column',
-              display: 'inline-flex',
+              display: 'flex',
             }}
           >
             {/* Column Headers */}
@@ -290,96 +409,87 @@ export default function MadeWindow({
               style={{
                 alignSelf: 'stretch',
                 background: '#C0C0C0',
-                overflow: 'hidden',
-                display: 'inline-flex',
+                display: 'flex',
                 position: 'sticky',
                 top: 0,
                 zIndex: 2,
+                borderBottom: '1px solid #808080',
               }}
             >
+              {/* Name Column */}
               <div
                 style={{
-                  width: '280px',
+                  width: '260px',
                   height: '20px',
                   paddingLeft: '6px',
                   paddingRight: '6px',
-                  paddingTop: '3px',
-                  paddingBottom: '3px',
+                  paddingTop: '2px',
+                  paddingBottom: '2px',
                   background: '#C0C0C0',
-                  boxShadow: '1px 1px 0px #666666 inset',
-                  outline: '1px white solid',
-                  outlineOffset: '-1px',
+                  boxShadow: '1px 1px 0px white inset, -1px -1px 0px #808080 inset',
+                  border: '1px solid #DFDFDF',
                   display: 'flex',
+                  alignItems: 'center',
+                  boxSizing: 'border-box',
                 }}
               >
-                <div
-                  style={{
-                    color: 'black',
-                    fontSize: '11px',
-                    fontFamily: "'MS W98 UI', 'Segoe UI', Tahoma, sans-serif",
-                    fontWeight: 700,
-                  }}
-                >
+                <span style={{ color: '#000000', fontSize: '11px', fontWeight: 700 }}>
                   Name
-                </div>
+                </span>
               </div>
+
+              {/* Type Column */}
               <div
                 style={{
-                  width: '140px',
+                  width: '130px',
                   height: '20px',
                   paddingLeft: '6px',
                   paddingRight: '6px',
-                  paddingTop: '3px',
-                  paddingBottom: '3px',
+                  paddingTop: '2px',
+                  paddingBottom: '2px',
                   background: '#C0C0C0',
-                  boxShadow: '1px 1px 0px #666666 inset',
-                  outline: '1px white solid',
-                  outlineOffset: '-1px',
+                  boxShadow: '1px 1px 0px white inset, -1px -1px 0px #808080 inset',
+                  border: '1px solid #DFDFDF',
                   display: 'flex',
+                  alignItems: 'center',
+                  boxSizing: 'border-box',
                 }}
               >
-                <div
-                  style={{
-                    color: 'black',
-                    fontSize: '11px',
-                    fontFamily: "'MS W98 UI', 'Segoe UI', Tahoma, sans-serif",
-                    fontWeight: 700,
-                  }}
-                >
+                <span style={{ color: '#000000', fontSize: '11px', fontWeight: 700 }}>
                   Type
-                </div>
+                </span>
               </div>
+
+              {/* Company / Client Column (renamed from Location) */}
               <div
                 style={{
-                  width: '160px',
+                  flex: 1,
+                  minWidth: '160px',
                   height: '20px',
                   paddingLeft: '6px',
                   paddingRight: '6px',
-                  paddingTop: '3px',
-                  paddingBottom: '3px',
+                  paddingTop: '2px',
+                  paddingBottom: '2px',
                   background: '#C0C0C0',
-                  boxShadow: '1px 1px 0px #666666 inset',
-                  outline: '1px white solid',
-                  outlineOffset: '-1px',
+                  boxShadow: '1px 1px 0px white inset, -1px -1px 0px #808080 inset',
+                  border: '1px solid #DFDFDF',
                   display: 'flex',
+                  alignItems: 'center',
+                  boxSizing: 'border-box',
                 }}
               >
-                <div
-                  style={{
-                    color: 'black',
-                    fontSize: '11px',
-                    fontFamily: "'MS W98 UI', 'Segoe UI', Tahoma, sans-serif",
-                    fontWeight: 700,
-                  }}
-                >
-                  Location
-                </div>
+                <span style={{ color: '#000000', fontSize: '11px', fontWeight: 700 }}>
+                  Company / Client
+                </span>
               </div>
             </div>
 
             {/* Project Rows */}
             {projects.map((proj, idx) => {
               const isSelected = selectedIndex === idx;
+              const itemType = getItemType(proj);
+              const iconComponent = getItemIcon(itemType);
+
               return (
                 <div
                   key={proj.id || idx}
@@ -390,74 +500,94 @@ export default function MadeWindow({
                   onTouchEnd={() => handleRowTouchEnd(idx)}
                   style={{
                     alignSelf: 'stretch',
-                    paddingTop: '3px',
-                    paddingBottom: '3px',
+                    paddingTop: '2px',
+                    paddingBottom: '2px',
                     paddingLeft: '4px',
                     background: isSelected ? '#000080' : 'transparent',
-                    overflow: 'hidden',
-                    display: 'inline-flex',
+                    display: 'flex',
+                    alignItems: 'center',
                     cursor: 'pointer',
                     userSelect: 'none',
+                    boxSizing: 'border-box',
                   }}
                 >
+                  {/* Name cell */}
                   <div
                     style={{
-                      width: '276px',
+                      width: '260px',
                       paddingLeft: '2px',
                       paddingRight: '4px',
                       overflow: 'hidden',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '4px',
+                      boxSizing: 'border-box',
                     }}
                   >
-                    <FolderIconSmall />
+                    <div style={{ width: '16px', height: '16px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      {iconComponent}
+                    </div>
                     <div
                       style={{
-                        color: isSelected ? 'white' : 'black',
+                        color: isSelected ? '#FFFFFF' : '#000000',
                         fontSize: '11px',
-                        fontFamily: "'MS W98 UI', 'Segoe UI', Tahoma, sans-serif",
                         fontWeight: 400,
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
                       }}
                     >
                       {proj.name}
                     </div>
                   </div>
+
+                  {/* Type cell */}
                   <div
                     style={{
-                      width: '140px',
+                      width: '130px',
                       paddingLeft: '6px',
+                      paddingRight: '4px',
                       overflow: 'hidden',
                       display: 'flex',
                       alignItems: 'center',
+                      boxSizing: 'border-box',
                     }}
                   >
                     <div
                       style={{
-                        color: isSelected ? 'white' : 'black',
+                        color: isSelected ? '#FFFFFF' : '#000000',
                         fontSize: '11px',
-                        fontFamily: "'MS W98 UI', 'Segoe UI', Tahoma, sans-serif",
                         fontWeight: 400,
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
                       }}
                     >
-                      {proj.type}
+                      {itemType}
                     </div>
                   </div>
+
+                  {/* Company / Client cell */}
                   <div
                     style={{
-                      width: '160px',
+                      flex: 1,
+                      minWidth: '160px',
                       paddingLeft: '6px',
+                      paddingRight: '4px',
                       overflow: 'hidden',
                       display: 'flex',
                       alignItems: 'center',
+                      boxSizing: 'border-box',
                     }}
                   >
                     <div
                       style={{
-                        color: isSelected ? 'white' : 'black',
+                        color: isSelected ? '#FFFFFF' : '#000000',
                         fontSize: '11px',
-                        fontFamily: "'MS W98 UI', 'Segoe UI', Tahoma, sans-serif",
                         fontWeight: 400,
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
                       }}
                     >
                       {proj.location}
@@ -467,236 +597,134 @@ export default function MadeWindow({
               );
             })}
           </div>
-
-          {/* Custom Scrollbar */}
-          <div
-            data-layer="scrollbar"
-            className="Scrollbar"
-            id="made-scrollbar"
-            style={{
-              width: '16px',
-              alignSelf: 'stretch',
-              background: '#DFDFDF',
-              overflow: 'hidden',
-              flexDirection: 'column',
-              display: 'inline-flex',
-            }}
-          >
-            {/* Scroll Up Button */}
-            <div
-              id="made-scroll-up"
-              onClick={handleScrollUp}
-              style={{
-                alignSelf: 'stretch',
-                height: '16px',
-                position: 'relative',
-                background: '#C0C0C0',
-                outline: '1px white solid',
-                outlineOffset: '-1px',
-                cursor: 'pointer',
-              }}
-            >
-              <div
-                style={{
-                  position: 'absolute',
-                  left: '4px',
-                  top: '5px',
-                  width: 0,
-                  height: 0,
-                  borderLeft: '4px solid transparent',
-                  borderRight: '4px solid transparent',
-                  borderBottom: '5px solid black',
-                }}
-              />
-            </div>
-
-            {/* Scroll Track */}
-            <div
-              ref={trackRef}
-              id="made-scroll-track"
-              style={{
-                alignSelf: 'stretch',
-                flex: 1,
-                position: 'relative',
-                background: '#DFDFDF',
-                overflow: 'hidden',
-              }}
-            >
-              <div
-                id="made-scroll-thumb"
-                style={{
-                  left: '1px',
-                  top: `${thumbTop}px`,
-                  position: 'absolute',
-                  cursor: 'pointer',
-                  width: '14px',
-                  height: '50px',
-                  background: '#C0C0C0',
-                  boxShadow: '-1px -1px 0px 1px white inset, 1px 1px 0px rgba(0, 0, 0, 0.40) inset',
-                }}
-              />
-            </div>
-
-            {/* Scroll Down Button */}
-            <div
-              id="made-scroll-down"
-              onClick={handleScrollDown}
-              style={{
-                alignSelf: 'stretch',
-                height: '16px',
-                position: 'relative',
-                background: '#C0C0C0',
-                outline: '1px white solid',
-                outlineOffset: '-1px',
-                cursor: 'pointer',
-              }}
-            >
-              <div
-                style={{
-                  position: 'absolute',
-                  left: '4px',
-                  top: '6px',
-                  width: 0,
-                  height: 0,
-                  borderLeft: '4px solid transparent',
-                  borderRight: '4px solid transparent',
-                  borderTop: '5px solid black',
-                }}
-              />
-            </div>
-          </div>
         </div>
 
-        {/* Details Pane */}
+        {/* Detail Panel at the bottom (fixed height, no clipping) */}
         <div
           data-layer="details-pane"
           className="DetailsPane"
           id="made-details-pane"
           style={{
             alignSelf: 'stretch',
-            paddingLeft: '12px',
-            paddingRight: '12px',
-            paddingTop: '10px',
-            paddingBottom: '10px',
+            height: '50px',
+            minHeight: '50px',
+            maxHeight: '50px',
+            paddingLeft: '8px',
+            paddingRight: '8px',
+            paddingTop: '4px',
+            paddingBottom: '4px',
             background: '#C0C0C0',
-            boxShadow: '1px 1px 0px rgba(0, 0, 0, 0.10) inset',
-            outline: '1px #808080 solid',
-            outlineOffset: '-1px',
-            display: 'inline-flex',
-            gap: '24px',
-            alignItems: 'flex-start',
+            border: '1px solid #808080',
+            borderRightColor: '#FFFFFF',
+            borderBottomColor: '#FFFFFF',
+            boxShadow: '1px 1px 0px white, inset 1px 1px 0px #808080',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            boxSizing: 'border-box',
+            overflow: 'hidden',
           }}
         >
-          {/* Selected Item Title & Icon */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <MadeIcon />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-              <div
-                style={{
-                  color: '#808080',
-                  fontSize: '10px',
-                  fontFamily: "'MS W98 UI', 'Segoe UI', Tahoma, sans-serif",
-                  fontWeight: 700,
-                  letterSpacing: '0.50px',
-                }}
-              >
-                SELECTED:
-              </div>
-              <div
-                id="made-details-title"
-                style={{
-                  color: 'black',
-                  fontSize: '12px',
-                  fontFamily: "'MS W98 UI', 'Segoe UI', Tahoma, sans-serif",
-                  fontWeight: 700,
-                }}
-              >
-                {currentMeta.title}
-              </div>
-            </div>
-          </div>
-
-          {/* Role & Platform */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div
-                style={{
-                  color: '#808080',
-                  fontSize: '10px',
-                  fontFamily: "'MS W98 UI', 'Segoe UI', Tahoma, sans-serif",
-                  fontWeight: 700,
-                  letterSpacing: '0.50px',
-                }}
-              >
-                ROLE:
-              </div>
-              <div
-                id="made-details-role"
-                style={{
-                  color: 'black',
-                  fontSize: '11px',
-                  fontFamily: "'MS W98 UI', 'Segoe UI', Tahoma, sans-serif",
-                  fontWeight: 400,
-                }}
-              >
-                {currentMeta.role}
-              </div>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div
-                style={{
-                  color: '#808080',
-                  fontSize: '10px',
-                  fontFamily: "'MS W98 UI', 'Segoe UI', Tahoma, sans-serif",
-                  fontWeight: 700,
-                  letterSpacing: '0.50px',
-                }}
-              >
-                PLATFORM:
-              </div>
-              <div
-                id="made-details-platform"
-                style={{
-                  color: 'black',
-                  fontSize: '11px',
-                  fontFamily: "'MS W98 UI', 'Segoe UI', Tahoma, sans-serif",
-                  fontWeight: 400,
-                }}
-              >
-                {currentMeta.platform}
-              </div>
-            </div>
-          </div>
-
-          {/* Focus Points */}
+          {/* Line 1: ROLE, PLATFORM, FOCUS as one comma-separated line with ellipsis */}
           <div
-            id="made-details-focus"
-            style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}
+            id="made-details-summary"
+            style={{
+              color: '#000000',
+              fontSize: '11px',
+              lineHeight: '18px',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
           >
-            <div
+            <span style={{ color: '#404040', fontWeight: 700, fontSize: '10px' }}>ROLE: </span>
+            {currentMeta.role}, <span style={{ color: '#404040', fontWeight: 700, fontSize: '10px' }}>PLATFORM: </span>
+            {currentMeta.platform}, <span style={{ color: '#404040', fontWeight: 700, fontSize: '10px' }}>FOCUS: </span>
+            {Array.isArray(currentMeta.focus) ? currentMeta.focus.join(', ') : currentMeta.focus}
+          </div>
+
+          {/* Line 2: NOTE in italic */}
+          <div
+            id="made-details-note"
+            style={{
+              color: '#404040',
+              fontSize: '11px',
+              lineHeight: '18px',
+              fontStyle: 'italic',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            Note: &quot;{currentNote}&quot;
+          </div>
+        </div>
+
+        {/* Status Bar */}
+        <div
+          id="made-status-bar"
+          style={{
+            alignSelf: 'stretch',
+            height: '20px',
+            background: '#C0C0C0',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px',
+            padding: '2px 4px',
+            boxSizing: 'border-box',
+          }}
+        >
+          {/* Left status pane: "8 object(s)" */}
+          <div
+            style={{
+              width: '130px',
+              height: '16px',
+              paddingLeft: '4px',
+              paddingRight: '4px',
+              background: '#C0C0C0',
+              border: '1px solid #808080',
+              borderRightColor: '#FFFFFF',
+              borderBottomColor: '#FFFFFF',
+              boxShadow: '1px 1px 0px rgba(0,0,0,0.2) inset',
+              display: 'flex',
+              alignItems: 'center',
+              boxSizing: 'border-box',
+            }}
+          >
+            <span style={{ color: '#000000', fontSize: '11px' }}>
+              {projects.length} object(s)
+            </span>
+          </div>
+
+          {/* Right status pane: selected item name */}
+          <div
+            style={{
+              flex: 1,
+              height: '16px',
+              paddingLeft: '6px',
+              paddingRight: '4px',
+              background: '#C0C0C0',
+              border: '1px solid #808080',
+              borderRightColor: '#FFFFFF',
+              borderBottomColor: '#FFFFFF',
+              boxShadow: '1px 1px 0px rgba(0,0,0,0.2) inset',
+              display: 'flex',
+              alignItems: 'center',
+              overflow: 'hidden',
+              boxSizing: 'border-box',
+            }}
+          >
+            <span
               style={{
-                color: '#808080',
-                fontSize: '10px',
-                fontFamily: "'MS W98 UI', 'Segoe UI', Tahoma, sans-serif",
-                fontWeight: 700,
-                letterSpacing: '0.50px',
+                color: '#000000',
+                fontSize: '11px',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
               }}
             >
-              FOCUS:
-            </div>
-            {currentMeta.focus.map((item, fIdx) => (
-              <div
-                key={fIdx}
-                style={{
-                  color: 'black',
-                  fontSize: '10px',
-                  fontFamily: "'MS W98 UI', 'Segoe UI', Tahoma, sans-serif",
-                  fontWeight: 400,
-                }}
-              >
-                {item}
-              </div>
-            ))}
+              {selectedProject?.name || ''}
+            </span>
           </div>
         </div>
       </div>

@@ -1,125 +1,141 @@
 import React from 'react';
 import Window from '../components/Window';
-import Button from '../components/Button';
-import { FolderIconSmall } from '../components/Icons';
+import { MyComputerIcon } from '../components/Icons';
 import { portfolioData } from '../../../data/portfolioData';
 import { useSound } from '../../../context/SoundContext';
 
 export default function MyComputerWindow({
   isOpen,
   isActive,
-  isMaximized,
   zIndex,
   position,
   onFocus,
-  onMinimize,
-  onMaximize,
   onClose,
+  onOpenHello,
 }) {
   const profile = portfolioData.profile || {};
-  const systemProperties = portfolioData.systemProperties || {};
-  const systemInfo = systemProperties.systemInfo || {};
-  const systemStatus = systemProperties.systemStatus || {};
+  const rawExperience = portfolioData.systemProperties?.systemInfo?.EXPERIENCE || '5 Years';
+  const experienceText = `${rawExperience} of 'just one small change'`;
   const { playSound } = useSound();
 
-  const handleOk = () => {
+  const handleSayHello = () => {
+    playSound('chimes');
+    if (onOpenHello) onOpenHello();
+    if (onClose) onClose();
+  };
+
+  const handleClose = () => {
     playSound('chord');
     if (onClose) onClose();
   };
 
-  const handleCancel = () => {
-    if (onClose) onClose();
-  };
+  const sysInfoItems = [
+    { label: 'SYSTEM TYPE', val: 'Product Designer (mostly human)' },
+    { label: 'SPECIALIZATION', val: 'Fintech, Web, Mobile. Making numbers look friendly.' },
+    { label: 'EXPERIENCE', val: experienceText },
+    { label: 'CURRENT ROLE', val: 'Product Designer at Neo. Unofficially: the person who knows where the Figma file is.' },
+    { label: 'LOCATION', val: 'Goa, India. Working, not vacationing.' },
+    { label: 'PRIMARY TOOLS', val: 'Figma, Photoshop, Illustrator, and Ctrl+Z' },
+    { label: 'INTERESTS', val: 'Product design, UX strategy, AI, research. Also strong opinions about padding.' },
+  ];
+
+  const sysStatusItems = [
+    { label: 'DESIGN SYSTEM', val: 'ACTIVE' },
+    { label: 'FINTECH MODE', val: 'ACTIVE (SADLY)' },
+    { label: 'IDEAS', val: 'RUNNING (UNSTABLE)' },
+    { label: 'COFFEE', val: 'REQUIRED' },
+  ];
 
   return (
     <Window
       id="my-computer-window"
-      title="My Computer"
-      icon={<FolderIconSmall />}
+      title="Me.exe"
+      icon={<MyComputerIcon />}
       isOpen={isOpen}
       isActive={isActive}
-      isMaximized={isMaximized}
+      isMaximized={false}
       zIndex={zIndex}
       position={position}
-      defaultWidth={780}
-      defaultHeight={660}
-      hasMenu={true}
+      defaultWidth={620}
+      defaultHeight="auto"
+      hasMenu={false}
+      showMinimize={false}
+      showMaximize={false}
+      showClose={true}
+      isDialog={true}
       onFocus={onFocus}
-      onMinimize={onMinimize}
-      onMaximize={onMaximize}
-      onClose={onClose}
+      onClose={handleClose}
     >
       <div
-        className="WindowClientArea"
+        className="WindowClientArea win-dialog-client"
         style={{
           alignSelf: 'stretch',
-          flex: 1,
-          paddingLeft: '20px',
-          paddingRight: '20px',
-          paddingTop: '16px',
-          paddingBottom: '16px',
+          paddingLeft: '16px',
+          paddingRight: '16px',
+          paddingTop: '12px',
+          paddingBottom: '14px',
           background: '#C0C0C0',
-          overflowY: 'auto',
+          boxShadow: 'none',
+          border: 'none',
           flexDirection: 'column',
-          gap: '12px',
+          gap: '10px',
           display: 'flex',
           boxSizing: 'border-box',
+          fontFamily: "var(--win-font, 'W95FA', 'MS Sans Serif', Tahoma, sans-serif)",
+          fontSize: '11px',
         }}
       >
-        <div
-          style={{
-            alignSelf: 'stretch',
-            color: '#808080',
-            fontSize: '11px',
-            fontFamily: 'Inter, sans-serif',
-            fontStyle: 'italic',
-            fontWeight: 400,
-          }}
-        >
-          &quot;Yes, unfortunately, this is mine.&quot;
-        </div>
-
-        {/* Title */}
-        <div style={{ alignSelf: 'stretch', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+        {/* Header section */}
+        <div style={{ alignSelf: 'stretch', display: 'flex', flexDirection: 'column', gap: '3px' }}>
           <div
             style={{
               alignSelf: 'stretch',
-              color: 'black',
-              fontSize: '22px',
-              fontFamily: "'MS W98 UI', 'Segoe UI', Tahoma, sans-serif",
-              fontWeight: 700,
+              color: '#404040',
+              fontSize: '11px',
+              fontStyle: 'italic',
+              fontWeight: 400,
             }}
           >
-            {profile.name.toUpperCase()}
+            &quot;Yes, unfortunately, this is mine.&quot;
+          </div>
+          <div
+            style={{
+              alignSelf: 'stretch',
+              color: '#000000',
+              fontSize: '20px',
+              fontWeight: 700,
+              lineHeight: '22px',
+            }}
+          >
+            NAVEEN KUMAR PANDEY
           </div>
           <div
             style={{
               alignSelf: 'stretch',
               color: '#000080',
               fontSize: '12px',
-              fontFamily: "'MS W98 UI', 'Segoe UI', Tahoma, sans-serif",
               fontWeight: 700,
             }}
           >
-            {profile.title}
+            PRODUCT DESIGNER
           </div>
           <div
             style={{
               alignSelf: 'stretch',
-              color: '#808080',
-              fontSize: '10px',
-              fontFamily: "'MS W98 UI', 'Segoe UI', Tahoma, sans-serif",
+              color: '#404040',
+              fontSize: '11px',
               fontWeight: 400,
+              whiteSpace: 'nowrap',
             }}
           >
-            FINTECH • WEB &amp; MOBILE
+            Fintech • Web • Mobile
           </div>
         </div>
 
         {/* 3D Divider */}
         <div style={{ alignSelf: 'stretch', height: '2px', display: 'flex', flexDirection: 'column' }}>
           <div style={{ height: '1px', borderBottom: '1px solid #808080' }} />
-          <div style={{ height: '1px', borderBottom: '1px solid white' }} />
+          <div style={{ height: '1px', borderBottom: '1px solid #FFFFFF' }} />
         </div>
 
         {/* 2 Columns: System Info on left, About & Status on right */}
@@ -127,103 +143,85 @@ export default function MyComputerWindow({
           style={{
             alignSelf: 'stretch',
             display: 'flex',
-            gap: '16px',
-            flexWrap: 'wrap',
+            gap: '12px',
+            alignItems: 'stretch',
           }}
         >
           {/* Left Column: System Information */}
-          <div style={{ flex: '1 1 320px', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ flex: '1 1 310px', display: 'flex', flexDirection: 'column' }}>
             <div
               className="GroupSystemInformation"
               style={{
                 alignSelf: 'stretch',
-                paddingTop: '22px',
-                paddingBottom: '12px',
-                paddingLeft: '14px',
-                paddingRight: '14px',
+                height: '100%',
+                paddingTop: '16px',
+                paddingBottom: '10px',
+                paddingLeft: '12px',
+                paddingRight: '12px',
                 position: 'relative',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '6px',
+                border: '1px solid #808080',
+                boxShadow: '1px 1px 0px #FFFFFF, inset 1px 1px 0px #FFFFFF',
+                boxSizing: 'border-box',
               }}
             >
-              <div
-                style={{
-                  position: 'absolute',
-                  left: 0,
-                  right: 0,
-                  top: '7px',
-                  bottom: 0,
-                  border: '1px solid #808080',
-                  pointerEvents: 'none',
-                }}
-              />
-              <div
-                style={{
-                  position: 'absolute',
-                  left: '1px',
-                  right: '1px',
-                  top: '8px',
-                  bottom: '1px',
-                  border: '1px solid white',
-                  pointerEvents: 'none',
-                }}
-              />
+              {/* Group Box Title */}
               <div
                 style={{
                   paddingLeft: '4px',
                   paddingRight: '4px',
                   left: '10px',
-                  top: 0,
+                  top: '-7px',
                   position: 'absolute',
                   background: '#C0C0C0',
                   display: 'inline-flex',
                 }}
               >
-                <div
+                <span
                   style={{
-                    color: 'black',
+                    color: '#000000',
                     fontSize: '11px',
-                    fontFamily: "'MS W98 UI', 'Segoe UI', Tahoma, sans-serif",
                     fontWeight: 700,
                   }}
                 >
                   SYSTEM INFORMATION
-                </div>
+                </span>
               </div>
 
-              {Object.entries(systemInfo).map(([label, val]) => (
+              {sysInfoItems.map((item) => (
                 <div
-                  key={label}
+                  key={item.label}
                   style={{
                     alignSelf: 'stretch',
                     display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
+                    alignItems: 'flex-start',
+                    gap: '8px',
+                    lineHeight: '14px',
                   }}
                 >
                   <div
                     style={{
-                      width: '120px',
-                      color: '#808080',
+                      width: '108px',
+                      flexShrink: 0,
+                      color: '#404040',
                       fontSize: '10px',
-                      fontFamily: "'MS W98 UI', 'Segoe UI', Tahoma, sans-serif",
                       fontWeight: 700,
-                      letterSpacing: '0.50px',
+                      letterSpacing: '0.3px',
                     }}
                   >
-                    {label.toUpperCase()}
+                    {item.label}:
                   </div>
                   <div
                     style={{
                       flex: 1,
-                      color: 'black',
+                      color: '#000000',
                       fontSize: '11px',
-                      fontFamily: "'MS W98 UI', 'Segoe UI', Tahoma, sans-serif",
                       fontWeight: 400,
                     }}
                   >
-                    {val}
+                    {item.val}
                   </div>
                 </div>
               ))}
@@ -231,76 +229,54 @@ export default function MyComputerWindow({
           </div>
 
           {/* Right Column: About & System Status */}
-          <div style={{ flex: '1 1 320px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div style={{ flex: '1 1 270px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {/* About Box */}
             <div
               className="GroupAbout"
               style={{
                 alignSelf: 'stretch',
-                paddingTop: '22px',
-                paddingBottom: '12px',
-                paddingLeft: '14px',
-                paddingRight: '14px',
+                paddingTop: '16px',
+                paddingBottom: '10px',
+                paddingLeft: '12px',
+                paddingRight: '12px',
                 position: 'relative',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '6px',
+                border: '1px solid #808080',
+                boxShadow: '1px 1px 0px #FFFFFF, inset 1px 1px 0px #FFFFFF',
+                boxSizing: 'border-box',
               }}
             >
-              <div
-                style={{
-                  position: 'absolute',
-                  left: 0,
-                  right: 0,
-                  top: '7px',
-                  bottom: 0,
-                  border: '1px solid #808080',
-                  pointerEvents: 'none',
-                }}
-              />
-              <div
-                style={{
-                  position: 'absolute',
-                  left: '1px',
-                  right: '1px',
-                  top: '8px',
-                  bottom: '1px',
-                  border: '1px solid white',
-                  pointerEvents: 'none',
-                }}
-              />
               <div
                 style={{
                   paddingLeft: '4px',
                   paddingRight: '4px',
                   left: '10px',
-                  top: 0,
+                  top: '-7px',
                   position: 'absolute',
                   background: '#C0C0C0',
                   display: 'inline-flex',
                 }}
               >
-                <div
+                <span
                   style={{
-                    color: 'black',
+                    color: '#000000',
                     fontSize: '11px',
-                    fontFamily: "'MS W98 UI', 'Segoe UI', Tahoma, sans-serif",
                     fontWeight: 700,
                   }}
                 >
                   ABOUT
-                </div>
+                </span>
               </div>
               <div
                 style={{
-                  color: 'black',
+                  color: '#000000',
                   fontSize: '11px',
-                  fontFamily: "'MS W98 UI', 'Segoe UI', Tahoma, sans-serif",
+                  lineHeight: '15px',
                   fontWeight: 400,
-                  lineHeight: '18px',
                 }}
               >
-                {systemProperties.about}
+                I&apos;m a product designer who builds fintech, web and mobile products people can actually use, even on a Monday. I work across product strategy, UX, interaction design, design systems, research and design QA, which is a fancy way of saying I notice the 2px misalignment you didn&apos;t.
               </div>
             </div>
 
@@ -309,100 +285,127 @@ export default function MyComputerWindow({
               className="GroupSystemStatus"
               style={{
                 alignSelf: 'stretch',
-                paddingTop: '22px',
-                paddingBottom: '12px',
-                paddingLeft: '14px',
-                paddingRight: '14px',
+                paddingTop: '16px',
+                paddingBottom: '10px',
+                paddingLeft: '12px',
+                paddingRight: '12px',
                 position: 'relative',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '6px',
+                gap: '5px',
+                border: '1px solid #808080',
+                boxShadow: '1px 1px 0px #FFFFFF, inset 1px 1px 0px #FFFFFF',
+                boxSizing: 'border-box',
               }}
             >
-              <div
-                style={{
-                  position: 'absolute',
-                  left: 0,
-                  right: 0,
-                  top: '7px',
-                  bottom: 0,
-                  border: '1px solid #808080',
-                  pointerEvents: 'none',
-                }}
-              />
-              <div
-                style={{
-                  position: 'absolute',
-                  left: '1px',
-                  right: '1px',
-                  top: '8px',
-                  bottom: '1px',
-                  border: '1px solid white',
-                  pointerEvents: 'none',
-                }}
-              />
               <div
                 style={{
                   paddingLeft: '4px',
                   paddingRight: '4px',
                   left: '10px',
-                  top: 0,
+                  top: '-7px',
                   position: 'absolute',
                   background: '#C0C0C0',
                   display: 'inline-flex',
                 }}
               >
-                <div
+                <span
                   style={{
-                    color: 'black',
+                    color: '#000000',
                     fontSize: '11px',
-                    fontFamily: "'MS W98 UI', 'Segoe UI', Tahoma, sans-serif",
                     fontWeight: 700,
                   }}
                 >
                   SYSTEM STATUS
-                </div>
+                </span>
               </div>
-              {Object.entries(systemStatus).map(([name, status]) => (
+              {sysStatusItems.map((item) => (
                 <div
-                  key={name}
+                  key={item.label}
                   style={{
                     display: 'flex',
                     justifyContent: 'space-between',
-                    color: '#808080',
                     fontSize: '11px',
-                    fontFamily: "'MS W98 UI', 'Segoe UI', Tahoma, sans-serif",
+                    lineHeight: '14px',
                   }}
                 >
-                  <span>{name.toUpperCase()}</span>
-                  <span>{status.toUpperCase()}</span>
+                  <span style={{ color: '#404040', fontWeight: 700, fontSize: '10px' }}>
+                    {item.label}:
+                  </span>
+                  <span style={{ color: '#000000', fontWeight: 700 }}>
+                    {item.val}
+                  </span>
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        {/* Divider */}
-        <div style={{ alignSelf: 'stretch', height: '2px', display: 'flex', flexDirection: 'column' }}>
+        {/* 3D Divider */}
+        <div style={{ alignSelf: 'stretch', height: '2px', display: 'flex', flexDirection: 'column', marginTop: '2px' }}>
           <div style={{ height: '1px', borderBottom: '1px solid #808080' }} />
-          <div style={{ height: '1px', borderBottom: '1px solid white' }} />
+          <div style={{ height: '1px', borderBottom: '1px solid #FFFFFF' }} />
         </div>
 
-        {/* Buttons */}
+        {/* Buttons Row */}
         <div
           style={{
             alignSelf: 'stretch',
             display: 'flex',
-            justifyContent: 'center',
+            justifyContent: 'flex-end',
             gap: '8px',
+            paddingTop: '2px',
           }}
         >
-          <Button id="btn-ok-mycomputer" onClick={handleOk}>
-            OK
-          </Button>
-          <Button id="btn-cancel-mycomputer" onClick={handleCancel}>
-            Cancel
-          </Button>
+          {/* Default Button: Say Hello */}
+          <button
+            id="btn-say-hello"
+            onClick={handleSayHello}
+            style={{
+              minWidth: '80px',
+              height: '23px',
+              padding: '0 12px',
+              background: '#C0C0C0',
+              boxShadow: '2px 2px 0px #DFDFDF inset, -2px -2px 0px #7F7F7F inset, 1px 1px 0px white inset, -1px -1px 0px black inset',
+              border: '1px solid #000000',
+              outline: '1px dotted #000000',
+              outlineOffset: '-4px',
+              fontSize: '11px',
+              fontFamily: "var(--win-font, 'W95FA', 'MS Sans Serif', Tahoma, sans-serif)",
+              color: '#000000',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxSizing: 'border-box',
+            }}
+          >
+            Say Hello
+          </button>
+
+          {/* Close Button */}
+          <button
+            id="btn-close-mycomputer"
+            onClick={handleClose}
+            style={{
+              minWidth: '75px',
+              height: '23px',
+              padding: '0 12px',
+              background: '#C0C0C0',
+              boxShadow: '2px 2px 0px #DFDFDF inset, -2px -2px 0px #7F7F7F inset, 1px 1px 0px white inset, -1px -1px 0px black inset',
+              border: 'none',
+              fontSize: '11px',
+              fontFamily: "var(--win-font, 'W95FA', 'MS Sans Serif', Tahoma, sans-serif)",
+              color: '#000000',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxSizing: 'border-box',
+            }}
+          >
+            Close
+          </button>
         </div>
       </div>
     </Window>

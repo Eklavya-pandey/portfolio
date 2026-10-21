@@ -148,15 +148,55 @@ export const DragSizeIcon = () => (
   </svg>
 );
 
-// System Tray Speaker Icon
+// System Tray Speaker Icon - 16x16 authentic Win98
 export const SpeakerIcon = () => (
-  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-    <path
-      d="M0.999512 6.50044C1.26475 6.50044 1.51912 6.39507 1.70668 6.20752C1.89423 6.01997 1.99959 5.7656 1.99959 5.50036V3.5002C1.99959 3.23496 2.10496 2.98059 2.29251 2.79304C2.48006 2.60549 2.73443 2.50012 2.99967 2.50012C3.26491 2.50012 3.51928 2.60549 3.70684 2.79304C3.89439 2.98059 3.99975 3.23496 3.99975 3.5002V10.0007C3.99975 10.266 4.10512 10.5203 4.29267 10.7079C4.48022 10.8954 4.73459 11.0008 4.99983 11.0008C5.26507 11.0008 5.51944 10.8954 5.70699 10.7079C5.89455 10.5203 5.99991 10.266 5.99991 10.0007V2.00008C5.99991 1.73484 6.10528 1.48047 6.29283 1.29292C6.48038 1.10537 6.73475 1 6.99999 1C7.26523 1 7.5196 1.10537 7.70715 1.29292C7.89471 1.48047 8.00007 1.73484 8.00007 2.00008V8.5006C8.00007 8.76584 8.10544 9.02021 8.29299 9.20776C8.48054 9.39531 8.73491 9.50068 9.00015 9.50068C9.26539 9.50068 9.51976 9.39531 9.70731 9.20776C9.89487 9.02021 10.0002 8.76584 10.0002 8.5006V6.50044C10.0002 6.2352 10.1056 5.98083 10.2931 5.79328C10.4807 5.60573 10.7351 5.50036 11.0003 5.50036"
-      stroke="black"
-      strokeWidth="2"
-      strokeLinecap="round"
-    />
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ shapeRendering: 'crispEdges' }}>
+    {/* Speaker magnet base */}
+    <rect x="1" y="6" width="3" height="4" fill="#808080" />
+    <rect x="1" y="6" width="1" height="4" fill="#000000" />
+    <rect x="2" y="6" width="2" height="1" fill="#FFFFFF" />
+    <rect x="2" y="9" width="2" height="1" fill="#000000" />
+    {/* Speaker cone / horn */}
+    <rect x="4" y="5" width="1" height="6" fill="#C0C0C0" />
+    <rect x="5" y="4" width="1" height="8" fill="#C0C0C0" />
+    <rect x="6" y="3" width="1" height="10" fill="#FFFF00" />
+    <rect x="7" y="2" width="1" height="12" fill="#FFFF00" />
+    <rect x="8" y="1" width="1" height="14" fill="#000000" />
+    <rect x="7" y="2" width="1" height="1" fill="#FFFFFF" />
+    <rect x="6" y="3" width="1" height="1" fill="#FFFFFF" />
+    <rect x="5" y="4" width="1" height="1" fill="#FFFFFF" />
+    <rect x="4" y="5" width="1" height="1" fill="#FFFFFF" />
+    <rect x="7" y="13" width="1" height="1" fill="#808080" />
+    <rect x="6" y="12" width="1" height="1" fill="#808080" />
+    <rect x="5" y="11" width="1" height="1" fill="#808080" />
+    <rect x="4" y="10" width="1" height="1" fill="#808080" />
+    {/* Inner sound wave */}
+    <path d="M10 5H11V6H12V10H11V11H10" stroke="#000000" strokeWidth="1" fill="none" />
+    {/* Outer sound wave */}
+    <path d="M13 3H14V4H15V12H14V13H13" stroke="#000000" strokeWidth="1" fill="none" />
+  </svg>
+);
+
+// 16x16 Internal Tool Icon (Gear File)
+export const GearFileIconSmall = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ shapeRendering: 'crispEdges' }}>
+    <path d="M2 1H10L14 5V15H2V1Z" fill="#FFFFFF" stroke="#000000" strokeWidth="1" />
+    <path d="M10 1V5H14" fill="#DFDFDF" stroke="#000000" strokeWidth="1" />
+    <rect x="6" y="7" width="4" height="4" fill="#000080" />
+    <rect x="5" y="8" width="6" height="2" fill="#000080" />
+    <rect x="7" y="6" width="2" height="6" fill="#000080" />
+    <rect x="7" y="8" width="2" height="2" fill="#FFFFFF" />
+  </svg>
+);
+
+// 16x16 Web Icon (Globe File)
+export const GlobeFileIconSmall = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ shapeRendering: 'crispEdges' }}>
+    <path d="M2 1H10L14 5V15H2V1Z" fill="#FFFFFF" stroke="#000000" strokeWidth="1" />
+    <path d="M10 1V5H14" fill="#DFDFDF" stroke="#000000" strokeWidth="1" />
+    <circle cx="8" cy="9.5" r="3.5" fill="#1084D0" stroke="#000000" strokeWidth="1" />
+    <line x1="4.5" y1="9.5" x2="11.5" y2="9.5" stroke="#FFFFFF" strokeWidth="1" />
+    <ellipse cx="8" cy="9.5" rx="1.5" ry="3.5" stroke="#FFFFFF" strokeWidth="1" fill="none" />
   </svg>
 );
 
