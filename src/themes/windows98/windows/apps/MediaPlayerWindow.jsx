@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Window from '../../components/Window';
 import { useWin98Audio } from '../../context/Win98AudioContext';
 
