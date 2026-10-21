@@ -1539,3 +1539,64 @@
   flex-shrink: 0 !important;
   overflow: visible !important;
 }
+
+/* Windows 98 Shell Standards: Dotted Focus, Close button, Mobile Notice */
+button:focus-visible,
+button:focus,
+button:focus-visible,
+.win-btn:focus,
+.win-btn:focus-visible,
+.Button:focus,
+.Button:focus-visible,
+.MenuItem:focus,
+.MenuItem:focus-visible,
+[role="menuitem"]:focus,
+[role="menuitem"]:focus-visible,
+[role="button"]:focus,
+[role="button"]:focus-visible,
+.ButtonWindowButton:focus,
+.ButtonWindowButton:focus-visible,
+input:focus,
+input:focus-visible,
+select:focus,
+select:focus-visible,
+textarea:focus,
+textarea:focus-visible {
+  outline: 1px dotted #000000 !important;
+  outline-offset: -2px;
+}
+
+/* Close is the red-gray X */
+.win-btn-close svg path {
+  fill: #800000;
+}
+.win-btn-close:hover svg path,
+.win-btn-close:active svg path {
+  fill: #CC0000;
+  stroke: #CC0000;
+}
+
+/* Mobile Desktop Notice */
+.win98-mobile-notice {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: #FFFFCC;
+  color: #000000;
+  border: 1px solid #000000;
+  box-shadow: 2px 2px 0px rgba(0,0,0,0.4);
+  padding: 4px 8px;
+  font-size: 11px;
+  font-family: var(--win-font);
+  z-index: 20;
+  display: none;
+  align-items: center;
+  gap: 4px;
+}
+
+@media (max-width: 768px) {
+  .win98-mobile-notice {
+    display: flex;
+  }
+}
+

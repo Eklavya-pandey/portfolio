@@ -39,6 +39,9 @@ export default function WindowControls({
     >
       {showMinimize && (
         <div
+          role="button"
+          tabIndex={0}
+          aria-label="Minimize"
           className="ButtonWindowButton win-btn-minimize"
           style={getStyle('min')}
           onMouseDown={() => setPressedBtn('min')}
@@ -50,6 +53,12 @@ export default function WindowControls({
             e.stopPropagation();
             if (onMinimize) onMinimize();
           }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              if (onMinimize) onMinimize();
+            }
+          }}
           title="Minimize"
         >
           <div className="UtillityIcons" style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -60,6 +69,9 @@ export default function WindowControls({
 
       {showMaximize && (
         <div
+          role="button"
+          tabIndex={0}
+          aria-label={isMaximized ? 'Restore' : 'Maximize'}
           className="ButtonWindowButton win-btn-maximize"
           style={getStyle('max')}
           onMouseDown={() => setPressedBtn('max')}
@@ -71,6 +83,12 @@ export default function WindowControls({
             e.stopPropagation();
             if (onMaximize) onMaximize();
           }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              if (onMaximize) onMaximize();
+            }
+          }}
           title={isMaximized ? 'Restore' : 'Maximize'}
         >
           <div className="UtillityIcons" style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -81,6 +99,9 @@ export default function WindowControls({
 
       {showClose && (
         <div
+          role="button"
+          tabIndex={0}
+          aria-label="Close"
           className="ButtonWindowButton win-btn-close"
           style={getStyle('close')}
           onMouseDown={() => setPressedBtn('close')}
@@ -91,6 +112,12 @@ export default function WindowControls({
           onClick={(e) => {
             e.stopPropagation();
             if (onClose) onClose();
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              if (onClose) onClose();
+            }
           }}
           title="Close"
         >

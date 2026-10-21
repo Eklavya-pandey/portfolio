@@ -159,3 +159,107 @@ export const SpeakerIcon = () => (
     />
   </svg>
 );
+
+// 32x32 Desktop Icons for Games & Shell Apps
+export const MinesweeperIcon = () => (
+  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+    <rect x="2" y="2" width="28" height="28" fill="#C0C0C0" stroke="#000" strokeWidth="2" />
+    <circle cx="16" cy="16" r="8" fill="#000" />
+    <rect x="14" y="4" width="4" height="24" fill="#000" />
+    <rect x="4" y="14" width="24" height="4" fill="#000" />
+    <line x1="8" y1="8" x2="24" y2="24" stroke="#000" strokeWidth="4" />
+    <line x1="8" y1="24" x2="24" y2="8" stroke="#000" strokeWidth="4" />
+    <circle cx="13" cy="13" r="2.5" fill="#FFF" />
+  </svg>
+);
+
+export const SolitaireIcon = () => (
+  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+    <rect x="6" y="2" width="20" height="28" rx="2" fill="#FFF" stroke="#000" strokeWidth="2" />
+    <path d="M16 8L10 18H22L16 8Z" fill="#CC0000" />
+    <path d="M16 26L10 16H22L16 26Z" fill="#CC0000" />
+    <text x="8" y="12" fontSize="9" fontFamily="Arial" fill="#CC0000" fontWeight="bold">A</text>
+  </svg>
+);
+
+export const FreeCellIcon = () => (
+  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+    <rect x="3" y="3" width="12" height="12" rx="1" fill="#FFF" stroke="#000" strokeWidth="1.5" />
+    <rect x="17" y="3" width="12" height="12" rx="1" fill="#FFF" stroke="#000" strokeWidth="1.5" />
+    <rect x="10" y="16" width="12" height="13" rx="1" fill="#FFF" stroke="#000" strokeWidth="1.5" />
+    <text x="5" y="12" fontSize="8" fill="#CC0000" fontWeight="bold">♦</text>
+    <text x="19" y="12" fontSize="8" fill="#000" fontWeight="bold">♠</text>
+    <text x="12" y="25" fontSize="8" fill="#CC0000" fontWeight="bold">♥</text>
+  </svg>
+);
+
+export const ChessIcon = () => (
+  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+    <rect x="4" y="24" width="24" height="5" fill="#000" />
+    <path d="M7 24V18C7 14 9 12 9 8C9 6 11 4 16 4C21 4 23 6 23 8C23 12 25 14 25 18V24H7Z" fill="#FFF" stroke="#000" strokeWidth="2" />
+    <circle cx="16" cy="6" r="3" fill="#CC0000" />
+    <line x1="16" y1="12" x2="16" y2="20" stroke="#000" strokeWidth="2" />
+    <line x1="12" y1="16" x2="20" y2="16" stroke="#000" strokeWidth="2" />
+  </svg>
+);
+
+export const PaintIcon = () => (
+  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+    <rect x="3" y="3" width="26" height="26" rx="4" fill="#E8E8E8" stroke="#000" strokeWidth="2" />
+    <path d="M7 23 C7 14 16 10 25 7 C23 16 19 25 7 23 Z" fill="#0066CC" />
+    <circle cx="11" cy="11" r="3" fill="#FF0000" />
+    <circle cx="21" cy="17" r="3" fill="#FFFF00" />
+    <circle cx="16" cy="22" r="3" fill="#009900" />
+  </svg>
+);
+
+export const NotepadIcon = () => (
+  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+    <rect x="4" y="2" width="24" height="28" fill="#4D88FF" stroke="#000" strokeWidth="2" />
+    <path d="M8 2V30" stroke="#000" strokeWidth="1" />
+    <rect x="11" y="6" width="13" height="2" fill="#FFF" />
+    <rect x="11" y="11" width="13" height="2" fill="#FFF" />
+    <rect x="11" y="16" width="13" height="2" fill="#FFF" />
+    <rect x="11" y="21" width="13" height="2" fill="#FFF" />
+  </svg>
+);
+
+export const CalculatorIcon = () => (
+  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+    <rect x="4" y="2" width="24" height="28" rx="2" fill="#C0C0C0" stroke="#000" strokeWidth="2" />
+    <rect x="7" y="5" width="18" height="6" fill="#FFF" stroke="#000" strokeWidth="1" />
+    <rect x="7" y="14" width="4" height="3" fill="#000080" />
+    <rect x="14" y="14" width="4" height="3" fill="#000080" />
+    <rect x="21" y="14" width="4" height="3" fill="#800000" />
+    <rect x="7" y="20" width="4" height="3" fill="#000080" />
+    <rect x="14" y="20" width="4" height="3" fill="#000080" />
+    <rect x="21" y="20" width="4" height="3" fill="#800000" />
+    <rect x="7" y="25" width="4" height="3" fill="#000080" />
+    <rect x="14" y="25" width="4" height="3" fill="#000080" />
+    <rect x="21" y="25" width="4" height="3" fill="#800000" />
+  </svg>
+);
+
+export const InternetExplorerIcon = () => (
+  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+    <circle cx="16" cy="16" r="14" fill="#0066CC" stroke="#003366" strokeWidth="1" />
+    <path d="M2 16 C8 26 24 26 30 16 C24 6 8 6 2 16 Z" fill="#FFCC00" opacity="0.9" />
+    <text x="10" y="23" fill="#FFFFFF" fontSize="20" fontWeight="bold" fontFamily="Arial">e</text>
+  </svg>
+);
+
+export const MediaPlayerIcon = () => (
+  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+    <circle cx="16" cy="16" r="14" fill="#000080" stroke="#000" strokeWidth="1" />
+    <circle cx="16" cy="16" r="9" fill="#C0C0C0" stroke="#FFF" strokeWidth="1" />
+    <path d="M14 11L21 16L14 21V11Z" fill="#000080" />
+  </svg>
+);
+
+export const WinampIcon = () => (
+  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+    <rect width="32" height="32" rx="4" fill="#1C1C20" stroke="#505058" strokeWidth="1" />
+    <path d="M18 2L6 18H16L14 30L26 14H16L18 2Z" fill="#FFFF00" stroke="#FF9900" strokeWidth="1" />
+  </svg>
+);
+

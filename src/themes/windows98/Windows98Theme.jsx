@@ -28,9 +28,36 @@ import NovaInvestWindow from './windows/NovaInvestWindow';
 import OneStepPrintWindow from './windows/OneStepPrintWindow';
 import DesktopContextMenu from './components/DesktopContextMenu';
 
+// New Games & Shell Apps
+import MinesweeperWindow, { MinesweeperIconSmall } from './windows/games/MinesweeperWindow';
+import SolitaireWindow, { SolitaireIconSmall } from './windows/games/SolitaireWindow';
+import FreeCellWindow, { FreeCellIconSmall } from './windows/games/FreeCellWindow';
+import ChessWindow, { ChessIconSmall } from './windows/games/ChessWindow';
+import PaintWindow, { PaintIconSmall } from './windows/apps/PaintWindow';
+import NotepadWindow, { NotepadIconSmall } from './windows/apps/NotepadWindow';
+import CalculatorWindow, { CalculatorIconSmall } from './windows/apps/CalculatorWindow';
+import InternetExplorerWindow, { InternetExplorerIconSmall } from './windows/apps/InternetExplorerWindow';
+import MediaPlayerWindow, { MediaPlayerIconSmall } from './windows/apps/MediaPlayerWindow';
+import WinampWindow, { WinampIconSmall } from './windows/apps/WinampWindow';
+import { Win98AudioProvider } from './context/Win98AudioContext';
+
+import {
+  MinesweeperIcon,
+  SolitaireIcon,
+  FreeCellIcon,
+  ChessIcon,
+  PaintIcon,
+  NotepadIcon,
+  CalculatorIcon,
+  InternetExplorerIcon,
+  MediaPlayerIcon,
+  WinampIcon,
+} from './components/Icons';
+
 import { useSound } from '../../context/SoundContext';
 
 const INITIAL_DESKTOP_ICONS = [
+  // Column 1 (x: 24) - Core
   {
     id: 'me',
     domId: 'icon-me',
@@ -91,6 +118,110 @@ const INITIAL_DESKTOP_ICONS = [
     x: 24,
     y: 440,
   },
+
+  // Column 2 (x: 104) - Shell Apps
+  {
+    id: 'ie',
+    domId: 'icon-ie',
+    name: 'Internet Explorer',
+    defaultName: 'Internet Explorer',
+    iconType: 'internetExplorer',
+    windowKey: 'internetExplorer',
+    x: 104,
+    y: 20,
+  },
+  {
+    id: 'paint',
+    domId: 'icon-paint',
+    name: 'Paint',
+    defaultName: 'Paint',
+    iconType: 'paint',
+    windowKey: 'paint',
+    x: 104,
+    y: 104,
+  },
+  {
+    id: 'notepad',
+    domId: 'icon-notepad',
+    name: 'Notepad',
+    defaultName: 'Notepad',
+    iconType: 'notepad',
+    windowKey: 'notepad',
+    x: 104,
+    y: 188,
+  },
+  {
+    id: 'calculator',
+    domId: 'icon-calculator',
+    name: 'Calculator',
+    defaultName: 'Calculator',
+    iconType: 'calculator',
+    windowKey: 'calculator',
+    x: 104,
+    y: 272,
+  },
+  {
+    id: 'mediaPlayer',
+    domId: 'icon-media-player',
+    name: 'Media Player',
+    defaultName: 'Media Player',
+    iconType: 'mediaPlayer',
+    windowKey: 'mediaPlayer',
+    x: 104,
+    y: 356,
+  },
+  {
+    id: 'winamp',
+    domId: 'icon-winamp',
+    name: 'Winamp',
+    defaultName: 'Winamp',
+    iconType: 'winamp',
+    windowKey: 'winamp',
+    x: 104,
+    y: 440,
+  },
+
+  // Column 3 (x: 184) - Games
+  {
+    id: 'minesweeper',
+    domId: 'icon-minesweeper',
+    name: 'Minesweeper',
+    defaultName: 'Minesweeper',
+    iconType: 'minesweeper',
+    windowKey: 'minesweeper',
+    x: 184,
+    y: 20,
+  },
+  {
+    id: 'solitaire',
+    domId: 'icon-solitaire',
+    name: 'Solitaire',
+    defaultName: 'Solitaire',
+    iconType: 'solitaire',
+    windowKey: 'solitaire',
+    x: 184,
+    y: 104,
+  },
+  {
+    id: 'freecell',
+    domId: 'icon-freecell',
+    name: 'FreeCell',
+    defaultName: 'FreeCell',
+    iconType: 'freecell',
+    windowKey: 'freecell',
+    x: 184,
+    y: 188,
+  },
+  {
+    id: 'chess',
+    domId: 'icon-chess',
+    name: 'Chess',
+    defaultName: 'Chess',
+    iconType: 'chess',
+    windowKey: 'chess',
+    x: 184,
+    y: 272,
+  },
 ];
 
 const ICON_COMPONENT_MAP = {
@@ -100,6 +231,16 @@ const ICON_COMPONENT_MAP = {
   skills: <SkillsIcon />,
   hello: <HelloIcon />,
   oops: <OopsIcon />,
+  internetExplorer: <InternetExplorerIcon />,
+  paint: <PaintIcon />,
+  notepad: <NotepadIcon />,
+  calculator: <CalculatorIcon />,
+  mediaPlayer: <MediaPlayerIcon />,
+  winamp: <WinampIcon />,
+  minesweeper: <MinesweeperIcon />,
+  solitaire: <SolitaireIcon />,
+  freecell: <FreeCellIcon />,
+  chess: <ChessIcon />,
 };
 
 const INITIAL_WINDOWS = {
@@ -191,6 +332,108 @@ const INITIAL_WINDOWS = {
     isMinimized: false,
     isMaximized: false,
     position: { x: 220, y: 40 },
+    zIndex: 30,
+  },
+  // Shell Apps
+  internetExplorer: {
+    id: 'internetExplorer',
+    title: 'Microsoft Internet Explorer',
+    icon: <InternetExplorerIconSmall />,
+    isOpen: false,
+    isMinimized: false,
+    isMaximized: false,
+    position: { x: 260, y: 40 },
+    zIndex: 30,
+  },
+  paint: {
+    id: 'paint',
+    title: 'untitled - Paint',
+    icon: <PaintIconSmall />,
+    isOpen: false,
+    isMinimized: false,
+    isMaximized: false,
+    position: { x: 280, y: 50 },
+    zIndex: 30,
+  },
+  notepad: {
+    id: 'notepad',
+    title: 'Untitled - Notepad',
+    icon: <NotepadIconSmall />,
+    isOpen: false,
+    isMinimized: false,
+    isMaximized: false,
+    position: { x: 340, y: 80 },
+    zIndex: 30,
+  },
+  calculator: {
+    id: 'calculator',
+    title: 'Calculator',
+    icon: <CalculatorIconSmall />,
+    isOpen: false,
+    isMinimized: false,
+    isMaximized: false,
+    position: { x: 360, y: 110 },
+    zIndex: 30,
+  },
+  mediaPlayer: {
+    id: 'mediaPlayer',
+    title: 'Windows Media Player',
+    icon: <MediaPlayerIconSmall />,
+    isOpen: false,
+    isMinimized: false,
+    isMaximized: false,
+    position: { x: 310, y: 100 },
+    zIndex: 30,
+  },
+  winamp: {
+    id: 'winamp',
+    title: 'WINAMP',
+    icon: <WinampIconSmall />,
+    isOpen: false,
+    isMinimized: false,
+    isMaximized: false,
+    position: { x: 350, y: 70 },
+    zIndex: 30,
+  },
+  // Games
+  minesweeper: {
+    id: 'minesweeper',
+    title: 'Minesweeper',
+    icon: <MinesweeperIconSmall />,
+    isOpen: false,
+    isMinimized: false,
+    isMaximized: false,
+    position: { x: 270, y: 80 },
+    zIndex: 30,
+  },
+  solitaire: {
+    id: 'solitaire',
+    title: 'Solitaire',
+    icon: <SolitaireIconSmall />,
+    isOpen: false,
+    isMinimized: false,
+    isMaximized: false,
+    position: { x: 290, y: 60 },
+    zIndex: 30,
+  },
+  freecell: {
+    id: 'freecell',
+    title: 'FreeCell',
+    icon: <FreeCellIconSmall />,
+    isOpen: false,
+    isMinimized: false,
+    isMaximized: false,
+    position: { x: 310, y: 70 },
+    zIndex: 30,
+  },
+  chess: {
+    id: 'chess',
+    title: 'Chess',
+    icon: <ChessIconSmall />,
+    isOpen: false,
+    isMinimized: false,
+    isMaximized: false,
+    position: { x: 330, y: 80 },
     zIndex: 30,
   },
 };
@@ -527,13 +770,23 @@ export default function Windows98Theme() {
     return () => window.removeEventListener('mousedown', handleGlobalMouseDown, true);
   }, [isStartMenuOpen, contextMenu]);
 
-  // Global keyboard shortcuts (Escape, Delete, F2, Enter)
+  // Global keyboard shortcuts (Alt+F4, Escape, Delete, F2, Enter)
   useEffect(() => {
     const handleGlobalKeyDown = (e) => {
+      // Alt+F4 closes the active window
+      if (e.altKey && (e.key === 'F4' || e.keyCode === 115)) {
+        e.preventDefault();
+        if (activeWindowId) {
+          closeWindow(activeWindowId);
+        }
+        return;
+      }
+
       if (e.key === 'Escape') {
         if (contextMenu) setContextMenu(null);
         if (isStartMenuOpen) setIsStartMenuOpen(false);
         if (renamingIconId) setRenamingIconId(null);
+        if (isShutDownOpen) setIsShutDownOpen(false);
         return;
       }
 
@@ -589,42 +842,47 @@ export default function Windows98Theme() {
     }));
 
   return (
-    <div
-      className="Windows98Experience"
-      style={{
-        width: '100vw',
-        height: '100vh',
-        overflow: 'hidden',
-        position: 'relative',
-        background: '#008080',
-        userSelect: 'none',
-      }}
-    >
-      {/* 1. BIOS Startup Screen */}
-      {!biosDone && <BiosScreen onComplete={handleBiosComplete} />}
-
-      {/* 2. Desktop Environment */}
+    <Win98AudioProvider>
       <div
-        id="desktop-environment"
+        className="Windows98Experience"
         style={{
-          width: '100%',
-          height: '100%',
+          width: '100vw',
+          height: '100vh',
+          overflow: 'hidden',
           position: 'relative',
-          display: biosDone ? 'block' : 'none',
+          background: '#008080',
+          userSelect: 'none',
         }}
       >
+        {/* 1. BIOS Startup Screen */}
+        {!biosDone && <BiosScreen onComplete={handleBiosComplete} />}
+
+        {/* 2. Desktop Environment */}
         <div
-          data-layer="desktop-area"
-          className="DesktopArea"
-          onClick={handleDesktopClick}
+          id="desktop-environment"
           style={{
             width: '100%',
-            height: 'calc(100% - 38px)',
+            height: '100%',
             position: 'relative',
-            overflow: 'hidden',
-            background: '#008080',
+            display: biosDone ? 'block' : 'none',
           }}
         >
+          <div
+            data-layer="desktop-area"
+            className="DesktopArea"
+            onClick={handleDesktopClick}
+            style={{
+              width: '100%',
+              height: 'calc(100% - 38px)',
+              position: 'relative',
+              overflow: 'hidden',
+              background: '#008080',
+            }}
+          >
+            {/* Mobile Device Notice */}
+            <div className="win98-mobile-notice">
+              ℹ️ Best on desktop
+            </div>
           {/* Desktop Icons (Draggable, Selectable, Renamable, Deletable) */}
           {desktopIcons.map((icon) => (
             <DesktopIcon
@@ -818,6 +1076,154 @@ export default function Windows98Theme() {
               onClose={() => closeWindow('onestepprint')}
             />
           )}
+
+          {/* Window 10: Internet Explorer */}
+          {windows.internetExplorer && (
+            <InternetExplorerWindow
+              isOpen={windows.internetExplorer.isOpen && !windows.internetExplorer.isMinimized}
+              isActive={activeWindowId === 'internetExplorer'}
+              isMaximized={windows.internetExplorer.isMaximized}
+              zIndex={windows.internetExplorer.zIndex}
+              position={windows.internetExplorer.position}
+              onFocus={() => focusWindow('internetExplorer')}
+              onMinimize={() => minimizeWindow('internetExplorer')}
+              onMaximize={() => toggleMaximize('internetExplorer')}
+              onClose={() => closeWindow('internetExplorer')}
+            />
+          )}
+
+          {/* Window 11: Paint */}
+          {windows.paint && (
+            <PaintWindow
+              isOpen={windows.paint.isOpen && !windows.paint.isMinimized}
+              isActive={activeWindowId === 'paint'}
+              isMaximized={windows.paint.isMaximized}
+              zIndex={windows.paint.zIndex}
+              position={windows.paint.position}
+              onFocus={() => focusWindow('paint')}
+              onMinimize={() => minimizeWindow('paint')}
+              onMaximize={() => toggleMaximize('paint')}
+              onClose={() => closeWindow('paint')}
+            />
+          )}
+
+          {/* Window 12: Notepad */}
+          {windows.notepad && (
+            <NotepadWindow
+              isOpen={windows.notepad.isOpen && !windows.notepad.isMinimized}
+              isActive={activeWindowId === 'notepad'}
+              isMaximized={windows.notepad.isMaximized}
+              zIndex={windows.notepad.zIndex}
+              position={windows.notepad.position}
+              onFocus={() => focusWindow('notepad')}
+              onMinimize={() => minimizeWindow('notepad')}
+              onMaximize={() => toggleMaximize('notepad')}
+              onClose={() => closeWindow('notepad')}
+            />
+          )}
+
+          {/* Window 13: Calculator */}
+          {windows.calculator && (
+            <CalculatorWindow
+              isOpen={windows.calculator.isOpen && !windows.calculator.isMinimized}
+              isActive={activeWindowId === 'calculator'}
+              isMaximized={windows.calculator.isMaximized}
+              zIndex={windows.calculator.zIndex}
+              position={windows.calculator.position}
+              onFocus={() => focusWindow('calculator')}
+              onMinimize={() => minimizeWindow('calculator')}
+              onMaximize={() => toggleMaximize('calculator')}
+              onClose={() => closeWindow('calculator')}
+            />
+          )}
+
+          {/* Window 14: Media Player */}
+          {windows.mediaPlayer && (
+            <MediaPlayerWindow
+              isOpen={windows.mediaPlayer.isOpen && !windows.mediaPlayer.isMinimized}
+              isActive={activeWindowId === 'mediaPlayer'}
+              isMaximized={windows.mediaPlayer.isMaximized}
+              zIndex={windows.mediaPlayer.zIndex}
+              position={windows.mediaPlayer.position}
+              onFocus={() => focusWindow('mediaPlayer')}
+              onMinimize={() => minimizeWindow('mediaPlayer')}
+              onMaximize={() => toggleMaximize('mediaPlayer')}
+              onClose={() => closeWindow('mediaPlayer')}
+            />
+          )}
+
+          {/* Window 15: Winamp */}
+          {windows.winamp && (
+            <WinampWindow
+              isOpen={windows.winamp.isOpen && !windows.winamp.isMinimized}
+              isActive={activeWindowId === 'winamp'}
+              zIndex={windows.winamp.zIndex}
+              position={windows.winamp.position}
+              onFocus={() => focusWindow('winamp')}
+              onMinimize={() => minimizeWindow('winamp')}
+              onClose={() => closeWindow('winamp')}
+            />
+          )}
+
+          {/* Window 16: Minesweeper */}
+          {windows.minesweeper && (
+            <MinesweeperWindow
+              isOpen={windows.minesweeper.isOpen && !windows.minesweeper.isMinimized}
+              isActive={activeWindowId === 'minesweeper'}
+              isMaximized={windows.minesweeper.isMaximized}
+              zIndex={windows.minesweeper.zIndex}
+              position={windows.minesweeper.position}
+              onFocus={() => focusWindow('minesweeper')}
+              onMinimize={() => minimizeWindow('minesweeper')}
+              onMaximize={() => toggleMaximize('minesweeper')}
+              onClose={() => closeWindow('minesweeper')}
+            />
+          )}
+
+          {/* Window 17: Solitaire */}
+          {windows.solitaire && (
+            <SolitaireWindow
+              isOpen={windows.solitaire.isOpen && !windows.solitaire.isMinimized}
+              isActive={activeWindowId === 'solitaire'}
+              isMaximized={windows.solitaire.isMaximized}
+              zIndex={windows.solitaire.zIndex}
+              position={windows.solitaire.position}
+              onFocus={() => focusWindow('solitaire')}
+              onMinimize={() => minimizeWindow('solitaire')}
+              onMaximize={() => toggleMaximize('solitaire')}
+              onClose={() => closeWindow('solitaire')}
+            />
+          )}
+
+          {/* Window 18: FreeCell */}
+          {windows.freecell && (
+            <FreeCellWindow
+              isOpen={windows.freecell.isOpen && !windows.freecell.isMinimized}
+              isActive={activeWindowId === 'freecell'}
+              isMaximized={windows.freecell.isMaximized}
+              zIndex={windows.freecell.zIndex}
+              position={windows.freecell.position}
+              onFocus={() => focusWindow('freecell')}
+              onMinimize={() => minimizeWindow('freecell')}
+              onMaximize={() => toggleMaximize('freecell')}
+              onClose={() => closeWindow('freecell')}
+            />
+          )}
+
+          {/* Window 19: Chess */}
+          {windows.chess && (
+            <ChessWindow
+              isOpen={windows.chess.isOpen && !windows.chess.isMinimized}
+              isActive={activeWindowId === 'chess'}
+              isMaximized={windows.chess.isMaximized}
+              zIndex={windows.chess.zIndex}
+              position={windows.chess.position}
+              onFocus={() => focusWindow('chess')}
+              onMinimize={() => minimizeWindow('chess')}
+              onMaximize={() => toggleMaximize('chess')}
+              onClose={() => closeWindow('chess')}
+            />
+          )}
         </div>
 
         {/* Start Menu */}
@@ -851,6 +1257,26 @@ export default function Windows98Theme() {
               openWindow('hello');
             } else if (key === 'run') {
               openWindow('skills');
+            } else if (key === 'internetExplorer') {
+              openWindow('internetExplorer');
+            } else if (key === 'paint') {
+              openWindow('paint');
+            } else if (key === 'notepad') {
+              openWindow('notepad');
+            } else if (key === 'calculator') {
+              openWindow('calculator');
+            } else if (key === 'mediaPlayer') {
+              openWindow('mediaPlayer');
+            } else if (key === 'winamp') {
+              openWindow('winamp');
+            } else if (key === 'minesweeper') {
+              openWindow('minesweeper');
+            } else if (key === 'solitaire') {
+              openWindow('solitaire');
+            } else if (key === 'freecell') {
+              openWindow('freecell');
+            } else if (key === 'chess') {
+              openWindow('chess');
             }
           }}
         />
@@ -874,5 +1300,6 @@ export default function Windows98Theme() {
         />
       </div>
     </div>
+  </Win98AudioProvider>
   );
 }

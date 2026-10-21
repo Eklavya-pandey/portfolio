@@ -30,7 +30,9 @@ export default function TitleBar({
         paddingBottom: '2px',
         paddingLeft: '4px',
         paddingRight: '2px',
-        background: isActive ? '#000080' : '#808080',
+        background: isActive
+          ? 'linear-gradient(90deg, #000080 0%, #1084D0 100%)'
+          : 'linear-gradient(90deg, #808080 0%, #B5B5B5 100%)',
         justifyContent: 'space-between',
         alignItems: 'center',
         display: 'flex',
@@ -62,7 +64,7 @@ export default function TitleBar({
             color: 'white',
             fontSize: '12px',
             fontFamily: "'MS W98 UI', 'Segoe UI', Tahoma, sans-serif",
-            fontWeight: 400,
+            fontWeight: 700,
             lineHeight: '13px',
             letterSpacing: '0.24px',
             whiteSpace: 'nowrap',

@@ -1,5 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FolderIconSmall, FileIconSmall, ProgramIconSmall } from './Icons';
+import {
+  FolderIconSmall,
+  FileIconSmall,
+  ProgramIconSmall,
+  InternetExplorerIcon,
+} from './Icons';
+import { MinesweeperIconSmall } from '../windows/games/MinesweeperWindow';
+import { SolitaireIconSmall } from '../windows/games/SolitaireWindow';
+import { FreeCellIconSmall } from '../windows/games/FreeCellWindow';
+import { ChessIconSmall } from '../windows/games/ChessWindow';
+import { PaintIconSmall } from '../windows/apps/PaintWindow';
+import { NotepadIconSmall } from '../windows/apps/NotepadWindow';
+import { CalculatorIconSmall } from '../windows/apps/CalculatorWindow';
+import { InternetExplorerIconSmall } from '../windows/apps/InternetExplorerWindow';
+import { MediaPlayerIconSmall } from '../windows/apps/MediaPlayerWindow';
+import { WinampIconSmall } from '../windows/apps/WinampWindow';
 import { useSound } from '../../../context/SoundContext';
 
 const MAIN_ITEMS = [
@@ -15,6 +30,16 @@ const MAIN_ITEMS = [
 
 const SUBMENUS = {
   programs: [
+    { key: 'internetExplorer', label: 'Internet Explorer', icon: <InternetExplorerIconSmall /> },
+    { key: 'paint', label: 'Paint', icon: <PaintIconSmall /> },
+    { key: 'notepad', label: 'Notepad', icon: <NotepadIconSmall /> },
+    { key: 'calculator', label: 'Calculator', icon: <CalculatorIconSmall /> },
+    { key: 'mediaPlayer', label: 'Windows Media Player', icon: <MediaPlayerIconSmall /> },
+    { key: 'winamp', label: 'Winamp', icon: <WinampIconSmall /> },
+    { key: 'minesweeper', label: 'Minesweeper', icon: <MinesweeperIconSmall /> },
+    { key: 'solitaire', label: 'Solitaire', icon: <SolitaireIconSmall /> },
+    { key: 'freecell', label: 'FreeCell', icon: <FreeCellIconSmall /> },
+    { key: 'chess', label: 'Chess', icon: <ChessIconSmall /> },
     { key: 'made', label: 'MADE (Projects)', icon: <FolderIconSmall /> },
     { key: 'about', label: 'ABOUT_ME.EXE', icon: <ProgramIconSmall /> },
     { key: 'skills', label: 'SKILLS.EXE', icon: <FolderIconSmall /> },
@@ -25,6 +50,7 @@ const SUBMENUS = {
   ],
   documents: [
     { key: 'resume', label: 'Resume.doc', icon: <FileIconSmall /> },
+    { key: 'notepad', label: 'Resume.txt (Notepad)', icon: <NotepadIconSmall /> },
     { key: 'nova', label: 'Case Study - Nova Invest', icon: <FileIconSmall /> },
     { key: 'made', label: 'Projects Overview', icon: <FileIconSmall /> },
   ],
