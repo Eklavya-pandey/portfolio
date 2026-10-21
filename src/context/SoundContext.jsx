@@ -23,60 +23,31 @@ export function SoundProvider({ children }) {
   const isUnlocked = useRef(false);
 
   const unlockAudio = useCallback(() => {
-    if (isUnlocked.current) return;
     isUnlocked.current = true;
-
-    // Silent play-pause to unlock HTML5 audio restrictions on browsers
-    Object.values(audioCache.current).forEach(audio => {
-      try {
-        const promise = audio.play();
-        if (promise !== undefined) {
-          promise.then(() => {
-            audio.pause();
-            audio.currentTime = 0;
-          }).catch(() => {});
-        }
-      } catch (e) {}
-    });
   }, []);
 
   useEffect(() => {
-    // Pre-initialize audio elements
+    // Pre-initialize audio elements with preload none to prevent browser audio activity
     Object.entries(SOUND_FILES).forEach(([key, src]) => {
       try {
         const audio = new Audio(src);
-        audio.preload = 'auto';
+        audio.preload = 'none';
         audioCache.current[key] = audio;
       } catch (e) {
         console.warn(`Could not preload audio: ${key}`, e);
       }
     });
 
-    const unlockAudio = () => {
-      if (isUnlocked.current) return;
+    const handleFirstGesture = () => {
       isUnlocked.current = true;
-
-      // Silent play-pause to unlock HTML5 audio restrictions on browsers
-      Object.values(audioCache.current).forEach(audio => {
-        try {
-          const promise = audio.play();
-          if (promise !== undefined) {
-            promise.then(() => {
-              audio.pause();
-              audio.currentTime = 0;
-            }).catch(() => {});
-          }
-        } catch (e) {}
-      });
-
-      window.removeEventListener('click', unlockAudio);
-      window.removeEventListener('keydown', unlockAudio);
-      window.removeEventListener('touchstart', unlockAudio);
+      window.removeEventListener('click', handleFirstGesture);
+      window.removeEventListener('keydown', handleFirstGesture);
+      window.removeEventListener('touchstart', handleFirstGesture);
     };
 
-    window.addEventListener('click', unlockAudio, { passive: true });
-    window.addEventListener('keydown', unlockAudio, { passive: true });
-    window.addEventListener('touchstart', unlockAudio, { passive: true });
+    window.addEventListener('click', handleFirstGesture, { passive: true });
+    window.addEventListener('keydown', handleFirstGesture, { passive: true });
+    window.addEventListener('touchstart', handleFirstGesture, { passive: true });
 
     // Expose sound manager on window for compatibility
     window.soundManager = {

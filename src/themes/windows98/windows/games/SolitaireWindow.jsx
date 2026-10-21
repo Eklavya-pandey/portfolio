@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Window from '../../components/Window';
+import AboutAppDialog from '../../components/AboutAppDialog';
 
 const SUITS = [
   { name: 'spades', symbol: '♠', color: 'black' },
@@ -24,7 +25,7 @@ const RANKS = [
   { val: 13, label: 'K' },
 ];
 
-// Small card icon for TitleBar
+// TitleBar icon
 export const SolitaireIconSmall = () => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
     <rect x="2" y="1" width="12" height="14" rx="1" fill="#FFFFFF" stroke="#000000" strokeWidth="1" />
@@ -33,12 +34,21 @@ export const SolitaireIconSmall = () => (
   </svg>
 );
 
-// Card View Component with authentic Win98 card back and face
-function CardView({ card, isFaceUp = true, isSelected = false, style = {}, onClick, onDoubleClick }) {
+// Card View Component
+function CardView({
+  card,
+  isFaceUp = true,
+  isSelected = false,
+  style = {},
+  onClick,
+  onDoubleClick,
+  onDragStart,
+  draggable = false,
+}) {
   if (!card) return null;
 
+  // Blue cross-hatch pattern for card back
   if (!isFaceUp) {
-    // Windows 98 classic royal blue pattern card back
     return (
       <div
         onClick={onClick}
@@ -46,11 +56,11 @@ function CardView({ card, isFaceUp = true, isSelected = false, style = {}, onCli
           width: '56px',
           height: '80px',
           borderRadius: '3px',
-          background: 'linear-gradient(135deg, #000080 0%, #1044A0 50%, #000080 100%)',
+          background: '#000080',
           border: '1px solid #000000',
-          boxShadow: '1px 1px 2px rgba(0,0,0,0.3)',
+          boxShadow: '1px 1px 2px rgba(0,0,0,0.4)',
           boxSizing: 'border-box',
-          padding: '3px',
+          padding: '2px',
           cursor: 'pointer',
           userSelect: 'none',
           position: 'relative',
@@ -61,18 +71,13 @@ function CardView({ card, isFaceUp = true, isSelected = false, style = {}, onCli
           style={{
             width: '100%',
             height: '100%',
-            border: '1px dashed #FFFFFF',
+            border: '1px solid #FFFFFF',
             borderRadius: '2px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#FFFFFF',
-            fontSize: '10px',
-            opacity: 0.8,
+            background:
+              'repeating-linear-gradient(45deg, #000080, #000080 3px, #1044A0 3px, #1044A0 6px), repeating-linear-gradient(-45deg, #000080, #000080 3px, #1044A0 3px, #1044A0 6px)',
+            boxSizing: 'border-box',
           }}
-        >
-          ♠♥♦♣
-        </div>
+        />
       </div>
     );
   }
@@ -84,28 +89,36 @@ function CardView({ card, isFaceUp = true, isSelected = false, style = {}, onCli
     <div
       onClick={onClick}
       onDoubleClick={onDoubleClick}
+      onDragStart={onDragStart}
+      draggable={draggable}
       style={{
         width: '56px',
         height: '80px',
         borderRadius: '3px',
         background: isSelected ? '#FFFFCC' : '#FFFFFF',
         border: isSelected ? '2px solid #0000FF' : '1px solid #000000',
-        boxShadow: '1px 1px 2px rgba(0,0,0,0.3)',
+        boxShadow: '1px 1px 2px rgba(0,0,0,0.35)',
         boxSizing: 'border-box',
-        padding: '3px 4px',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
         cursor: 'pointer',
         userSelect: 'none',
         position: 'relative',
         color: textColor,
-        fontFamily: "'MS Sans Serif', Tahoma, Arial, sans-serif",
+        fontFamily: "var(--win-font, 'W95FA', 'MS Sans Serif', Tahoma, sans-serif)",
         ...style,
       }}
     >
-      {/* Top Left Rank & Suit */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '2px', lineHeight: '12px' }}>
+      {/* Top Left Rank and Suit */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '2px',
+          left: '3px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          lineHeight: '10px',
+        }}
+      >
         <span style={{ fontSize: '11px', fontWeight: 'bold' }}>{card.label}</span>
         <span style={{ fontSize: '11px' }}>{card.symbol}</span>
       </div>
@@ -113,24 +126,29 @@ function CardView({ card, isFaceUp = true, isSelected = false, style = {}, onCli
       {/* Center Symbol */}
       <div
         style={{
-          alignSelf: 'center',
-          fontSize: card.val > 10 ? '18px' : '20px',
-          lineHeight: '20px',
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          fontSize: card.val > 10 ? '16px' : '22px',
           fontWeight: card.val > 10 ? 'bold' : 'normal',
+          lineHeight: '22px',
         }}
       >
         {card.val > 10 ? card.label : card.symbol}
       </div>
 
-      {/* Bottom Right Inverted Rank & Suit */}
+      {/* Bottom Right Rank and Suit - rotated 180 degrees */}
       <div
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '2px',
-          lineHeight: '12px',
-          alignSelf: 'flex-end',
+          position: 'absolute',
+          bottom: '2px',
+          right: '3px',
           transform: 'rotate(180deg)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          lineHeight: '10px',
         }}
       >
         <span style={{ fontSize: '11px', fontWeight: 'bold' }}>{card.label}</span>
@@ -179,23 +197,38 @@ export default function SolitaireWindow({
   const [waste, setWaste] = useState([]);
   const [foundations, setFoundations] = useState([[], [], [], []]);
   const [tableau, setTableau] = useState([[], [], [], [], [], [], []]);
-  const [selectedCardInfo, setSelectedCardInfo] = useState(null); // { source: 'waste' | 'tableau' | 'foundation', colIndex, cardIndex }
+  const [selectedCardInfo, setSelectedCardInfo] = useState(null);
   const [history, setHistory] = useState([]);
-  const [isWon, setIsWon] = useState(false);
+
+  // Options & Stats
+  const [drawThree, setDrawThree] = useState(false);
+  const [scoringMode, setScoringMode] = useState('Standard'); // 'Standard' | 'Vegas' | 'None'
+  const [score, setScore] = useState(0);
+  const [time, setTime] = useState(0);
+  const [isGameActive, setIsGameActive] = useState(false);
+
+  // Dialogs
+  const [showOptionsDialog, setShowOptionsDialog] = useState(false);
   const [showAboutDialog, setShowAboutDialog] = useState(false);
+  const [isWon, setIsWon] = useState(false);
+
+  // Cascade win animation
+  const canvasRef = useRef(null);
+  const animFrameRef = useRef(null);
+  const timerRef = useRef(null);
 
   // Initialize new game
   const dealNewGame = useCallback(() => {
     const deck = generateDeck();
     const newTableau = [[], [], [], [], [], [], []];
 
-    // Deal to tableau (1 card in col 0, 2 in col 1, ..., 7 in col 6)
+    // Deal: 1 in col 0, 2 in col 1, ..., 7 in col 6
     for (let c = 0; c < 7; c++) {
       for (let r = 0; r <= c; r++) {
         const card = deck.pop();
         newTableau[c].push({
           card,
-          isFaceUp: r === c, // only top card is face-up initially
+          isFaceUp: r === c,
         });
       }
     }
@@ -206,15 +239,34 @@ export default function SolitaireWindow({
     setTableau(newTableau);
     setSelectedCardInfo(null);
     setHistory([]);
+    setScore(scoringMode === 'Vegas' ? -52 : 0);
+    setTime(0);
+    setIsGameActive(false);
     setIsWon(false);
-  }, []);
+    if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+  }, [scoringMode]);
 
   useEffect(() => {
     dealNewGame();
   }, [dealNewGame]);
 
-  // Push current state to undo history
+  // Timer
+  useEffect(() => {
+    if (isGameActive && !isWon) {
+      timerRef.current = setInterval(() => {
+        setTime((t) => t + 1);
+      }, 1000);
+    } else {
+      if (timerRef.current) clearInterval(timerRef.current);
+    }
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [isGameActive, isWon]);
+
+  // Push history
   const pushHistory = () => {
+    setIsGameActive(true);
     setHistory((prev) => [
       ...prev.slice(-30),
       {
@@ -222,11 +274,12 @@ export default function SolitaireWindow({
         waste: [...waste],
         foundations: foundations.map((f) => [...f]),
         tableau: tableau.map((col) => col.map((c) => ({ ...c }))),
+        score,
       },
     ]);
   };
 
-  // Undo last action
+  // Undo
   const handleUndo = () => {
     if (history.length === 0) return;
     const last = history[history.length - 1];
@@ -235,59 +288,45 @@ export default function SolitaireWindow({
     setWaste(last.waste);
     setFoundations(last.foundations);
     setTableau(last.tableau);
+    setScore(last.score);
     setSelectedCardInfo(null);
     setIsWon(false);
   };
 
-  // Draw 1 card from Stock to Waste
+  // Stock click
   const handleStockClick = () => {
     pushHistory();
     if (stock.length > 0) {
+      const drawCount = drawThree ? Math.min(3, stock.length) : 1;
       const nextStock = [...stock];
-      const drawnCard = nextStock.pop();
+      const drawn = [];
+      for (let i = 0; i < drawCount; i++) {
+        drawn.push(nextStock.pop());
+      }
       setStock(nextStock);
-      setWaste((prev) => [...prev, drawnCard]);
+      setWaste((prev) => [...prev, ...drawn]);
     } else {
-      // Recycle waste back to stock
+      // Recycle waste to stock
       setStock([...waste].reverse());
       setWaste([]);
+      if (scoringMode === 'Standard') {
+        setScore((s) => Math.max(0, s - 20));
+      }
     }
     setSelectedCardInfo(null);
   };
 
-  // Check victory condition
-  useEffect(() => {
-    const totalFoundations = foundations.reduce((acc, f) => acc + f.length, 0);
-    if (totalFoundations === 52 && !isWon) {
-      setIsWon(true);
-    }
-  }, [foundations, isWon]);
-
-  // Close dialogs on Escape
-  useEffect(() => {
-    if (!isWon && !showAboutDialog) return;
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') {
-        e.stopPropagation();
-        if (isWon) setIsWon(false);
-        if (showAboutDialog) setShowAboutDialog(false);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isWon, showAboutDialog]);
-
-  // Check if card can be placed on foundation
+  // Foundation placement validation
   const canPlaceOnFoundation = (card, targetPile) => {
     if (!card) return false;
     if (targetPile.length === 0) {
       return card.val === 1; // Ace only
     }
-    const topCard = targetPile[targetPile.length - 1];
-    return topCard.suit === card.suit && card.val === topCard.val + 1;
+    const top = targetPile[targetPile.length - 1];
+    return top.suit === card.suit && card.val === top.val + 1;
   };
 
-  // Check if card stack can be placed on tableau column
+  // Tableau placement validation
   const canPlaceOnTableau = (movingCard, targetCol) => {
     if (!movingCard) return false;
     if (targetCol.length === 0) {
@@ -298,27 +337,28 @@ export default function SolitaireWindow({
     return top.card.color !== movingCard.color && top.card.val === movingCard.val + 1;
   };
 
-  // Double click auto-move to foundations
+  // Auto-move on double click
   const handleAutoMoveFoundation = (card, sourceInfo) => {
     for (let fIdx = 0; fIdx < 4; fIdx++) {
       if (canPlaceOnFoundation(card, foundations[fIdx])) {
         pushHistory();
-        // Remove from source
         if (sourceInfo.source === 'waste') {
           setWaste((prev) => prev.slice(0, prev.length - 1));
+          setScore((s) => s + 10);
         } else if (sourceInfo.source === 'tableau') {
           setTableau((prev) => {
             const nextTab = prev.map((col) => [...col]);
             nextTab[sourceInfo.colIndex].pop();
-            // Flip newly exposed top card
             const col = nextTab[sourceInfo.colIndex];
-            if (col.length > 0) {
+            if (col.length > 0 && !col[col.length - 1].isFaceUp) {
               col[col.length - 1].isFaceUp = true;
+              setScore((s) => s + 5);
             }
             return nextTab;
           });
+          setScore((s) => s + 10);
         }
-        // Add to foundation
+
         setFoundations((prev) => {
           const nextF = prev.map((pile) => [...pile]);
           nextF[fIdx].push(card);
@@ -331,7 +371,7 @@ export default function SolitaireWindow({
     return false;
   };
 
-  // Click handler for Tableau Column target
+  // Tableau column click
   const handleTableauColClick = (colIndex) => {
     if (!selectedCardInfo) return;
 
@@ -360,15 +400,17 @@ export default function SolitaireWindow({
 
     if (canPlaceOnTableau(baseCard, targetCol)) {
       pushHistory();
-      // Remove from source
+
       if (selectedCardInfo.source === 'waste') {
         setWaste((prev) => prev.slice(0, prev.length - 1));
+        setScore((s) => s + 5);
       } else if (selectedCardInfo.source === 'foundation') {
         setFoundations((prev) => {
           const nextF = prev.map((pile) => [...pile]);
           nextF[selectedCardInfo.fIndex].pop();
           return nextF;
         });
+        setScore((s) => Math.max(0, s - 15));
       } else if (selectedCardInfo.source === 'tableau') {
         setTableau((prev) => {
           const nextT = prev.map((col) => [...col]);
@@ -376,16 +418,15 @@ export default function SolitaireWindow({
             0,
             selectedCardInfo.cardIndex
           );
-          // Auto flip top card
           const col = nextT[selectedCardInfo.colIndex];
-          if (col.length > 0) {
+          if (col.length > 0 && !col[col.length - 1].isFaceUp) {
             col[col.length - 1].isFaceUp = true;
+            setScore((s) => s + 5);
           }
           return nextT;
         });
       }
 
-      // Append to target tableau column
       setTableau((prev) => {
         const nextT = prev.map((col) => [...col]);
         nextT[colIndex] = [...nextT[colIndex], ...movingCards];
@@ -397,7 +438,7 @@ export default function SolitaireWindow({
     }
   };
 
-  // Click handler for Foundation Pile target
+  // Foundation pile click
   const handleFoundationClick = (fIndex) => {
     if (!selectedCardInfo) return;
 
@@ -413,22 +454,24 @@ export default function SolitaireWindow({
 
     if (candidateCard && canPlaceOnFoundation(candidateCard, foundations[fIndex])) {
       pushHistory();
-      // Remove from source
+
       if (selectedCardInfo.source === 'waste') {
         setWaste((prev) => prev.slice(0, prev.length - 1));
+        setScore((s) => s + 10);
       } else if (selectedCardInfo.source === 'tableau') {
         setTableau((prev) => {
           const nextT = prev.map((col) => [...col]);
           nextT[selectedCardInfo.colIndex].pop();
           const col = nextT[selectedCardInfo.colIndex];
-          if (col.length > 0) {
+          if (col.length > 0 && !col[col.length - 1].isFaceUp) {
             col[col.length - 1].isFaceUp = true;
+            setScore((s) => s + 5);
           }
           return nextT;
         });
+        setScore((s) => s + 10);
       }
 
-      // Add to foundation
       setFoundations((prev) => {
         const nextF = prev.map((pile) => [...pile]);
         nextF[fIndex].push(candidateCard);
@@ -440,12 +483,113 @@ export default function SolitaireWindow({
     }
   };
 
+  // Check victory (all 52 cards on foundations)
+  useEffect(() => {
+    const totalFoundations = foundations.reduce((acc, f) => acc + f.length, 0);
+    if (totalFoundations === 52 && !isWon) {
+      setIsWon(true);
+      startWinCascade();
+    }
+  }, [foundations, isWon]);
+
+  // Classic Windows 98 Bouncing Cards Cascade Animation
+  const startWinCascade = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    canvas.width = canvas.parentElement.clientWidth || 600;
+    canvas.height = canvas.parentElement.clientHeight || 420;
+
+    // Build array of 52 cards ordered by rank descending from foundations
+    const cardsToBounce = [];
+    for (let f = 3; f >= 0; f--) {
+      for (let r = 12; r >= 0; r--) {
+        cardsToBounce.push({
+          suit: SUITS[f].name,
+          symbol: SUITS[f].symbol,
+          color: SUITS[f].color,
+          label: RANKS[r].label,
+          val: RANKS[r].val,
+          x: canvas.width - (4 - f) * 64,
+          y: 12,
+          vx: (Math.random() - 0.5) * 6,
+          vy: Math.random() * 2 + 1,
+          done: false,
+        });
+      }
+    }
+
+    let currentCardIndex = 0;
+    const activeCards = [];
+
+    const drawCardStamp = (c) => {
+      const w = 56;
+      const h = 80;
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(c.x, c.y, w, h);
+      ctx.strokeStyle = '#000000';
+      ctx.strokeRect(c.x, c.y, w, h);
+
+      ctx.fillStyle = c.color === 'red' ? '#D00000' : '#000000';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.fillText(c.label, c.x + 4, c.y + 12);
+      ctx.fillText(c.symbol, c.x + 4, c.y + 24);
+
+      ctx.font = '16px sans-serif';
+      ctx.fillText(c.symbol, c.x + 22, c.y + 46);
+    };
+
+    const animate = () => {
+      // Release next card periodically
+      if (currentCardIndex < cardsToBounce.length) {
+        activeCards.push(cardsToBounce[currentCardIndex]);
+        currentCardIndex++;
+      }
+
+      for (let i = 0; i < activeCards.length; i++) {
+        const c = activeCards[i];
+        if (c.done) continue;
+
+        c.x += c.vx;
+        c.y += c.vy;
+        c.vy += 0.45; // Gravity
+
+        // Bounce on floor
+        if (c.y + 80 >= canvas.height) {
+          c.y = canvas.height - 80;
+          c.vy = -c.vy * 0.82;
+          if (Math.abs(c.vy) < 1) {
+            c.done = true;
+          }
+        }
+
+        // Draw card stamp without clearing canvas to create classic trail
+        drawCardStamp(c);
+      }
+
+      animFrameRef.current = requestAnimationFrame(animate);
+    };
+
+    animFrameRef.current = requestAnimationFrame(animate);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+    };
+  }, []);
+
   const menuItems = [
     {
       label: 'Game',
       items: [
         { label: 'Deal (New Game)', onClick: dealNewGame },
         { label: 'Undo', onClick: handleUndo },
+        { isSeparator: true },
+        { label: 'Deck...', onClick: () => alert('Deck backs: Blue Cross-Hatch selected.') },
+        { label: 'Options...', onClick: () => setShowOptionsDialog(true) },
         { isSeparator: true },
         { label: 'Exit', onClick: onClose },
       ],
@@ -462,265 +606,420 @@ export default function SolitaireWindow({
   ];
 
   return (
-    <Window
-      id="window-solitaire"
-      title="Solitaire"
-      icon={<SolitaireIconSmall />}
-      isOpen={isOpen}
-      isActive={isActive}
-      isMaximized={isMaximized}
-      zIndex={zIndex}
-      position={position}
-      defaultWidth={620}
-      defaultHeight={460}
-      hasMenu={true}
-      menuItems={menuItems}
-      onFocus={onFocus}
-      onMinimize={onMinimize}
-      onMaximize={onMaximize}
-      onClose={onClose}
-    >
-      <div
-        style={{
-          width: '100%',
-          height: '100%',
-          background: '#008000', // Classic Solitaire green felt
-          padding: '12px',
-          boxSizing: 'border-box',
-          overflow: 'auto',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '16px',
-          userSelect: 'none',
-          position: 'relative',
-        }}
+    <>
+      <Window
+        id="window-solitaire"
+        title="Solitaire"
+        icon={<SolitaireIconSmall />}
+        isOpen={isOpen}
+        isActive={isActive}
+        isMaximized={isMaximized}
+        zIndex={zIndex}
+        position={position}
+        defaultWidth={630}
+        defaultHeight={480}
+        resizable={true}
+        allowMaximize={true}
+        hasMenu={true}
+        menuItems={menuItems}
+        hasStatusBar={true}
+        statusText={`Score: ${score}   Time: ${time}`}
+        onFocus={onFocus}
+        onMinimize={onMinimize}
+        onMaximize={onMaximize}
+        onClose={onClose}
       >
-        {/* Top Row: Stock, Waste, and 4 Foundations */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', maxWidth: '580px' }}>
-          {/* Stock & Waste */}
-          <div style={{ display: 'flex', gap: '8px' }}>
-            {/* Stock Pile */}
-            <div
-              onClick={handleStockClick}
-              style={{
-                width: '56px',
-                height: '80px',
-                borderRadius: '3px',
-                border: '1px dashed #004D00',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-              }}
-            >
-              {stock.length > 0 ? (
-                <CardView isFaceUp={false} card={stock[stock.length - 1]} />
-              ) : (
-                <span style={{ color: '#004D00', fontSize: '18px' }}>🔄</span>
-              )}
-            </div>
-
-            {/* Waste Pile */}
-            <div
-              style={{
-                width: '56px',
-                height: '80px',
-                borderRadius: '3px',
-                border: '1px dashed #004D00',
-                position: 'relative',
-              }}
-            >
-              {waste.length > 0 && (
-                <CardView
-                  card={waste[waste.length - 1]}
-                  isFaceUp={true}
-                  isSelected={selectedCardInfo?.source === 'waste'}
-                  onClick={() => {
-                    setSelectedCardInfo({ source: 'waste' });
-                  }}
-                  onDoubleClick={() => {
-                    handleAutoMoveFoundation(waste[waste.length - 1], { source: 'waste' });
-                  }}
-                />
-              )}
-            </div>
-          </div>
-
-          {/* Foundations (4 piles) */}
-          <div style={{ display: 'flex', gap: '8px' }}>
-            {foundations.map((pile, fIdx) => (
+        <div
+          style={{
+            width: '100%',
+            height: '100%',
+            background: '#008000',
+            padding: '12px',
+            boxSizing: 'border-box',
+            overflow: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '14px',
+            userSelect: 'none',
+            position: 'relative',
+            fontFamily: "var(--win-font, 'W95FA', 'MS Sans Serif', Tahoma, sans-serif)",
+          }}
+        >
+          {/* Top Row: Stock, Waste, and 4 Foundations */}
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'flex-start',
+              maxWidth: '580px',
+            }}
+          >
+            {/* Stock and Waste */}
+            <div style={{ display: 'flex', gap: '8px' }}>
+              {/* Stock Slot */}
               <div
-                key={`f-${fIdx}`}
-                onClick={() => handleFoundationClick(fIdx)}
+                onClick={handleStockClick}
                 style={{
                   width: '56px',
                   height: '80px',
                   borderRadius: '3px',
-                  border: '1px solid #004D00',
+                  border: '1px solid #005000',
                   background: 'rgba(0,0,0,0.1)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: 'pointer',
-                  position: 'relative',
+                  boxSizing: 'border-box',
                 }}
               >
-                {pile.length > 0 ? (
-                  <CardView
-                    card={pile[pile.length - 1]}
-                    isFaceUp={true}
-                    isSelected={selectedCardInfo?.source === 'foundation' && selectedCardInfo?.fIndex === fIdx}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedCardInfo({ source: 'foundation', fIndex: fIdx });
+                {stock.length > 0 ? (
+                  <CardView isFaceUp={false} card={stock[stock.length - 1]} />
+                ) : (
+                  // Classic Green 'O' circle indicating empty stock
+                  <div
+                    style={{
+                      width: '26px',
+                      height: '26px',
+                      borderRadius: '50%',
+                      border: '3px solid #005000',
+                      boxSizing: 'border-box',
                     }}
                   />
-                ) : (
-                  <span style={{ color: '#004D00', fontSize: '20px', opacity: 0.5 }}>♠</span>
                 )}
+              </div>
+
+              {/* Waste Slot */}
+              <div
+                style={{
+                  width: '56px',
+                  height: '80px',
+                  borderRadius: '3px',
+                  border: '1px solid #005000',
+                  position: 'relative',
+                  background: 'rgba(0,0,0,0.1)',
+                  boxSizing: 'border-box',
+                }}
+              >
+                {waste.length > 0 && (
+                  <CardView
+                    card={waste[waste.length - 1]}
+                    isFaceUp={true}
+                    isSelected={selectedCardInfo?.source === 'waste'}
+                    onClick={() => setSelectedCardInfo({ source: 'waste' })}
+                    onDoubleClick={() =>
+                      handleAutoMoveFoundation(waste[waste.length - 1], { source: 'waste' })
+                    }
+                  />
+                )}
+              </div>
+            </div>
+
+            {/* 4 Foundations */}
+            <div style={{ display: 'flex', gap: '8px' }}>
+              {foundations.map((pile, fIdx) => (
+                <div
+                  key={`found-${fIdx}`}
+                  onClick={() => handleFoundationClick(fIdx)}
+                  style={{
+                    width: '56px',
+                    height: '80px',
+                    borderRadius: '3px',
+                    border: '1px solid #005000',
+                    background: 'rgba(0,0,0,0.1)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    position: 'relative',
+                    boxSizing: 'border-box',
+                  }}
+                >
+                  {pile.length > 0 ? (
+                    <CardView
+                      card={pile[pile.length - 1]}
+                      isFaceUp={true}
+                      isSelected={
+                        selectedCardInfo?.source === 'foundation' &&
+                        selectedCardInfo?.fIndex === fIdx
+                      }
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedCardInfo({ source: 'foundation', fIndex: fIdx });
+                      }}
+                    />
+                  ) : (
+                    <span style={{ color: '#005000', fontSize: '18px', opacity: 0.6 }}>
+                      {SUITS[fIdx].symbol}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 7 Tableau Columns */}
+          <div style={{ display: 'flex', gap: '8px', flex: 1, minHeight: '260px' }}>
+            {tableau.map((col, colIndex) => (
+              <div
+                key={`tab-col-${colIndex}`}
+                onClick={() => handleTableauColClick(colIndex)}
+                style={{
+                  width: '56px',
+                  minHeight: '220px',
+                  position: 'relative',
+                  border: col.length === 0 ? '1px dashed #005000' : 'none',
+                  borderRadius: '3px',
+                  cursor: 'pointer',
+                }}
+              >
+                {col.map((item, cardIndex) => {
+                  const isSelected =
+                    selectedCardInfo?.source === 'tableau' &&
+                    selectedCardInfo?.colIndex === colIndex &&
+                    cardIndex >= selectedCardInfo?.cardIndex;
+
+                  return (
+                    <div
+                      key={item.card.id}
+                      style={{
+                        position: 'absolute',
+                        top: `${cardIndex * 18}px`,
+                        left: '0px',
+                        zIndex: cardIndex + 1,
+                      }}
+                    >
+                      <CardView
+                        card={item.card}
+                        isFaceUp={item.isFaceUp}
+                        isSelected={isSelected}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (item.isFaceUp) {
+                            setSelectedCardInfo({
+                              source: 'tableau',
+                              colIndex,
+                              cardIndex,
+                            });
+                          }
+                        }}
+                        onDoubleClick={(e) => {
+                          e.stopPropagation();
+                          if (item.isFaceUp && cardIndex === col.length - 1) {
+                            handleAutoMoveFoundation(item.card, { source: 'tableau', colIndex });
+                          }
+                        }}
+                      />
+                    </div>
+                  );
+                })}
               </div>
             ))}
           </div>
-        </div>
 
-        {/* Tableau (7 Columns) */}
-        <div style={{ display: 'flex', gap: '8px', flex: 1, minHeight: '260px' }}>
-          {tableau.map((col, colIndex) => (
+          {/* Win Cascade Canvas Overlay */}
+          {isWon && (
+            <canvas
+              ref={canvasRef}
+              style={{
+                position: 'absolute',
+                inset: 0,
+                zIndex: 50,
+                pointerEvents: 'none',
+              }}
+            />
+          )}
+
+          {/* You Won Message Dialog */}
+          {isWon && (
             <div
-              key={`tab-col-${colIndex}`}
-              onClick={() => handleTableauColClick(colIndex)}
               style={{
-                width: '56px',
-                minHeight: '220px',
-                position: 'relative',
-                border: col.length === 0 ? '1px dashed #004D00' : 'none',
-                borderRadius: '3px',
-                cursor: 'pointer',
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                background: '#C0C0C0',
+                boxShadow:
+                  '1px 1px 0px #FFFFFF inset, -1px -1px 0px #000000 inset, 2px 2px 0px #DFDFDF inset, -2px -2px 0px #808080 inset',
+                padding: '3px',
+                zIndex: 60,
+                minWidth: '220px',
+                textAlign: 'center',
+                fontFamily: "var(--win-font, 'W95FA', 'MS Sans Serif', Tahoma, sans-serif)",
+                fontSize: '11px',
               }}
             >
-              {col.map((item, cardIndex) => {
-                const isSelected =
-                  selectedCardInfo?.source === 'tableau' &&
-                  selectedCardInfo?.colIndex === colIndex &&
-                  cardIndex >= selectedCardInfo?.cardIndex;
-
-                return (
-                  <div
-                    key={item.card.id}
-                    style={{
-                      position: 'absolute',
-                      top: `${cardIndex * 18}px`,
-                      left: '0px',
-                      zIndex: cardIndex + 1,
-                    }}
-                  >
-                    <CardView
-                      card={item.card}
-                      isFaceUp={item.isFaceUp}
-                      isSelected={isSelected}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (item.isFaceUp) {
-                          setSelectedCardInfo({
-                            source: 'tableau',
-                            colIndex,
-                            cardIndex,
-                          });
-                        }
-                      }}
-                      onDoubleClick={(e) => {
-                        e.stopPropagation();
-                        if (item.isFaceUp && cardIndex === col.length - 1) {
-                          handleAutoMoveFoundation(item.card, { source: 'tableau', colIndex });
-                        }
-                      }}
-                    />
-                  </div>
-                );
-              })}
+              <div
+                style={{
+                  background: 'linear-gradient(90deg, #000080 0%, #1084D0 100%)',
+                  color: '#FFFFFF',
+                  padding: '2px 4px',
+                  fontWeight: 'bold',
+                  textAlign: 'left',
+                }}
+              >
+                Solitaire
+              </div>
+              <div style={{ padding: '16px 20px' }}>
+                <div style={{ fontSize: '13px', fontWeight: 'bold', marginBottom: '8px' }}>
+                  You won!
+                </div>
+                <p style={{ margin: '0 0 14px 0' }}>
+                  Congratulations! Solitaire completed in {time} seconds.
+                </p>
+                <button
+                  onClick={dealNewGame}
+                  style={{
+                    padding: '3px 14px',
+                    background: '#C0C0C0',
+                    boxShadow:
+                      '1px 1px 0px #DFDFDF inset, -1px -1px 0px #7F7F7F inset, 1px 1px 0px white, -1px -1px 0px black',
+                    border: 'none',
+                    fontSize: '11px',
+                    fontFamily: "var(--win-font, 'W95FA', 'MS Sans Serif', Tahoma, sans-serif)",
+                    cursor: 'pointer',
+                  }}
+                >
+                  Deal Again
+                </button>
+              </div>
             </div>
-          ))}
+          )}
         </div>
+      </Window>
 
-        {/* Win Dialog (Simple "You win!" dialog, no sound) */}
-        {isWon && (
+      {/* Options Dialog */}
+      {showOptionsDialog && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 99999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'transparent',
+          }}
+          onClick={() => setShowOptionsDialog(false)}
+        >
           <div
+            className="win95-window win-dialog"
             style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
+              width: '280px',
               background: '#C0C0C0',
-              border: '2px solid',
-              borderColor: '#FFFFFF #808080 #808080 #FFFFFF',
-              boxShadow: '3px 3px 10px rgba(0,0,0,0.5)',
-              padding: '16px 24px',
-              zIndex: 99,
-              textAlign: 'center',
+              boxShadow:
+                '1px 1px 0px #FFFFFF inset, -1px -1px 0px #000000 inset, 2px 2px 0px #DFDFDF inset, -2px -2px 0px #808080 inset',
+              padding: '3px',
+              fontFamily: "var(--win-font, 'W95FA', 'MS Sans Serif', Tahoma, sans-serif)",
+              fontSize: '11px',
             }}
+            onClick={(e) => e.stopPropagation()}
           >
-            <div style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '10px' }}>You win!</div>
-            <p style={{ fontSize: '12px', margin: '0 0 14px 0' }}>Congratulations! You solved Klondike Solitaire!</p>
-            <button
-              className="win-btn"
-              onClick={dealNewGame}
+            <div
               style={{
-                padding: '4px 16px',
-                background: '#C0C0C0',
-                border: '2px solid',
-                borderColor: '#FFFFFF #808080 #808080 #FFFFFF',
-                cursor: 'pointer',
+                background: 'linear-gradient(90deg, #000080 0%, #1084D0 100%)',
+                color: '#FFFFFF',
+                padding: '2px 4px',
                 fontWeight: 'bold',
-                fontSize: '11px',
               }}
             >
-              Deal New Game
-            </button>
-          </div>
-        )}
-
-        {/* About Dialog */}
-        {showAboutDialog && (
-          <div
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              background: '#C0C0C0',
-              border: '2px solid',
-              borderColor: '#FFFFFF #808080 #808080 #FFFFFF',
-              boxShadow: '3px 3px 10px rgba(0,0,0,0.5)',
-              padding: '16px 20px',
-              zIndex: 100,
-              minWidth: '220px',
-              textAlign: 'center',
-            }}
-          >
-            <div style={{ fontSize: '13px', fontWeight: 'bold', marginBottom: '8px', color: '#000080' }}>
-              Solitaire
+              Options
             </div>
-            <p style={{ fontSize: '12px', margin: '0 0 14px 0' }}>
-              Standard Draw-One Klondike Solitaire for Windows 98.
-            </p>
-            <button
-              className="win-btn"
-              onClick={() => setShowAboutDialog(false)}
-              style={{
-                padding: '3px 16px',
-                background: '#C0C0C0',
-                border: '2px solid',
-                borderColor: '#FFFFFF #808080 #808080 #FFFFFF',
-                cursor: 'pointer',
-                fontWeight: 'bold',
-                fontSize: '11px',
-              }}
-            >
-              OK
-            </button>
+            <div style={{ padding: '12px 14px' }}>
+              <fieldset
+                style={{
+                  border: '1px solid #808080',
+                  padding: '8px 10px',
+                  marginBottom: '10px',
+                }}
+              >
+                <legend>Draw</legend>
+                <label style={{ display: 'block', marginBottom: '4px' }}>
+                  <input
+                    type="radio"
+                    name="drawOption"
+                    checked={!drawThree}
+                    onChange={() => setDrawThree(false)}
+                  />{' '}
+                  Draw One
+                </label>
+                <label style={{ display: 'block' }}>
+                  <input
+                    type="radio"
+                    name="drawOption"
+                    checked={drawThree}
+                    onChange={() => setDrawThree(true)}
+                  />{' '}
+                  Draw Three
+                </label>
+              </fieldset>
+
+              <fieldset
+                style={{
+                  border: '1px solid #808080',
+                  padding: '8px 10px',
+                  marginBottom: '12px',
+                }}
+              >
+                <legend>Scoring</legend>
+                <label style={{ display: 'block', marginBottom: '4px' }}>
+                  <input
+                    type="radio"
+                    name="scoreOption"
+                    checked={scoringMode === 'Standard'}
+                    onChange={() => setScoringMode('Standard')}
+                  />{' '}
+                  Standard
+                </label>
+                <label style={{ display: 'block', marginBottom: '4px' }}>
+                  <input
+                    type="radio"
+                    name="scoreOption"
+                    checked={scoringMode === 'Vegas'}
+                    onChange={() => setScoringMode('Vegas')}
+                  />{' '}
+                  Vegas
+                </label>
+                <label style={{ display: 'block' }}>
+                  <input
+                    type="radio"
+                    name="scoreOption"
+                    checked={scoringMode === 'None'}
+                    onChange={() => setScoringMode('None')}
+                  />{' '}
+                  None
+                </label>
+              </fieldset>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+                <button
+                  onClick={() => setShowOptionsDialog(false)}
+                  style={{
+                    padding: '2px 14px',
+                    background: '#C0C0C0',
+                    boxShadow:
+                      '1px 1px 0px #DFDFDF inset, -1px -1px 0px #7F7F7F inset, 1px 1px 0px white, -1px -1px 0px black',
+                    border: 'none',
+                    fontSize: '11px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  OK
+                </button>
+              </div>
+            </div>
           </div>
-        )}
-      </div>
-    </Window>
+        </div>
+      )}
+
+      {/* About Solitaire Dialog */}
+      <AboutAppDialog
+        isOpen={showAboutDialog}
+        appName="Solitaire"
+        version="Version 4.10.1998"
+        icon={<SolitaireIconSmall />}
+        description="Shuffling cards instead of doing real work."
+        onClose={() => setShowAboutDialog(false)}
+      />
+    </>
   );
 }

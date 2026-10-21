@@ -14,6 +14,9 @@ export default function Window({
   position = { x: 100, y: 100 },
   defaultWidth = 680,
   defaultHeight = 520,
+  minWidth = 260,
+  minHeight = 180,
+  resizable = false,
   hasMenu = true,
   menuItems,
   hasStatusBar = false,
@@ -31,7 +34,9 @@ export default function Window({
   children,
 }) {
   const [pos, setPos] = useState(position);
+  const [size, setSize] = useState({ width: defaultWidth, height: defaultHeight });
   const dragRef = useRef(null);
+  const resizeRef = useRef(null);
   const windowRef = useRef(null);
 
   // Sync position changes from props (e.g. cascading updates)
@@ -40,6 +45,11 @@ export default function Window({
       setPos(position);
     }
   }, [position.x, position.y]);
+
+  // Sync size with defaultWidth/defaultHeight if they change
+  useEffect(() => {
+    setSize({ width: defaultWidth, height: defaultHeight });
+  }, [defaultWidth, defaultHeight]);
 
   const handleStartDrag = useCallback(
     (clientX, clientY, target) => {
@@ -63,8 +73,8 @@ export default function Window({
 
         const maxW = window.innerWidth;
         const maxH = window.innerHeight - 28;
-        const curW = windowRef.current ? windowRef.current.offsetWidth : defaultWidth;
-        const curH = windowRef.current ? windowRef.current.offsetHeight : defaultHeight;
+        const curW = windowRef.current ? windowRef.current.offsetWidth : (typeof size.width === 'number' ? size.width : defaultWidth);
+        const curH = windowRef.current ? windowRef.current.offsetHeight : (typeof size.height === 'number' ? size.height : defaultHeight);
 
         let nextX = dragRef.current.initialLeft + deltaX;
         let nextY = dragRef.current.initialTop + deltaY;
@@ -84,7 +94,7 @@ export default function Window({
       window.addEventListener('mousemove', handleMouseMove);
       window.addEventListener('mouseup', handleMouseUp);
     },
-    [isMaximized, pos, onFocus, defaultWidth, defaultHeight]
+    [isMaximized, pos, onFocus, size, defaultWidth, defaultHeight]
   );
 
   const handleTouchStart = useCallback(
@@ -113,8 +123,8 @@ export default function Window({
 
         const maxW = window.innerWidth;
         const maxH = window.innerHeight - 28;
-        const curW = windowRef.current ? windowRef.current.offsetWidth : defaultWidth;
-        const curH = windowRef.current ? windowRef.current.offsetHeight : defaultHeight;
+        const curW = windowRef.current ? windowRef.current.offsetWidth : (typeof size.width === 'number' ? size.width : defaultWidth);
+        const curH = windowRef.current ? windowRef.current.offsetHeight : (typeof size.height === 'number' ? size.height : defaultHeight);
 
         let nextX = dragRef.current.initialLeft + deltaX;
         let nextY = dragRef.current.initialTop + deltaY;
@@ -134,21 +144,123 @@ export default function Window({
       window.addEventListener('touchmove', handleTouchMove, { passive: false });
       window.addEventListener('touchend', handleTouchEnd);
     },
-    [isMaximized, pos, onFocus, defaultWidth, defaultHeight]
+    [isMaximized, pos, onFocus, size, defaultWidth, defaultHeight]
+  );
+
+  // Resize Drag Handling
+  const handleStartResize = useCallback(
+    (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (!resizable || isMaximized) return;
+      if (onFocus) onFocus();
+
+      const startX = e.clientX;
+      const startY = e.clientY;
+      const curW = windowRef.current ? windowRef.current.offsetWidth : (typeof size.width === 'number' ? size.width : defaultWidth);
+      const curH = windowRef.current ? windowRef.current.offsetHeight : (typeof size.height === 'number' ? size.height : defaultHeight);
+
+      resizeRef.current = {
+        startX,
+        startY,
+        initialW: curW,
+        initialH: curH,
+      };
+
+      const onMouseMove = (moveEv) => {
+        if (!resizeRef.current) return;
+        const dx = moveEv.clientX - resizeRef.current.startX;
+        const dy = moveEv.clientY - resizeRef.current.startY;
+
+        const maxW = window.innerWidth - pos.x - 4;
+        const maxH = window.innerHeight - 28 - pos.y - 4;
+
+        const nextW = Math.max(minWidth, Math.min(maxW, resizeRef.current.initialW + dx));
+        const nextH = Math.max(minHeight, Math.min(maxH, resizeRef.current.initialH + dy));
+
+        setSize({ width: nextW, height: nextH });
+      };
+
+      const onMouseUp = () => {
+        resizeRef.current = null;
+        window.removeEventListener('mousemove', onMouseMove);
+        window.removeEventListener('mouseup', onMouseUp);
+      };
+
+      window.addEventListener('mousemove', onMouseMove);
+      window.addEventListener('mouseup', onMouseUp);
+    },
+    [resizable, isMaximized, onFocus, pos, size, minWidth, minHeight, defaultWidth, defaultHeight]
+  );
+
+  const handleTouchResize = useCallback(
+    (e) => {
+      e.stopPropagation();
+      if (!resizable || isMaximized || !e.touches || !e.touches[0]) return;
+      if (onFocus) onFocus();
+
+      const touch = e.touches[0];
+      const startX = touch.clientX;
+      const startY = touch.clientY;
+      const curW = windowRef.current ? windowRef.current.offsetWidth : (typeof size.width === 'number' ? size.width : defaultWidth);
+      const curH = windowRef.current ? windowRef.current.offsetHeight : (typeof size.height === 'number' ? size.height : defaultHeight);
+
+      resizeRef.current = {
+        startX,
+        startY,
+        initialW: curW,
+        initialH: curH,
+      };
+
+      const onTouchMove = (moveEv) => {
+        if (!resizeRef.current || !moveEv.touches || !moveEv.touches[0]) return;
+        const t = moveEv.touches[0];
+        const dx = t.clientX - resizeRef.current.startX;
+        const dy = t.clientY - resizeRef.current.startY;
+
+        const maxW = window.innerWidth - pos.x - 4;
+        const maxH = window.innerHeight - 28 - pos.y - 4;
+
+        const nextW = Math.max(minWidth, Math.min(maxW, resizeRef.current.initialW + dx));
+        const nextH = Math.max(minHeight, Math.min(maxH, resizeRef.current.initialH + dy));
+
+        setSize({ width: nextW, height: nextH });
+      };
+
+      const onTouchEnd = () => {
+        resizeRef.current = null;
+        window.removeEventListener('touchmove', onTouchMove);
+        window.removeEventListener('touchend', onTouchEnd);
+      };
+
+      window.addEventListener('touchmove', onTouchMove, { passive: false });
+      window.addEventListener('touchend', onTouchEnd);
+    },
+    [resizable, isMaximized, onFocus, pos, size, minWidth, minHeight, defaultWidth, defaultHeight]
   );
 
   if (!isOpen) return null;
+
+  const currentW = isMaximized
+    ? '100vw'
+    : typeof size.width === 'number'
+    ? `${size.width}px`
+    : size.width;
+
+  const currentH = isMaximized
+    ? 'calc(100vh - 28px)'
+    : size.height === 'auto'
+    ? 'auto'
+    : typeof size.height === 'number'
+    ? `${size.height}px`
+    : size.height;
 
   const windowStyle = {
     position: 'absolute',
     left: isMaximized ? '0px' : `${pos.x}px`,
     top: isMaximized ? '0px' : `${pos.y}px`,
-    width: isMaximized ? '100vw' : `${defaultWidth}px`,
-    height: isMaximized
-      ? 'calc(100vh - 28px)'
-      : defaultHeight === 'auto'
-      ? 'auto'
-      : `${defaultHeight}px`,
+    width: currentW,
+    height: currentH,
     maxHeight: 'calc(100vh - 36px)',
     padding: '3px',
     background: '#C0C0C0',
@@ -164,6 +276,8 @@ export default function Window({
     overflow: 'hidden',
     ...style,
   };
+
+  const allowMaximize = resizable && !isDialog;
 
   return (
     <div
@@ -184,10 +298,11 @@ export default function Window({
         isActive={isActive}
         isMaximized={isMaximized}
         onMinimize={onMinimize}
-        onMaximize={onMaximize}
+        onMaximize={allowMaximize ? onMaximize : null}
         onClose={onClose}
         showMinimize={isDialog ? false : showMinimize}
         showMaximize={isDialog ? false : showMaximize}
+        allowMaximize={allowMaximize}
         showClose={showClose}
         onMouseDown={(e) => handleStartDrag(e.clientX, e.clientY, e.target)}
         onTouchStart={handleTouchStart}
@@ -211,6 +326,39 @@ export default function Window({
       </div>
 
       {hasStatusBar && <StatusBar text={statusText} />}
+
+      {/* Resize Grip for resizable windows */}
+      {resizable && !isMaximized && (
+        <div
+          className="win98-resize-grip"
+          onMouseDown={handleStartResize}
+          onTouchStart={handleTouchResize}
+          style={{
+            position: 'absolute',
+            right: '1px',
+            bottom: '1px',
+            width: '16px',
+            height: '16px',
+            cursor: 'se-resize',
+            zIndex: 50,
+            display: 'flex',
+            alignItems: 'flex-end',
+            justifyContent: 'flex-end',
+            padding: '2px',
+            boxSizing: 'border-box',
+          }}
+          title="Resize"
+        >
+          <svg width="11" height="11" viewBox="0 0 11 11" fill="none" style={{ pointerEvents: 'none', shapeRendering: 'crispEdges' }}>
+            <line x1="10" y1="2" x2="2" y2="10" stroke="#FFFFFF" strokeWidth="1" />
+            <line x1="9" y1="2" x2="2" y2="9" stroke="#808080" strokeWidth="1" />
+            <line x1="10" y1="6" x2="6" y2="10" stroke="#FFFFFF" strokeWidth="1" />
+            <line x1="9" y1="6" x2="6" y2="9" stroke="#808080" strokeWidth="1" />
+            <line x1="10" y1="10" x2="10" y2="10" stroke="#FFFFFF" strokeWidth="1" />
+            <line x1="9" y1="10" x2="10" y2="9" stroke="#808080" strokeWidth="1" />
+          </svg>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,13 +1,8 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Window from '../../components/Window';
+import AboutAppDialog from '../../components/AboutAppDialog';
+import { useSound } from '../../../../context/SoundContext';
 
-// 16 Classic Windows 98 Colors
-const WIN98_COLORS = [
-  '#000000', '#808080', '#800000', '#808000', '#008000', '#008080', '#000080', '#800080',
-  '#FFFFFF', '#C0C0C0', '#FF0000', '#FFFF00', '#00FF00', '#00FFFF', '#0000FF', '#FF00FF',
-];
-
-// Small Paint Icon
 export const PaintIconSmall = () => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
     <rect x="2" y="2" width="12" height="12" rx="2" fill="#EFEFEF" stroke="#000" strokeWidth="1" />
@@ -18,16 +13,34 @@ export const PaintIconSmall = () => (
   </svg>
 );
 
+// 28 Classic Windows 98 Paint Palette Colors (2 rows of 14)
+const PAINT_PALETTE = [
+  // Row 1
+  '#000000', '#808080', '#800000', '#808000', '#008000', '#008080', '#000080',
+  '#800080', '#808040', '#004040', '#0080FF', '#004080', '#8000FF', '#804000',
+  // Row 2
+  '#FFFFFF', '#C0C0C0', '#FF0000', '#FFFF00', '#00FF00', '#00FFFF', '#0000FF',
+  '#FF00FF', '#FFFF80', '#00FF80', '#80FFFF', '#7F7FFF', '#FF0080', '#FF8040',
+];
+
+// Tool Definitions (16 tools in authentic order, 2 columns)
 const TOOLS = [
-  { id: 'pencil', label: 'Pencil', icon: '✏️' },
-  { id: 'brush', label: 'Brush', icon: '🖌️' },
-  { id: 'eraser', label: 'Eraser', icon: '🧹' },
-  { id: 'bucket', label: 'Fill Bucket', icon: '🪣' },
-  { id: 'line', label: 'Line', icon: '📏' },
-  { id: 'rect', label: 'Rectangle', icon: '⬜' },
-  { id: 'ellipse', label: 'Ellipse', icon: '⭕' },
-  { id: 'text', label: 'Text', icon: '🅰️' },
-  { id: 'picker', label: 'Color Picker', icon: '🧪' },
+  { id: 'free-select', name: 'Free-Form Select', hint: 'Selects a free-form part of the picture to move, copy, or edit.' },
+  { id: 'select', name: 'Select', hint: 'Selects a rectangular part of the picture to move, copy, or edit.' },
+  { id: 'eraser', name: 'Eraser', hint: 'Erases a portion of the picture, using the selected eraser shape.' },
+  { id: 'bucket', name: 'Fill With Color', hint: 'Fills an area with the current drawing color.' },
+  { id: 'picker', name: 'Pick Color', hint: 'Picks up a color from the picture for drawing.' },
+  { id: 'magnifier', name: 'Magnifier', hint: 'Changes the magnification.' },
+  { id: 'pencil', name: 'Pencil', hint: 'Draws a free-form line one pixel wide.' },
+  { id: 'brush', name: 'Brush', hint: 'Draws using a brush with the selected shape and size.' },
+  { id: 'airbrush', name: 'Airbrush', hint: 'Draws using an airbrush of the selected spray size.' },
+  { id: 'text', name: 'Text', hint: 'Inserts text into the picture.' },
+  { id: 'line', name: 'Line', hint: 'Draws a straight line with the selected line width.' },
+  { id: 'curve', name: 'Curve', hint: 'Draws a curved line with the selected line width.' },
+  { id: 'rect', name: 'Rectangle', hint: 'Draws a rectangle with the selected fill style.' },
+  { id: 'polygon', name: 'Polygon', hint: 'Draws a polygon with the selected fill style.' },
+  { id: 'ellipse', name: 'Ellipse', hint: 'Draws an ellipse with the selected fill style.' },
+  { id: 'rounded-rect', name: 'Rounded Rectangle', hint: 'Draws a rounded rectangle with the selected fill style.' },
 ];
 
 export default function PaintWindow({
@@ -41,34 +54,43 @@ export default function PaintWindow({
   onMaximize,
   onClose,
 }) {
+  const { playSound } = useSound();
+
   const canvasRef = useRef(null);
-  const [selectedTool, setSelectedTool] = useState('pencil');
-  const [primaryColor, setPrimaryColor] = useState('#000000');
-  const [secondaryColor, setSecondaryColor] = useState('#FFFFFF');
-  const [lineWidth, setLineWidth] = useState(2);
-  const [fillStyle, setFillStyle] = useState('outline'); // 'outline' | 'fill-outline' | 'fill-only'
-  const [isDrawing, setIsDrawing] = useState(false);
-  const [startPos, setStartPos] = useState({ x: 0, y: 0 });
-  const [snapshot, setSnapshot] = useState(null);
-  const [undoStack, setUndoStack] = useState([]);
-  const [textInput, setTextInput] = useState('');
-  const [textPos, setTextPos] = useState(null);
-  const [showAboutDialog, setShowAboutDialog] = useState(false);
+  const fileInputRef = useRef(null);
 
-  // Close dialog on Escape key
-  useEffect(() => {
-    if (!showAboutDialog) return;
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') {
-        e.stopPropagation();
-        setShowAboutDialog(false);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [showAboutDialog]);
+  const [activeTool, setActiveTool] = useState('pencil');
+  const [fgColor, setFgColor] = useState('#000000');
+  const [bgColor, setBgColor] = useState('#FFFFFF');
+  const [lineWidth, setLineWidth] = useState(1);
+  const [brushSize, setBrushSize] = useState(4);
+  const [eraserSize, setEraserSize] = useState(6);
+  const [fillStyle, setFillStyle] = useState('outline'); // 'outline' | 'fill-outline' | 'solid'
+  const [zoomLevel, setZoomLevel] = useState(1); // 1x, 2x, 6x, 8x
+  const [cursorCoords, setCursorCoords] = useState(null);
+  const [showAbout, setShowAbout] = useState(false);
 
-  // Initialize canvas with white background
+  // Drawing state
+  const isDrawingRef = useRef(false);
+  const startPosRef = useRef({ x: 0, y: 0 });
+  const snapshotRef = useRef(null);
+  const undoStackRef = useRef([]);
+
+  // Polygon points
+  const [polyPoints, setPolyPoints] = useState([]);
+
+  // Text tool
+  const [textInputPos, setTextInputPos] = useState(null);
+  const [textVal, setTextVal] = useState('');
+
+  // Selection move
+  const selectBoxRef = useRef(null);
+
+  // Status bar text
+  const currentToolMeta = TOOLS.find((t) => t.id === activeTool);
+  const toolHint = currentToolMeta?.hint || 'For Help, click Help Topics on the Help Menu.';
+
+  // Initialize Canvas
   useEffect(() => {
     if (!isOpen) return;
     const canvas = canvasRef.current;
@@ -76,274 +98,353 @@ export default function PaintWindow({
     const ctx = canvas.getContext('2d');
     ctx.fillStyle = '#FFFFFF';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    // Initial undo snapshot
-    const initialData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    setUndoStack([initialData]);
+    const initial = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    undoStackRef.current = [initial];
   }, [isOpen]);
 
+  // Save Undo snapshot
   const saveUndo = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    setUndoStack((prev) => [...prev.slice(-19), data]);
+    undoStackRef.current = [...undoStackRef.current.slice(-19), data];
   }, []);
 
+  // Handle Undo (Ctrl+Z)
   const handleUndo = useCallback(() => {
-    if (undoStack.length <= 1) return;
+    if (undoStackRef.current.length <= 1) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    const nextStack = [...undoStack];
-    nextStack.pop(); // Remove current
-    const prevData = nextStack[nextStack.length - 1];
-    ctx.putImageData(prevData, 0, 0);
-    setUndoStack(nextStack);
-  }, [undoStack]);
+    undoStackRef.current.pop();
+    const prev = undoStackRef.current[undoStackRef.current.length - 1];
+    if (prev) {
+      ctx.putImageData(prev, 0, 0);
+    }
+  }, []);
 
-  const handleClear = useCallback(() => {
+  // Clear Canvas
+  const handleClearImage = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
     saveUndo();
-  }, [saveUndo]);
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = bgColor;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    setPolyPoints([]);
+    setTextInputPos(null);
+  };
 
-  const handleSaveAsPNG = useCallback(() => {
+  // Export Save PNG
+  const handleSave = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const dataUrl = canvas.toDataURL('image/png');
     const link = document.createElement('a');
     link.download = 'untitled.png';
-    link.href = dataUrl;
+    link.href = canvas.toDataURL('image/png');
+    document.body.appendChild(link);
     link.click();
-  }, []);
+    document.body.removeChild(link);
+  };
 
-  // Flood fill algorithm
-  const floodFill = (startX, startY, fillColorHex) => {
+  // Open Image File
+  const handleFileChange = (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        saveUndo();
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, Math.min(canvas.width, img.width), Math.min(canvas.height, img.height));
+      };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
+  // Flood Fill Algorithm
+  const floodFill = (startX, startY, fillHex) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    const w = canvas.width;
-    const h = canvas.height;
-    const imgData = ctx.getImageData(0, 0, w, h);
+    const width = canvas.width;
+    const height = canvas.height;
+    const imgData = ctx.getImageData(0, 0, width, height);
     const data = imgData.data;
 
-    const startIndex = (startY * w + startX) * 4;
-    const targetR = data[startIndex];
-    const targetG = data[startIndex + 1];
-    const targetB = data[startIndex + 2];
-    const targetA = data[startIndex + 3];
+    const startIdx = (startY * width + startX) * 4;
+    const targetR = data[startIdx];
+    const targetG = data[startIdx + 1];
+    const targetB = data[startIdx + 2];
+    const targetA = data[startIdx + 3];
 
-    // Convert hex color to rgb
-    const tempEl = document.createElement('div');
-    tempEl.style.color = fillColorHex;
-    document.body.appendChild(tempEl);
-    const rgbStr = window.getComputedStyle(tempEl).color;
-    document.body.removeChild(tempEl);
-    const match = rgbStr.match(/\d+/g);
-    if (!match) return;
-    const [fillR, fillG, fillB] = match.map(Number);
+    // Convert hex to rgb
+    const fillR = parseInt(fillHex.slice(1, 3), 16);
+    const fillG = parseInt(fillHex.slice(3, 5), 16);
+    const fillB = parseInt(fillHex.slice(5, 7), 16);
     const fillA = 255;
 
-    if (
-      targetR === fillR &&
-      targetG === fillG &&
-      targetB === fillB &&
-      targetA === fillA
-    ) {
-      return;
-    }
+    if (targetR === fillR && targetG === fillG && targetB === fillB && targetA === fillA) return;
 
+    saveUndo();
     const queue = [[startX, startY]];
-    const visited = new Uint8Array(w * h);
+    const seen = new Uint8Array(width * height);
 
     while (queue.length > 0) {
       const [x, y] = queue.pop();
-      const idx = (y * w + x) * 4;
-      const vIdx = y * w + x;
+      if (x < 0 || x >= width || y < 0 || y >= height) continue;
+      const pos = y * width + x;
+      if (seen[pos]) continue;
+      seen[pos] = 1;
 
-      if (x < 0 || x >= w || y < 0 || y >= h || visited[vIdx]) continue;
-
+      const idx = pos * 4;
       if (
         data[idx] === targetR &&
         data[idx + 1] === targetG &&
         data[idx + 2] === targetB &&
         data[idx + 3] === targetA
       ) {
-        visited[vIdx] = 1;
         data[idx] = fillR;
         data[idx + 1] = fillG;
         data[idx + 2] = fillB;
         data[idx + 3] = fillA;
 
-        if (x + 1 < w) queue.push([x + 1, y]);
-        if (x - 1 >= 0) queue.push([x - 1, y]);
-        if (y + 1 < h) queue.push([x, y + 1]);
-        if (y - 1 >= 0) queue.push([x, y - 1]);
+        queue.push([x + 1, y]);
+        queue.push([x - 1, y]);
+        queue.push([x, y + 1]);
+        queue.push([x, y - 1]);
       }
     }
+
     ctx.putImageData(imgData, 0, 0);
-    saveUndo();
   };
 
+  // Get Canvas Mouse Coordinates
   const getCanvasCoords = (e) => {
     const canvas = canvasRef.current;
     if (!canvas) return { x: 0, y: 0 };
     const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = Math.floor((e.clientX - rect.left) * scaleX);
+    const y = Math.floor((e.clientY - rect.top) * scaleY);
     return {
-      x: Math.floor(e.clientX - rect.left),
-      y: Math.floor(e.clientY - rect.top),
+      x: Math.max(0, Math.min(canvas.width - 1, x)),
+      y: Math.max(0, Math.min(canvas.height - 1, y)),
     };
   };
 
+  // Mouse Down handler
   const handleMouseDown = (e) => {
-    const { x, y } = getCanvasCoords(e);
+    if (e.target !== canvasRef.current) return;
+    const isRightClick = e.button === 2;
+    const drawColor = isRightClick ? bgColor : fgColor;
+    const coords = getCanvasCoords(e);
     const canvas = canvasRef.current;
-    if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
-    if (selectedTool === 'picker') {
-      const pixel = ctx.getImageData(x, y, 1, 1).data;
-      const hex = `#${((1 << 24) + (pixel[0] << 16) + (pixel[1] << 8) + pixel[2]).toString(16).slice(1)}`;
-      if (e.button === 2) {
-        setSecondaryColor(hex);
+    if (activeTool === 'bucket') {
+      floodFill(coords.x, coords.y, drawColor);
+      return;
+    }
+
+    if (activeTool === 'picker') {
+      const p = ctx.getImageData(coords.x, coords.y, 1, 1).data;
+      const hex = `#${((1 << 24) + (p[0] << 16) + (p[1] << 8) + p[2]).toString(16).slice(1).toUpperCase()}`;
+      if (isRightClick) {
+        setBgColor(hex);
       } else {
-        setPrimaryColor(hex);
+        setFgColor(hex);
       }
       return;
     }
 
-    if (selectedTool === 'bucket') {
-      floodFill(x, y, e.button === 2 ? secondaryColor : primaryColor);
+    if (activeTool === 'magnifier') {
+      setZoomLevel((prev) => (prev >= 6 ? 1 : prev === 1 ? 2 : 6));
       return;
     }
 
-    if (selectedTool === 'text') {
-      setTextPos({ x, y });
+    if (activeTool === 'text') {
+      setTextInputPos(coords);
       return;
     }
 
-    setIsDrawing(true);
-    setStartPos({ x, y });
-    setSnapshot(ctx.getImageData(0, 0, canvas.width, canvas.height));
+    saveUndo();
+    isDrawingRef.current = true;
+    startPosRef.current = coords;
+    snapshotRef.current = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
-    const color = e.button === 2 ? secondaryColor : primaryColor;
-    ctx.strokeStyle = color;
-    ctx.fillStyle = color;
-    ctx.lineWidth = selectedTool === 'eraser' ? lineWidth * 4 : lineWidth;
+    ctx.fillStyle = drawColor;
+    ctx.strokeStyle = drawColor;
+    ctx.lineWidth = lineWidth;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
 
-    if (selectedTool === 'pencil' || selectedTool === 'brush' || selectedTool === 'eraser') {
+    if (activeTool === 'pencil') {
+      ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.moveTo(x, y);
-      if (selectedTool === 'eraser') {
-        ctx.strokeStyle = '#FFFFFF';
-        ctx.fillStyle = '#FFFFFF';
-      }
-      ctx.lineTo(x, y);
+      ctx.moveTo(coords.x, coords.y);
+      ctx.lineTo(coords.x, coords.y);
       ctx.stroke();
+    } else if (activeTool === 'brush') {
+      ctx.lineWidth = brushSize;
+      ctx.beginPath();
+      ctx.moveTo(coords.x, coords.y);
+      ctx.lineTo(coords.x, coords.y);
+      ctx.stroke();
+    } else if (activeTool === 'eraser') {
+      ctx.fillStyle = bgColor;
+      ctx.fillRect(coords.x - eraserSize / 2, coords.y - eraserSize / 2, eraserSize, eraserSize);
+    } else if (activeTool === 'airbrush') {
+      sprayAirbrush(coords.x, coords.y, drawColor);
     }
   };
 
-  const handleMouseMove = (e) => {
-    if (!isDrawing) return;
-    const { x, y } = getCanvasCoords(e);
+  // Airbrush spray
+  const sprayAirbrush = (cx, cy, color) => {
     const canvas = canvasRef.current;
-    if (!canvas || !snapshot) return;
+    if (!canvas) return;
     const ctx = canvas.getContext('2d');
-
-    const color = e.buttons === 2 ? secondaryColor : primaryColor;
-    ctx.strokeStyle = color;
     ctx.fillStyle = color;
-    ctx.lineWidth = selectedTool === 'eraser' ? lineWidth * 4 : lineWidth;
+    const radius = 12;
+    const density = 20;
+    for (let i = 0; i < density; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const dist = Math.random() * radius;
+      const x = cx + Math.cos(angle) * dist;
+      const y = cy + Math.sin(angle) * dist;
+      ctx.fillRect(Math.floor(x), Math.floor(y), 1, 1);
+    }
+  };
 
-    if (selectedTool === 'pencil' || selectedTool === 'brush' || selectedTool === 'eraser') {
-      if (selectedTool === 'eraser') {
-        ctx.strokeStyle = '#FFFFFF';
-      }
-      ctx.lineTo(x, y);
+  // Mouse Move handler
+  const handleMouseMove = (e) => {
+    const coords = getCanvasCoords(e);
+    setCursorCoords(coords);
+
+    if (!isDrawingRef.current) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const isRightClick = e.buttons === 2;
+    const drawColor = isRightClick ? bgColor : fgColor;
+
+    if (activeTool === 'pencil') {
+      ctx.lineTo(coords.x, coords.y);
       ctx.stroke();
-    } else {
-      // Restore snapshot for live preview
-      ctx.putImageData(snapshot, 0, 0);
-      ctx.beginPath();
+    } else if (activeTool === 'brush') {
+      ctx.lineTo(coords.x, coords.y);
+      ctx.stroke();
+    } else if (activeTool === 'eraser') {
+      ctx.fillStyle = bgColor;
+      ctx.fillRect(coords.x - eraserSize / 2, coords.y - eraserSize / 2, eraserSize, eraserSize);
+    } else if (activeTool === 'airbrush') {
+      sprayAirbrush(coords.x, coords.y, drawColor);
+    } else if (['line', 'rect', 'ellipse', 'rounded-rect'].includes(activeTool)) {
+      // Restore snapshot then preview shape
+      if (snapshotRef.current) {
+        ctx.putImageData(snapshotRef.current, 0, 0);
+      }
+      ctx.strokeStyle = drawColor;
+      ctx.fillStyle = isRightClick ? fgColor : bgColor;
+      ctx.lineWidth = lineWidth;
 
-      if (selectedTool === 'line') {
-        ctx.moveTo(startPos.x, startPos.y);
-        ctx.lineTo(x, y);
+      const sx = startPosRef.current.x;
+      const sy = startPosRef.current.y;
+      const w = coords.x - sx;
+      const h = coords.y - sy;
+
+      if (activeTool === 'line') {
+        ctx.beginPath();
+        ctx.moveTo(sx, sy);
+        ctx.lineTo(coords.x, coords.y);
         ctx.stroke();
-      } else if (selectedTool === 'rect') {
-        const left = Math.min(startPos.x, x);
-        const top = Math.min(startPos.y, y);
-        const w = Math.abs(x - startPos.x);
-        const h = Math.abs(y - startPos.y);
-
-        if (fillStyle === 'outline' || fillStyle === 'fill-outline') {
-          ctx.strokeRect(left, top, w, h);
+      } else if (activeTool === 'rect') {
+        if (fillStyle === 'solid') {
+          ctx.fillStyle = drawColor;
+          ctx.fillRect(sx, sy, w, h);
+        } else if (fillStyle === 'fill-outline') {
+          ctx.fillRect(sx, sy, w, h);
+          ctx.strokeRect(sx, sy, w, h);
+        } else {
+          ctx.strokeRect(sx, sy, w, h);
         }
-        if (fillStyle === 'fill-outline' || fillStyle === 'fill-only') {
-          ctx.fillStyle = fillStyle === 'fill-outline' ? secondaryColor : primaryColor;
-          ctx.fillRect(left, top, w, h);
-          if (fillStyle === 'fill-outline') {
-            ctx.strokeRect(left, top, w, h);
-          }
-        }
-      } else if (selectedTool === 'ellipse') {
-        const rx = Math.abs(x - startPos.x) / 2;
-        const ry = Math.abs(y - startPos.y) / 2;
-        const cx = Math.min(startPos.x, x) + rx;
-        const cy = Math.min(startPos.y, y) + ry;
-
-        ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
-        if (fillStyle === 'outline' || fillStyle === 'fill-outline') {
+      } else if (activeTool === 'ellipse') {
+        ctx.beginPath();
+        ctx.ellipse(sx + w / 2, sy + h / 2, Math.abs(w / 2), Math.abs(h / 2), 0, 0, 2 * Math.PI);
+        if (fillStyle === 'solid') {
+          ctx.fillStyle = drawColor;
+          ctx.fill();
+        } else if (fillStyle === 'fill-outline') {
+          ctx.fill();
+          ctx.stroke();
+        } else {
           ctx.stroke();
         }
-        if (fillStyle === 'fill-outline' || fillStyle === 'fill-only') {
-          ctx.fillStyle = fillStyle === 'fill-outline' ? secondaryColor : primaryColor;
+      } else if (activeTool === 'rounded-rect') {
+        const r = 8;
+        ctx.beginPath();
+        ctx.roundRect ? ctx.roundRect(sx, sy, w, h, r) : ctx.rect(sx, sy, w, h);
+        if (fillStyle === 'solid') {
+          ctx.fillStyle = drawColor;
           ctx.fill();
-          if (fillStyle === 'fill-outline') {
-            ctx.stroke();
-          }
+        } else if (fillStyle === 'fill-outline') {
+          ctx.fill();
+          ctx.stroke();
+        } else {
+          ctx.stroke();
         }
       }
     }
   };
 
+  // Mouse Up handler
   const handleMouseUp = () => {
-    if (!isDrawing) return;
-    setIsDrawing(false);
-    setSnapshot(null);
-    saveUndo();
+    isDrawingRef.current = false;
+    snapshotRef.current = null;
   };
 
-  // Commit text tool
+  // Text Tool commit
   const handleCommitText = () => {
-    if (!textPos || !textInput.trim()) {
-      setTextPos(null);
-      setTextInput('');
+    if (!textInputPos || !textVal.trim()) {
+      setTextInputPos(null);
+      setTextVal('');
       return;
     }
     const canvas = canvasRef.current;
-    if (canvas) {
-      const ctx = canvas.getContext('2d');
-      ctx.font = '14px Arial, sans-serif';
-      ctx.fillStyle = primaryColor;
-      ctx.fillText(textInput, textPos.x, textPos.y);
-      saveUndo();
-    }
-    setTextPos(null);
-    setTextInput('');
+    if (!canvas) return;
+    saveUndo();
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = fgColor;
+    ctx.font = '14px Arial, sans-serif';
+    ctx.fillText(textVal, textInputPos.x, textInputPos.y + 12);
+    setTextInputPos(null);
+    setTextVal('');
   };
 
+  // Menu bar matching MS Paint 98
   const menuItems = [
     {
       label: 'File',
       items: [
-        { label: 'New', onClick: handleClear },
-        { label: 'Save as PNG', onClick: handleSaveAsPNG },
+        { label: 'New', shortcut: 'Ctrl+N', onClick: handleClearImage },
+        {
+          label: 'Open...',
+          shortcut: 'Ctrl+O',
+          onClick: () => {
+            if (fileInputRef.current) fileInputRef.current.click();
+          },
+        },
+        { label: 'Save', shortcut: 'Ctrl+S', onClick: handleSave },
+        { label: 'Save As...', onClick: handleSave },
         { isSeparator: true },
         { label: 'Exit', onClick: onClose },
       ],
@@ -351,395 +452,697 @@ export default function PaintWindow({
     {
       label: 'Edit',
       items: [
-        { label: 'Undo (Ctrl+Z)', onClick: handleUndo },
-        { label: 'Clear Image', onClick: handleClear },
+        { label: 'Undo', shortcut: 'Ctrl+Z', onClick: handleUndo },
+        { isSeparator: true },
+        { label: 'Cut', shortcut: 'Ctrl+X', disabled: true },
+        { label: 'Copy', shortcut: 'Ctrl+C', disabled: true },
+        { label: 'Paste', shortcut: 'Ctrl+V', disabled: true },
+        { label: 'Clear Selection', shortcut: 'Del', disabled: true },
+        { label: 'Select All', shortcut: 'Ctrl+A', disabled: true },
       ],
     },
     {
       label: 'View',
       items: [
-        { label: 'Tool Box ✓' },
-        { label: 'Color Box ✓' },
+        { label: 'Tool Box', checked: true },
+        { label: 'Color Box', checked: true },
+        { label: 'Status Bar', checked: true },
+      ],
+    },
+    {
+      label: 'Image',
+      items: [
+        { label: 'Clear Image', shortcut: 'Ctrl+Shift+N', onClick: handleClearImage },
+        {
+          label: 'Invert Colors',
+          shortcut: 'Ctrl+I',
+          onClick: () => {
+            const canvas = canvasRef.current;
+            if (!canvas) return;
+            saveUndo();
+            const ctx = canvas.getContext('2d');
+            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const d = imgData.data;
+            for (let i = 0; i < d.length; i += 4) {
+              d[i] = 255 - d[i];
+              d[i + 1] = 255 - d[i + 1];
+              d[i + 2] = 255 - d[i + 2];
+            }
+            ctx.putImageData(imgData, 0, 0);
+          },
+        },
+      ],
+    },
+    {
+      label: 'Colors',
+      items: [
+        { label: 'Edit Colors...', disabled: true },
       ],
     },
     {
       label: 'Help',
       items: [
+        { label: 'Help Topics', disabled: true },
+        { isSeparator: true },
         {
           label: 'About Paint',
-          onClick: () => setShowAboutDialog(true),
+          onClick: () => setShowAbout(true),
         },
       ],
     },
   ];
 
   return (
-    <Window
-      id="window-paint"
-      title="untitled - Paint"
-      icon={<PaintIconSmall />}
-      isOpen={isOpen}
-      isActive={isActive}
-      isMaximized={isMaximized}
-      zIndex={zIndex}
-      position={position}
-      defaultWidth={640}
-      defaultHeight={500}
-      hasMenu={true}
-      menuItems={menuItems}
-      hasStatusBar={true}
-      statusText="For Help, click Help Topics on the Help Menu."
-      onFocus={onFocus}
-      onMinimize={onMinimize}
-      onMaximize={onMaximize}
-      onClose={onClose}
-    >
-      <div
-        style={{
-          width: '100%',
-          height: '100%',
-          background: '#C0C0C0',
-          display: 'flex',
-          flexDirection: 'column',
-          boxSizing: 'border-box',
-          overflow: 'hidden',
-          userSelect: 'none',
-        }}
+    <>
+      <Window
+        id="paint-window"
+        title="untitled - Paint"
+        icon={<PaintIconSmall />}
+        isOpen={isOpen}
+        isActive={isActive}
+        isMaximized={isMaximized}
+        zIndex={zIndex}
+        position={position}
+        defaultWidth={680}
+        defaultHeight={500}
+        minWidth={460}
+        minHeight={340}
+        resizable={true}
+        hasMenu={true}
+        menuItems={menuItems}
+        hasStatusBar={true}
+        statusText={`${toolHint}    ${cursorCoords ? `${cursorCoords.x}, ${cursorCoords.y}` : ''}`}
+        onFocus={onFocus}
+        onMinimize={onMinimize}
+        onMaximize={onMaximize}
+        onClose={onClose}
       >
-        {/* Main Body: Left Toolbox + Canvas */}
-        <div style={{ flex: 1, display: 'flex', minHeight: 0, overflow: 'hidden' }}>
-          {/* Left Toolbox */}
+        {/* Hidden File Picker */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          style={{ display: 'none' }}
+          onChange={handleFileChange}
+        />
+
+        {/* Main Paint Workspace Container */}
+        <div
+          style={{
+            alignSelf: 'stretch',
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            background: '#C0C0C0',
+            overflow: 'hidden',
+            fontFamily: "var(--win-font, 'W95FA', 'MS Sans Serif', Tahoma, sans-serif)",
+            fontSize: '11px',
+            userSelect: 'none',
+          }}
+        >
+          {/* Top/Middle Area: Toolbox on left, Canvas workspace on right */}
           <div
             style={{
-              width: '64px',
-              background: '#C0C0C0',
-              borderRight: '1px solid #808080',
-              padding: '4px',
+              flex: 1,
               display: 'flex',
-              flexDirection: 'column',
-              gap: '6px',
-              boxSizing: 'border-box',
-              flexShrink: 0,
+              overflow: 'hidden',
+              minHeight: 0,
             }}
           >
-            {/* Tool grid (2 columns) */}
+            {/* Toolbox Panel (2 columns of 8 tools) */}
             <div
+              id="paint-toolbox"
               style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(2, 26px)',
-                gap: '2px',
-              }}
-            >
-              {TOOLS.map((tool) => {
-                const isSelected = selectedTool === tool.id;
-                return (
-                  <button
-                    key={tool.id}
-                    onClick={() => setSelectedTool(tool.id)}
-                    title={tool.label}
-                    style={{
-                      width: '26px',
-                      height: '26px',
-                      padding: 0,
-                      background: '#C0C0C0',
-                      border: '2px solid',
-                      borderColor: isSelected
-                        ? '#808080 #FFFFFF #FFFFFF #808080'
-                        : '#FFFFFF #808080 #808080 #FFFFFF',
-                      boxShadow: isSelected ? '1px 1px 0px #000 inset' : 'none',
-                      cursor: 'pointer',
-                      fontSize: '14px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    {tool.icon}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Sub-options for Rectangle / Ellipse / Line */}
-            <div
-              style={{
-                border: '2px solid',
-                borderColor: '#808080 #FFFFFF #FFFFFF #808080',
-                background: '#FFFFFF',
-                padding: '4px 2px',
+                width: '56px',
+                background: '#C0C0C0',
+                borderRight: '1px solid #808080',
+                padding: '3px 2px',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '4px',
-                fontSize: '10px',
+                alignItems: 'center',
+                boxSizing: 'border-box',
+                flexShrink: 0,
               }}
             >
-              <div style={{ fontWeight: 'bold', fontSize: '9px', textAlign: 'center' }}>STYLE</div>
+              {/* 16 Tool Buttons in 2x8 Grid */}
               <div
-                onClick={() => setFillStyle('outline')}
                 style={{
-                  padding: '2px',
-                  background: fillStyle === 'outline' ? '#000080' : 'transparent',
-                  color: fillStyle === 'outline' ? '#FFF' : '#000',
-                  cursor: 'pointer',
-                  textAlign: 'center',
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(2, 24px)',
+                  gridTemplateRows: 'repeat(8, 24px)',
+                  gap: '1px',
                 }}
               >
-                Outline
+                {TOOLS.map((tool) => {
+                  const isSelected = activeTool === tool.id;
+                  return (
+                    <button
+                      key={tool.id}
+                      onClick={() => setActiveTool(tool.id)}
+                      title={tool.name}
+                      style={{
+                        width: '24px',
+                        height: '24px',
+                        padding: 0,
+                        background: '#C0C0C0',
+                        boxShadow: isSelected
+                          ? '1px 1px 0px black inset, -1px -1px 0px white inset, 2px 2px 0px #808080 inset, -2px -2px 0px #DFDFDF inset'
+                          : '1px 1px 0px white inset, -1px -1px 0px black inset, 2px 2px 0px #DFDFDF inset, -2px -2px 0px #7F7F7F inset',
+                        border: 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        boxSizing: 'border-box',
+                      }}
+                    >
+                      {/* Authentic 16x16 Tool Icons */}
+                      {renderToolIcon(tool.id)}
+                    </button>
+                  );
+                })}
               </div>
+
+              {/* Tool Options Box (shows shape widths, fill styles, etc.) */}
               <div
-                onClick={() => setFillStyle('fill-outline')}
+                id="paint-tool-options"
                 style={{
+                  width: '48px',
+                  height: '66px',
+                  background: '#C0C0C0',
+                  border: '1px solid #808080',
+                  borderRightColor: '#FFFFFF',
+                  borderBottomColor: '#FFFFFF',
+                  boxShadow: '1px 1px 0px black inset',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                   padding: '2px',
-                  background: fillStyle === 'fill-outline' ? '#000080' : 'transparent',
-                  color: fillStyle === 'fill-outline' ? '#FFF' : '#000',
-                  cursor: 'pointer',
-                  textAlign: 'center',
+                  boxSizing: 'border-box',
                 }}
               >
-                Fill+Out
-              </div>
-              <div
-                onClick={() => setFillStyle('fill-only')}
-                style={{
-                  padding: '2px',
-                  background: fillStyle === 'fill-only' ? '#000080' : 'transparent',
-                  color: fillStyle === 'fill-only' ? '#FFF' : '#000',
-                  cursor: 'pointer',
-                  textAlign: 'center',
-                }}
-              >
-                Solid
+                {renderToolOptions(
+                  activeTool,
+                  lineWidth,
+                  setLineWidth,
+                  brushSize,
+                  setBrushSize,
+                  eraserSize,
+                  setEraserSize,
+                  fillStyle,
+                  setFillStyle,
+                  zoomLevel,
+                  setZoomLevel
+                )}
               </div>
             </div>
 
-            {/* Line Width */}
+            {/* Canvas Scrollable Workspace */}
             <div
               style={{
-                border: '2px solid',
-                borderColor: '#808080 #FFFFFF #FFFFFF #808080',
-                background: '#FFFFFF',
-                padding: '4px 2px',
+                flex: 1,
+                background: '#808080',
+                overflow: 'auto',
                 display: 'flex',
-                flexDirection: 'column',
-                gap: '3px',
-                alignItems: 'center',
+                alignItems: 'flex-start',
+                justifyContent: 'flex-start',
+                padding: '4px',
+                position: 'relative',
               }}
             >
-              {[1, 2, 4].map((w) => (
-                <div
-                  key={w}
-                  onClick={() => setLineWidth(w)}
+              <div
+                style={{
+                  position: 'relative',
+                  boxShadow: '2px 2px 4px rgba(0,0,0,0.4)',
+                  transform: `scale(${zoomLevel})`,
+                  transformOrigin: 'top left',
+                }}
+              >
+                <canvas
+                  ref={canvasRef}
+                  width={600}
+                  height={400}
+                  onMouseDown={handleMouseDown}
+                  onMouseMove={handleMouseMove}
+                  onMouseUp={handleMouseUp}
+                  onContextMenu={(e) => e.preventDefault()}
                   style={{
-                    width: '80%',
-                    height: `${w}px`,
-                    background: lineWidth === w ? '#000080' : '#000000',
+                    background: '#FFFFFF',
+                    display: 'block',
+                    cursor: getToolCursor(activeTool),
+                  }}
+                />
+
+                {/* Text Tool Floating Input */}
+                {textInputPos && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      left: `${textInputPos.x}px`,
+                      top: `${textInputPos.y}px`,
+                      zIndex: 10,
+                    }}
+                  >
+                    <input
+                      autoFocus
+                      type="text"
+                      value={textVal}
+                      onChange={(e) => setTextVal(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') handleCommitText();
+                        if (e.key === 'Escape') setTextInputPos(null);
+                      }}
+                      onBlur={handleCommitText}
+                      style={{
+                        border: '1px dotted #000',
+                        outline: 'none',
+                        background: 'transparent',
+                        color: fgColor,
+                        font: '14px Arial, sans-serif',
+                        padding: '1px 2px',
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Color Box: 28 colors in 2 rows of 14 + Foreground/Background Swatches */}
+          <div
+            id="paint-colorbox"
+            style={{
+              height: '46px',
+              background: '#C0C0C0',
+              borderTop: '1px solid #808080',
+              boxShadow: '0 1px 0 0 white inset',
+              display: 'flex',
+              alignItems: 'center',
+              padding: '3px 6px',
+              gap: '8px',
+              boxSizing: 'border-box',
+            }}
+          >
+            {/* Active Color Preview (Foreground on top-left, Background on bottom-right) */}
+            <div
+              style={{
+                width: '32px',
+                height: '32px',
+                position: 'relative',
+                background: '#C0C0C0',
+                border: '1px solid #808080',
+                borderRightColor: '#FFFFFF',
+                borderBottomColor: '#FFFFFF',
+                boxShadow: '1px 1px 0px black inset',
+                boxSizing: 'border-box',
+              }}
+              title="Foreground & Background Color"
+            >
+              {/* Background swatch (bottom-right) */}
+              <div
+                style={{
+                  position: 'absolute',
+                  right: '3px',
+                  bottom: '3px',
+                  width: '14px',
+                  height: '14px',
+                  background: bgColor,
+                  border: '1px solid #808080',
+                  boxShadow: '1px 1px 0px white inset',
+                }}
+              />
+              {/* Foreground swatch (top-left) */}
+              <div
+                style={{
+                  position: 'absolute',
+                  left: '3px',
+                  top: '3px',
+                  width: '14px',
+                  height: '14px',
+                  background: fgColor,
+                  border: '1px solid #808080',
+                  boxShadow: '1px 1px 0px white inset',
+                  zIndex: 2,
+                }}
+              />
+            </div>
+
+            {/* 28 Swatches in 2 Rows of 14 */}
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(14, 16px)',
+                gridTemplateRows: 'repeat(2, 16px)',
+                gap: '1px',
+              }}
+            >
+              {PAINT_PALETTE.map((hex, i) => (
+                <div
+                  key={`${hex}-${i}`}
+                  onClick={() => setFgColor(hex)}
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    setBgColor(hex);
+                  }}
+                  title={`Color: ${hex} (Left click: Foreground, Right click: Background)`}
+                  style={{
+                    width: '16px',
+                    height: '16px',
+                    background: hex,
+                    border: '1px solid #808080',
+                    borderRightColor: '#FFFFFF',
+                    borderBottomColor: '#FFFFFF',
+                    boxShadow: '1px 1px 0px black inset',
                     cursor: 'pointer',
-                    margin: '3px 0',
+                    boxSizing: 'border-box',
                   }}
                 />
               ))}
             </div>
           </div>
+        </div>
+      </Window>
 
-          {/* Canvas Working Area */}
+      {/* About Dialog */}
+      <AboutAppDialog
+        isOpen={showAbout}
+        appName="Paint"
+        version="Version 4.10 (Windows 98)"
+        icon={<PaintIconSmall />}
+        description="Every pixel placed with regret."
+        onClose={() => setShowAbout(false)}
+      />
+    </>
+  );
+}
+
+// Cursor styling per tool
+function getToolCursor(tool) {
+  switch (tool) {
+    case 'pencil':
+    case 'line':
+    case 'curve':
+    case 'rect':
+    case 'ellipse':
+    case 'rounded-rect':
+    case 'polygon':
+      return 'crosshair';
+    case 'brush':
+    case 'airbrush':
+      return 'crosshair';
+    case 'eraser':
+      return 'cell';
+    case 'bucket':
+      return 'crosshair';
+    case 'picker':
+      return 'crosshair';
+    case 'text':
+      return 'text';
+    case 'magnifier':
+      return 'zoom-in';
+    default:
+      return 'default';
+  }
+}
+
+// Render Authentic 16x16 Tool Icons
+function renderToolIcon(toolId) {
+  switch (toolId) {
+    case 'free-select':
+      return (
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M4 2C2 4 2 8 3 11C4 14 8 15 11 13C14 11 15 7 13 4C11 1 6 0 4 2Z" stroke="#000" strokeWidth="1" strokeDasharray="2 2" />
+        </svg>
+      );
+    case 'select':
+      return (
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <rect x="2" y="2" width="12" height="12" stroke="#000" strokeWidth="1" strokeDasharray="2 2" />
+        </svg>
+      );
+    case 'eraser':
+      return (
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M5 12L2 9L8 3L11 6L5 12Z" fill="#FFF" stroke="#000" />
+          <path d="M11 6L14 9L8 15L5 12L11 6Z" fill="#FFC0CB" stroke="#000" />
+        </svg>
+      );
+    case 'bucket':
+      return (
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M4 8L8 4L13 9L9 13L4 8Z" fill="#C0C0C0" stroke="#000" />
+          <path d="M9 13C9 13 12 15 14 15C15 15 15 14 14 13L12 11" stroke="#00F" strokeWidth="1.5" />
+        </svg>
+      );
+    case 'picker':
+      return (
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M13 2C14 3 14 4 13 5L10 8L7 5L10 2C11 1 12 1 13 2Z" fill="#000" />
+          <path d="M7 5L3 9L2 14L7 13L10 8L7 5Z" fill="#FFF" stroke="#000" />
+        </svg>
+      );
+    case 'magnifier':
+      return (
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle cx="6" cy="6" r="4" stroke="#000" strokeWidth="1.5" />
+          <line x1="9" y1="9" x2="14" y2="14" stroke="#000" strokeWidth="2" />
+        </svg>
+      );
+    case 'pencil':
+      return (
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M13 2L14 3L5 12L2 14L4 11L13 2Z" fill="#FFD700" stroke="#000" />
+          <path d="M2 14L4 13L3 12L2 14Z" fill="#000" />
+        </svg>
+      );
+    case 'brush':
+      return (
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M12 2L14 4L9 9L7 7L12 2Z" fill="#8B4513" />
+          <path d="M7 7L4 10C2 12 2 14 3 14C4 14 6 14 8 12L9 9L7 7Z" fill="#000" />
+        </svg>
+      );
+    case 'airbrush':
+      return (
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <rect x="7" y="5" width="6" height="9" fill="#008080" stroke="#000" />
+          <rect x="9" y="3" width="2" height="2" fill="#808080" />
+          <circle cx="4" cy="3" r="1" fill="#000" />
+          <circle cx="2" cy="5" r="1" fill="#000" />
+          <circle cx="5" cy="6" r="1" fill="#000" />
+        </svg>
+      );
+    case 'text':
+      return (
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M3 13L7 3H9L13 13H11L10 10H6L5 13H3ZM7 7H9L8 4L7 7Z" fill="#000" />
+        </svg>
+      );
+    case 'line':
+      return (
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <line x1="2" y1="14" x2="14" y2="2" stroke="#000" strokeWidth="1.5" />
+        </svg>
+      );
+    case 'curve':
+      return (
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M2 13C6 13 8 3 14 3" stroke="#000" strokeWidth="1.5" />
+        </svg>
+      );
+    case 'rect':
+      return (
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <rect x="2" y="3" width="12" height="10" stroke="#000" strokeWidth="1.5" />
+        </svg>
+      );
+    case 'polygon':
+      return (
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <polygon points="8,2 14,6 12,13 4,13 2,6" stroke="#000" strokeWidth="1.5" fill="none" />
+        </svg>
+      );
+    case 'ellipse':
+      return (
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <ellipse cx="8" cy="8" rx="6" ry="4.5" stroke="#000" strokeWidth="1.5" fill="none" />
+        </svg>
+      );
+    case 'rounded-rect':
+      return (
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <rect x="2" y="3" width="12" height="10" rx="3" stroke="#000" strokeWidth="1.5" fill="none" />
+        </svg>
+      );
+    default:
+      return null;
+  }
+}
+
+// Render Options Panel per Active Tool (icons, not text labels!)
+function renderToolOptions(
+  tool,
+  lineWidth,
+  setLineWidth,
+  brushSize,
+  setBrushSize,
+  eraserSize,
+  setEraserSize,
+  fillStyle,
+  setFillStyle,
+  zoomLevel,
+  setZoomLevel
+) {
+  // Line & Curve widths: 5 horizontal lines
+  if (tool === 'line' || tool === 'curve') {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', width: '100%', alignItems: 'center' }}>
+        {[1, 2, 3, 4, 5].map((w) => (
           <div
+            key={w}
+            onClick={() => setLineWidth(w)}
             style={{
-              flex: 1,
-              background: '#808080',
-              padding: '8px',
-              overflow: 'auto',
+              width: '36px',
+              height: '8px',
+              background: lineWidth === w ? '#000080' : 'transparent',
               display: 'flex',
-              alignItems: 'flex-start',
-              justifyContent: 'flex-start',
-              position: 'relative',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
             }}
           >
-            <div
-              style={{
-                border: '2px solid',
-                borderColor: '#000000 #FFFFFF #FFFFFF #000000',
-                boxShadow: '2px 2px 5px rgba(0,0,0,0.3)',
-                background: '#FFFFFF',
-                position: 'relative',
-              }}
-            >
-              <canvas
-                ref={canvasRef}
-                width={500}
-                height={360}
-                onMouseDown={handleMouseDown}
-                onMouseMove={handleMouseMove}
-                onMouseUp={handleMouseUp}
-                onContextMenu={(e) => e.preventDefault()}
-                style={{
-                  display: 'block',
-                  cursor: selectedTool === 'picker' ? 'crosshair' : 'default',
-                }}
-              />
-
-              {/* Text Input Overlay */}
-              {textPos && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    left: `${textPos.x}px`,
-                    top: `${textPos.y - 10}px`,
-                    background: 'rgba(255,255,255,0.9)',
-                    border: '1px dashed #000',
-                    padding: '2px',
-                    display: 'flex',
-                    gap: '4px',
-                    zIndex: 10,
-                  }}
-                >
-                  <input
-                    type="text"
-                    value={textInput}
-                    onChange={(e) => setTextInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') handleCommitText();
-                    }}
-                    autoFocus
-                    placeholder="Type text..."
-                    style={{ fontSize: '12px', border: '1px solid #808080', padding: '1px 3px' }}
-                  />
-                  <button onClick={handleCommitText} style={{ fontSize: '10px' }}>OK</button>
-                </div>
-              )}
-            </div>
+            <div style={{ width: '28px', height: `${w}px`, background: lineWidth === w ? '#FFF' : '#000' }} />
           </div>
-        </div>
-
-        {/* Bottom Color Palette (16 Colors) */}
-        <div
-          style={{
-            height: '42px',
-            background: '#C0C0C0',
-            borderTop: '2px solid #FFFFFF',
-            display: 'flex',
-            alignItems: 'center',
-            padding: '4px 8px',
-            gap: '8px',
-            boxSizing: 'border-box',
-          }}
-        >
-          {/* Active Colors Swatch (Foreground / Background) */}
-          <div
-            style={{
-              width: '32px',
-              height: '32px',
-              position: 'relative',
-              border: '2px solid',
-              borderColor: '#808080 #FFFFFF #FFFFFF #808080',
-              background: '#C0C0C0',
-              flexShrink: 0,
-            }}
-          >
-            {/* Secondary Color Box (Bottom Right) */}
-            <div
-              style={{
-                position: 'absolute',
-                right: '2px',
-                bottom: '2px',
-                width: '15px',
-                height: '15px',
-                background: secondaryColor,
-                border: '1px solid #000000',
-                boxShadow: '1px 1px 0px #FFF',
-              }}
-              title="Secondary Color (Right Click to set)"
-            />
-            {/* Primary Color Box (Top Left) */}
-            <div
-              style={{
-                position: 'absolute',
-                left: '2px',
-                top: '2px',
-                width: '15px',
-                height: '15px',
-                background: primaryColor,
-                border: '1px solid #000000',
-                boxShadow: '1px 1px 0px #FFF',
-                zIndex: 2,
-              }}
-              title="Primary Color (Left Click to set)"
-            />
-          </div>
-
-          {/* 16 Palette Swatches (2 rows of 8) */}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(8, 15px)',
-              gridTemplateRows: 'repeat(2, 15px)',
-              gap: '2px',
-            }}
-          >
-            {WIN98_COLORS.map((hex, idx) => (
-              <div
-                key={`color-${idx}`}
-                onClick={() => setPrimaryColor(hex)}
-                onContextMenu={(e) => {
-                  e.preventDefault();
-                  setSecondaryColor(hex);
-                }}
-                title={`${hex} (Left click: primary, Right click: secondary)`}
-                style={{
-                  width: '15px',
-                  height: '15px',
-                  background: hex,
-                  border: '1px solid #808080',
-                  boxShadow: '1px 1px 0px #FFFFFF inset',
-                  cursor: 'pointer',
-                  boxSizing: 'border-box',
-                }}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* About Dialog */}
-        {showAboutDialog && (
-          <div
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              background: '#C0C0C0',
-              border: '2px solid',
-              borderColor: '#FFFFFF #808080 #808080 #FFFFFF',
-              boxShadow: '3px 3px 10px rgba(0,0,0,0.5)',
-              padding: '16px 20px',
-              zIndex: 100,
-              minWidth: '220px',
-              textAlign: 'center',
-            }}
-          >
-            <div style={{ fontSize: '13px', fontWeight: 'bold', marginBottom: '8px', color: '#000080' }}>
-              Paint
-            </div>
-            <p style={{ fontSize: '12px', margin: '0 0 14px 0' }}>
-              Windows 98 classic canvas painting application.
-            </p>
-            <button
-              className="win-btn"
-              onClick={() => setShowAboutDialog(false)}
-              style={{
-                padding: '3px 16px',
-                background: '#C0C0C0',
-                border: '2px solid',
-                borderColor: '#FFFFFF #808080 #808080 #FFFFFF',
-                cursor: 'pointer',
-                fontWeight: 'bold',
-                fontSize: '11px',
-              }}
-            >
-              OK
-            </button>
-          </div>
-        )}
+        ))}
       </div>
-    </Window>
+    );
+  }
+
+  // Shapes fill styles: 3 icons (Outline only, Fill with outline, Solid fill)
+  if (['rect', 'polygon', 'ellipse', 'rounded-rect'].includes(tool)) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', width: '100%', alignItems: 'center' }}>
+        {[
+          { id: 'outline', title: 'Outline Only' },
+          { id: 'fill-outline', title: 'Outline and Fill' },
+          { id: 'solid', title: 'Solid Fill' },
+        ].map((item) => (
+          <div
+            key={item.id}
+            onClick={() => setFillStyle(item.id)}
+            title={item.title}
+            style={{
+              width: '36px',
+              height: '18px',
+              background: fillStyle === item.id ? '#000080' : 'transparent',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+            }}
+          >
+            <svg width="24" height="12" viewBox="0 0 24 12">
+              {item.id === 'outline' && (
+                <rect x="2" y="1" width="20" height="10" stroke={fillStyle === item.id ? '#FFF' : '#000'} strokeWidth="1.5" fill="none" />
+              )}
+              {item.id === 'fill-outline' && (
+                <rect x="2" y="1" width="20" height="10" stroke={fillStyle === item.id ? '#FFF' : '#000'} strokeWidth="1.5" fill="#C0C0C0" />
+              )}
+              {item.id === 'solid' && (
+                <rect x="2" y="1" width="20" height="10" fill={fillStyle === item.id ? '#FFF' : '#000'} />
+              )}
+            </svg>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  // Eraser sizes: 4 square icons
+  if (tool === 'eraser') {
+    return (
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 18px)', gap: '4px', justifyItems: 'center', alignItems: 'center' }}>
+        {[4, 6, 8, 12].map((s) => (
+          <div
+            key={s}
+            onClick={() => setEraserSize(s)}
+            style={{
+              width: '18px',
+              height: '18px',
+              background: eraserSize === s ? '#000080' : 'transparent',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+            }}
+          >
+            <div style={{ width: `${s}px`, height: `${s}px`, background: eraserSize === s ? '#FFF' : '#000' }} />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  // Brush shapes & sizes
+  if (tool === 'brush') {
+    return (
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 14px)', gap: '2px', justifyItems: 'center', alignItems: 'center' }}>
+        {[2, 4, 7].map((s) => (
+          <div
+            key={s}
+            onClick={() => setBrushSize(s)}
+            style={{
+              width: '14px',
+              height: '14px',
+              background: brushSize === s ? '#000080' : 'transparent',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+            }}
+          >
+            <div style={{ width: `${s}px`, height: `${s}px`, borderRadius: '50%', background: brushSize === s ? '#FFF' : '#000' }} />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  // Magnifier zoom levels (1x, 2x, 6x, 8x)
+  if (tool === 'magnifier') {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', width: '100%', alignItems: 'center' }}>
+        {[1, 2, 6, 8].map((z) => (
+          <div
+            key={z}
+            onClick={() => setZoomLevel(z)}
+            style={{
+              width: '36px',
+              height: '13px',
+              background: zoomLevel === z ? '#000080' : 'transparent',
+              color: zoomLevel === z ? '#FFF' : '#000',
+              fontSize: '10px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              fontWeight: 700,
+            }}
+          >
+            {z}x
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  // Default empty placeholder
+  return (
+    <div style={{ color: '#808080', fontSize: '9px', textAlign: 'center' }}>
+      Paint 98
+    </div>
   );
 }

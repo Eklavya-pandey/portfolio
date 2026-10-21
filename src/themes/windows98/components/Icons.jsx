@@ -95,9 +95,9 @@ export const MinimizeIcon = () => (
   </svg>
 );
 
-export const MaximizeIcon = () => (
+export const MaximizeIcon = ({ fill = "black" }) => (
   <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-    <path fillRule="evenodd" clipRule="evenodd" d="M8 0H0V8H8V0ZM7.11111 1.77778H0.888889V7.11111H7.11111V1.77778Z" fill="black" />
+    <path fillRule="evenodd" clipRule="evenodd" d="M8 0H0V8H8V0ZM7.11111 1.77778H0.888889V7.11111H7.11111V1.77778Z" fill={fill} />
   </svg>
 );
 

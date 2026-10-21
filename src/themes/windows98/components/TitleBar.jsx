@@ -13,6 +13,7 @@ export default function TitleBar({
   showControls = true,
   showMinimize = true,
   showMaximize = true,
+  allowMaximize = true,
   showClose = true,
   onMouseDown,
   onTouchStart,
@@ -84,6 +85,7 @@ export default function TitleBar({
           onClose={onClose}
           showMinimize={showMinimize}
           showMaximize={showMaximize}
+          allowMaximize={allowMaximize}
           showClose={showClose}
         />
       )}

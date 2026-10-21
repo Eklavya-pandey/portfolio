@@ -8,6 +8,7 @@ export default function WindowControls({
   onClose,
   showMinimize = true,
   showMaximize = true,
+  allowMaximize = true,
   showClose = true,
 }) {
   const [pressedBtn, setPressedBtn] = useState(null);
@@ -17,16 +18,16 @@ export default function WindowControls({
   const pressedBtnShadow =
     '1px 1px 0px #000000 inset, -1px -1px 0px #FFFFFF inset, 2px 2px 0px #808080 inset, -2px -2px 0px #DFDFDF inset';
 
-  const getStyle = (type) => ({
+  const getStyle = (type, disabled = false) => ({
     width: '16px',
     height: '16px',
     padding: '4px',
     background: '#C0C0C0',
-    boxShadow: pressedBtn === type ? pressedBtnShadow : defaultBtnShadow,
+    boxShadow: disabled ? defaultBtnShadow : (pressedBtn === type ? pressedBtnShadow : defaultBtnShadow),
     justifyContent: 'center',
     alignItems: 'center',
     display: 'flex',
-    cursor: 'pointer',
+    cursor: disabled ? 'default' : 'pointer',
     boxSizing: 'border-box',
     border: 'none',
     outline: 'none',
@@ -70,29 +71,34 @@ export default function WindowControls({
       {showMaximize && (
         <div
           role="button"
-          tabIndex={0}
+          tabIndex={allowMaximize ? 0 : -1}
           aria-label={isMaximized ? 'Restore' : 'Maximize'}
-          className="ButtonWindowButton win-btn-maximize"
-          style={getStyle('max')}
-          onMouseDown={() => setPressedBtn('max')}
+          aria-disabled={!allowMaximize}
+          className={`ButtonWindowButton win-btn-maximize ${!allowMaximize ? 'disabled' : ''}`}
+          style={getStyle('max', !allowMaximize)}
+          onMouseDown={() => {
+            if (allowMaximize) setPressedBtn('max');
+          }}
           onMouseUp={() => setPressedBtn(null)}
           onMouseLeave={() => setPressedBtn(null)}
-          onTouchStart={() => setPressedBtn('max')}
+          onTouchStart={() => {
+            if (allowMaximize) setPressedBtn('max');
+          }}
           onTouchEnd={() => setPressedBtn(null)}
           onClick={(e) => {
             e.stopPropagation();
-            if (onMaximize) onMaximize();
+            if (allowMaximize && onMaximize) onMaximize();
           }}
           onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
+            if (allowMaximize && (e.key === 'Enter' || e.key === ' ')) {
               e.preventDefault();
               if (onMaximize) onMaximize();
             }
           }}
-          title={isMaximized ? 'Restore' : 'Maximize'}
+          title={allowMaximize ? (isMaximized ? 'Restore' : 'Maximize') : ''}
         >
           <div className="UtillityIcons" style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            {isMaximized ? <RestoreIcon /> : <MaximizeIcon />}
+            {isMaximized ? <RestoreIcon /> : <MaximizeIcon fill={allowMaximize ? 'black' : '#808080'} />}
           </div>
         </div>
       )}

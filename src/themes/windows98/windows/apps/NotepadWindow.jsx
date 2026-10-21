@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Window from '../../components/Window';
-import { portfolioData } from '../../../../data/portfolioData';
+import AboutAppDialog from '../../components/AboutAppDialog';
+import { useSound } from '../../../../context/SoundContext';
 
-// Small Notepad Icon
 export const NotepadIconSmall = () => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
     <rect x="2" y="1" width="12" height="14" fill="#6699FF" stroke="#000" strokeWidth="1" />
@@ -13,31 +13,6 @@ export const NotepadIconSmall = () => (
     <rect x="5" y="12" width="7" height="1" fill="#FFF" />
   </svg>
 );
-
-function getResumePlainText() {
-  const { profile, experience, education, freelanceClients } = portfolioData;
-  let text = `=======================================================\n`;
-  text += `${profile.name}\n${profile.role}\n`;
-  text += `Location: ${profile.location} | Email: ${profile.email}\n`;
-  text += `=======================================================\n\n`;
-  text += `SUMMARY:\n${profile.summary}\n\n`;
-  text += `EXPERIENCE:\n`;
-  experience.forEach((exp) => {
-    text += `* ${exp.role} - ${exp.company} (${exp.period})\n`;
-    text += `  Focus: ${exp.focus}\n`;
-    text += `  ${exp.description}\n\n`;
-  });
-  text += `EDUCATION:\n`;
-  education.forEach((edu) => {
-    text += `* ${edu.degree} - ${edu.school} (${edu.period})\n`;
-    text += `  ${edu.detail}\n\n`;
-  });
-  text += `FREELANCE CLIENTS:\n`;
-  freelanceClients.forEach((client) => {
-    text += `* ${client.name} - ${client.project} (${client.year})\n`;
-  });
-  return text;
-}
 
 export default function NotepadWindow({
   isOpen,
@@ -50,125 +25,194 @@ export default function NotepadWindow({
   onMaximize,
   onClose,
 }) {
+  const { playSound } = useSound();
+
   const [text, setText] = useState('');
   const [fileName, setFileName] = useState('Untitled');
-  const [isReadOnly, setIsReadOnly] = useState(false);
+  const [isModified, setIsModified] = useState(false);
   const [wordWrap, setWordWrap] = useState(true);
-  const [cursorPos, setCursorPos] = useState({ line: 1, col: 1 });
   const [showFindDialog, setShowFindDialog] = useState(false);
   const [findQuery, setFindQuery] = useState('');
-  const [showOpenDialog, setShowOpenDialog] = useState(false);
-  const [showAboutDialog, setShowAboutDialog] = useState(false);
+  const [showConfirmClose, setShowConfirmClose] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
+
+  const textareaRef = useRef(null);
+  const fileInputRef = useRef(null);
+  const lastFindIdxRef = useRef(0);
 
   // Close dialogs on Escape key
   useEffect(() => {
-    if (!showOpenDialog && !showFindDialog && !showAboutDialog) return;
+    if (!showFindDialog && !showConfirmClose && !showAbout) return;
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
         e.stopPropagation();
-        if (showOpenDialog) setShowOpenDialog(false);
         if (showFindDialog) setShowFindDialog(false);
-        if (showAboutDialog) setShowAboutDialog(false);
+        if (showConfirmClose) setShowConfirmClose(false);
+        if (showAbout) setShowAbout(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [showOpenDialog, showFindDialog, showAboutDialog]);
+  }, [showFindDialog, showConfirmClose, showAbout]);
 
-  const textareaRef = useRef(null);
-
-  // Update cursor position Ln X, Col Y
-  const updateCursorPosition = () => {
-    const el = textareaRef.current;
-    if (!el) return;
-    const val = el.value.substr(0, el.selectionStart);
-    const lines = val.split('\n');
-    const line = lines.length;
-    const col = lines[lines.length - 1].length + 1;
-    setCursorPos({ line, col });
+  // Handle Text Change
+  const handleTextChange = (e) => {
+    setText(e.target.value);
+    setIsModified(true);
   };
 
+  // File Operations
   const handleNew = () => {
+    if (isModified) {
+      if (window.confirm(`Do you want to save changes to ${fileName}?`)) {
+        handleSave();
+      }
+    }
     setText('');
     setFileName('Untitled');
-    setIsReadOnly(false);
+    setIsModified(false);
   };
 
-  const handleOpenResume = () => {
-    const resumeText = getResumePlainText();
-    setText(resumeText);
-    setFileName('Resume.txt (Read Only)');
-    setIsReadOnly(true);
-    setShowOpenDialog(false);
+  const handleOpenFileClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setText(event.target.result || '');
+      setFileName(file.name);
+      setIsModified(false);
+    };
+    reader.readAsText(file);
+    e.target.value = '';
   };
 
   const handleSave = () => {
     const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = fileName.endsWith('.txt') ? fileName.replace(' (Read Only)', '') : `${fileName}.txt`;
+    link.href = url;
+    link.download = fileName.endsWith('.txt') ? fileName : `${fileName}.txt`;
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    setIsModified(false);
   };
 
-  const handleInsertTimeDate = () => {
-    if (isReadOnly) return;
-    const el = textareaRef.current;
-    const now = new Date();
-    const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const dateStr = now.toLocaleDateString();
-    const stamp = `${timeStr} ${dateStr}`;
+  const handleSaveAs = () => {
+    const userFileName = window.prompt('Save As filename:', fileName.endsWith('.txt') ? fileName : `${fileName}.txt`);
+    if (userFileName) {
+      const cleanName = userFileName.trim();
+      setFileName(cleanName);
+      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = cleanName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      setIsModified(false);
+    }
+  };
 
+  const handleAttemptClose = () => {
+    if (isModified && text.trim().length > 0) {
+      setShowConfirmClose(true);
+    } else {
+      if (onClose) onClose();
+    }
+  };
+
+  // Edit Operations
+  const handleInsertTimeDate = () => {
+    const now = new Date();
+    const timeDateStr = `${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} ${now.toLocaleDateString()}`;
+    const el = textareaRef.current;
     if (el) {
       const start = el.selectionStart;
       const end = el.selectionEnd;
-      const nextText = text.substring(0, start) + stamp + text.substring(end);
+      const nextText = text.substring(0, start) + timeDateStr + text.substring(end);
       setText(nextText);
+      setIsModified(true);
       setTimeout(() => {
-        el.selectionStart = el.selectionEnd = start + stamp.length;
+        el.selectionStart = el.selectionEnd = start + timeDateStr.length;
         el.focus();
-        updateCursorPosition();
       }, 0);
     } else {
-      setText((prev) => prev + stamp);
+      setText((prev) => prev + timeDateStr);
+      setIsModified(true);
     }
   };
 
   const handleSelectAll = () => {
     if (textareaRef.current) {
+      textareaRef.current.focus();
       textareaRef.current.select();
     }
   };
 
-  const handleFind = () => {
-    if (!findQuery.trim() || !textareaRef.current) return;
+  const handleDelete = () => {
     const el = textareaRef.current;
-    const idx = text.toLowerCase().indexOf(findQuery.toLowerCase(), el.selectionEnd);
-    if (idx !== -1) {
-      el.focus();
-      el.setSelectionRange(idx, idx + findQuery.length);
-      setShowFindDialog(false);
-    } else {
-      // Loop back to start
-      const startIdx = text.toLowerCase().indexOf(findQuery.toLowerCase(), 0);
-      if (startIdx !== -1) {
-        el.focus();
-        el.setSelectionRange(startIdx, startIdx + findQuery.length);
-        setShowFindDialog(false);
-      } else {
-        alert(`Cannot find "${findQuery}"`);
+    if (el) {
+      const start = el.selectionStart;
+      const end = el.selectionEnd;
+      if (start !== end) {
+        const nextText = text.substring(0, start) + text.substring(end);
+        setText(nextText);
+        setIsModified(true);
+        setTimeout(() => {
+          el.selectionStart = el.selectionEnd = start;
+          el.focus();
+        }, 0);
       }
     }
   };
 
+  // Search Find & Find Next
+  const handleFind = () => {
+    if (!findQuery || !textareaRef.current) return;
+    const idx = text.toLowerCase().indexOf(findQuery.toLowerCase(), lastFindIdxRef.current);
+    if (idx !== -1) {
+      textareaRef.current.focus();
+      textareaRef.current.setSelectionRange(idx, idx + findQuery.length);
+      lastFindIdxRef.current = idx + findQuery.length;
+    } else {
+      // Loop back to start
+      const loopIdx = text.toLowerCase().indexOf(findQuery.toLowerCase(), 0);
+      if (loopIdx !== -1) {
+        textareaRef.current.focus();
+        textareaRef.current.setSelectionRange(loopIdx, loopIdx + findQuery.length);
+        lastFindIdxRef.current = loopIdx + findQuery.length;
+      } else {
+        alert(`Cannot find "${findQuery}"`);
+        lastFindIdxRef.current = 0;
+      }
+    }
+  };
+
+  // Menu bar items matching classic Win98 Notepad (File, Edit, Search, Help - NO Format menu)
   const menuItems = [
     {
       label: 'File',
       items: [
-        { label: 'New', onClick: handleNew },
-        { label: 'Open...', onClick: () => setShowOpenDialog(true) },
-        { label: 'Save As...', onClick: handleSave },
+        { label: 'New', shortcut: 'Ctrl+N', onClick: handleNew },
+        { label: 'Open...', shortcut: 'Ctrl+O', onClick: handleOpenFileClick },
+        { label: 'Save', shortcut: 'Ctrl+S', onClick: handleSave },
+        { label: 'Save As...', onClick: handleSaveAs },
         { isSeparator: true },
-        { label: 'Exit', onClick: onClose },
+        { label: 'Page Setup...', disabled: true },
+        { label: 'Print', shortcut: 'Ctrl+P', disabled: true },
+        { isSeparator: true },
+        { label: 'Exit', onClick: handleAttemptClose },
       ],
     },
     {
@@ -176,54 +220,69 @@ export default function NotepadWindow({
       items: [
         {
           label: 'Undo',
+          shortcut: 'Ctrl+Z',
           onClick: () => {
-            document.execCommand('undo');
+            if (document.execCommand) document.execCommand('undo');
           },
         },
         { isSeparator: true },
         {
           label: 'Cut',
+          shortcut: 'Ctrl+X',
           onClick: () => {
-            document.execCommand('cut');
+            if (document.execCommand) document.execCommand('cut');
           },
         },
         {
           label: 'Copy',
+          shortcut: 'Ctrl+C',
           onClick: () => {
-            document.execCommand('copy');
+            if (document.execCommand) document.execCommand('copy');
           },
         },
         {
           label: 'Paste',
+          shortcut: 'Ctrl+V',
           onClick: async () => {
             try {
-              const clipboardText = await navigator.clipboard.readText();
-              if (textareaRef.current) {
+              const clip = await navigator.clipboard.readText();
+              if (clip && textareaRef.current) {
                 const el = textareaRef.current;
                 const start = el.selectionStart;
                 const end = el.selectionEnd;
-                setText(text.substring(0, start) + clipboardText + text.substring(end));
+                const nextText = text.substring(0, start) + clip + text.substring(end);
+                setText(nextText);
+                setIsModified(true);
               }
             } catch {
-              document.execCommand('paste');
+              if (document.execCommand) document.execCommand('paste');
             }
           },
         },
+        { label: 'Delete', shortcut: 'Del', onClick: handleDelete },
         { isSeparator: true },
-        { label: 'Select All', onClick: handleSelectAll },
-        { label: 'Time/Date (F5)', onClick: handleInsertTimeDate },
+        { label: 'Select All', shortcut: 'Ctrl+A', onClick: handleSelectAll },
+        { label: 'Time/Date', shortcut: 'F5', onClick: handleInsertTimeDate },
+        { isSeparator: true },
+        {
+          label: 'Word Wrap',
+          checked: wordWrap,
+          onClick: () => setWordWrap((prev) => !prev),
+        },
       ],
     },
     {
       label: 'Search',
-      items: [{ label: 'Find...', onClick: () => setShowFindDialog(true) }],
-    },
-    {
-      label: 'Format',
       items: [
         {
-          label: `Word Wrap ${wordWrap ? '✓' : ''}`,
-          onClick: () => setWordWrap((prev) => !prev),
+          label: 'Find...',
+          shortcut: 'Ctrl+F',
+          onClick: () => setShowFindDialog(true),
+        },
+        {
+          label: 'Find Next',
+          shortcut: 'F3',
+          onClick: handleFind,
         },
       ],
     },
@@ -231,246 +290,304 @@ export default function NotepadWindow({
       label: 'Help',
       items: [
         {
+          label: 'Help Topics',
+          disabled: true,
+        },
+        { isSeparator: true },
+        {
           label: 'About Notepad',
-          onClick: () => setShowAboutDialog(true),
+          onClick: () => setShowAbout(true),
         },
       ],
     },
   ];
 
   return (
-    <Window
-      id="window-notepad"
-      title={`${fileName} - Notepad`}
-      icon={<NotepadIconSmall />}
-      isOpen={isOpen}
-      isActive={isActive}
-      isMaximized={isMaximized}
-      zIndex={zIndex}
-      position={position}
-      defaultWidth={540}
-      defaultHeight={380}
-      hasMenu={true}
-      menuItems={menuItems}
-      hasStatusBar={true}
-      statusText={`Ln ${cursorPos.line}, Col ${cursorPos.col}`}
-      onFocus={onFocus}
-      onMinimize={onMinimize}
-      onMaximize={onMaximize}
-      onClose={onClose}
-    >
-      <div
-        style={{
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          background: '#FFFFFF',
-          position: 'relative',
-        }}
+    <>
+      <Window
+        id="notepad-window"
+        title={`${fileName} - Notepad`}
+        icon={<NotepadIconSmall />}
+        isOpen={isOpen}
+        isActive={isActive}
+        isMaximized={isMaximized}
+        zIndex={zIndex}
+        position={position}
+        defaultWidth={560}
+        defaultHeight={380}
+        minWidth={320}
+        minHeight={200}
+        resizable={true}
+        hasMenu={true}
+        menuItems={menuItems}
+        hasStatusBar={false}
+        onFocus={onFocus}
+        onMinimize={onMinimize}
+        onMaximize={onMaximize}
+        onClose={handleAttemptClose}
       >
-        <textarea
-          ref={textareaRef}
-          value={text}
-          readOnly={isReadOnly}
-          wrap={wordWrap ? 'soft' : 'off'}
-          onChange={(e) => {
-            if (!isReadOnly) {
-              setText(e.target.value);
-              updateCursorPosition();
-            }
-          }}
-          onKeyUp={updateCursorPosition}
-          onClick={updateCursorPosition}
-          onSelect={updateCursorPosition}
-          onKeyDown={(e) => {
-            if (e.key === 'F5') {
-              e.preventDefault();
-              handleInsertTimeDate();
-            }
-          }}
-          style={{
-            flex: 1,
-            width: '100%',
-            height: '100%',
-            padding: '6px',
-            border: 'none',
-            outline: 'none',
-            resize: 'none',
-            boxSizing: 'border-box',
-            fontFamily: "'Courier New', Courier, monospace",
-            fontSize: '13px',
-            lineHeight: '18px',
-            color: '#000000',
-            whiteSpace: wordWrap ? 'pre-wrap' : 'pre',
-            overflowX: wordWrap ? 'hidden' : 'auto',
-            overflowY: 'auto',
-          }}
-          placeholder={isReadOnly ? '' : 'Type text here...'}
+        {/* Hidden File Input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".txt,text/plain"
+          style={{ display: 'none' }}
+          onChange={handleFileChange}
         />
 
-        {/* Open Dialog */}
-        {showOpenDialog && (
-          <div
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              background: '#C0C0C0',
-              border: '2px solid',
-              borderColor: '#FFFFFF #808080 #808080 #FFFFFF',
-              boxShadow: '2px 2px 5px rgba(0,0,0,0.4)',
-              padding: '12px 16px',
-              zIndex: 100,
-              minWidth: '240px',
+        {/* Text Area */}
+        <div
+          style={{
+            alignSelf: 'stretch',
+            flex: 1,
+            display: 'flex',
+            background: '#FFFFFF',
+            position: 'relative',
+            overflow: 'hidden',
+          }}
+        >
+          <textarea
+            ref={textareaRef}
+            id="notepad-textarea"
+            value={text}
+            onChange={handleTextChange}
+            onKeyDown={(e) => {
+              if (e.key === 'F5') {
+                e.preventDefault();
+                handleInsertTimeDate();
+              }
+              if (e.key === 'F3') {
+                e.preventDefault();
+                handleFind();
+              }
             }}
+            wrap={wordWrap ? 'soft' : 'off'}
+            spellCheck={false}
+            style={{
+              width: '100%',
+              height: '100%',
+              margin: 0,
+              padding: '6px 8px',
+              border: 'none',
+              outline: 'none',
+              resize: 'none',
+              boxSizing: 'border-box',
+              background: '#FFFFFF',
+              color: '#000000',
+              fontFamily: "'Fixedsys', 'Courier New', Courier, monospace",
+              fontSize: '13px',
+              lineHeight: '18px',
+              letterSpacing: '0px',
+              whiteSpace: wordWrap ? 'pre-wrap' : 'pre',
+              overflowX: wordWrap ? 'hidden' : 'auto',
+              overflowY: 'auto',
+            }}
+          />
+        </div>
+      </Window>
+
+      {/* Find Dialog */}
+      {showFindDialog && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 99999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          onClick={() => setShowFindDialog(false)}
+        >
+          <div
+            className="win95-window win-dialog"
+            style={{
+              width: '320px',
+              background: '#C0C0C0',
+              boxShadow: '1px 1px 0px #FFFFFF inset, -1px -1px 0px #000000 inset, 2px 2px 0px #DFDFDF inset, -2px -2px 0px #808080 inset',
+              padding: '3px',
+              boxSizing: 'border-box',
+              fontFamily: "var(--win-font, 'W95FA', 'MS Sans Serif', Tahoma, sans-serif)",
+              fontSize: '11px',
+            }}
+            onClick={(e) => e.stopPropagation()}
           >
-            <div style={{ fontSize: '11px', fontWeight: 'bold', marginBottom: '8px' }}>Open File</div>
             <div
-              onClick={handleOpenResume}
               style={{
-                background: '#FFFFFF',
-                border: '2px solid',
-                borderColor: '#808080 #FFFFFF #FFFFFF #808080',
-                padding: '6px 8px',
-                cursor: 'pointer',
+                background: 'linear-gradient(90deg, #000080 0%, #1084D0 100%)',
+                color: 'white',
+                fontWeight: 700,
+                padding: '2px 4px',
                 display: 'flex',
+                justifyContent: 'space-between',
                 alignItems: 'center',
-                gap: '6px',
-                fontSize: '11px',
               }}
             >
-              📄 <strong>Resume.txt</strong> (from System)
-            </div>
-            <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
+              <span>Find</span>
               <button
-                className="win-btn"
-                onClick={() => setShowOpenDialog(false)}
-                style={{
-                  padding: '2px 10px',
-                  background: '#C0C0C0',
-                  border: '2px solid',
-                  borderColor: '#FFFFFF #808080 #808080 #FFFFFF',
-                  fontSize: '11px',
-                  cursor: 'pointer',
-                }}
+                onClick={() => setShowFindDialog(false)}
+                style={{ width: '16px', height: '14px', background: '#C0C0C0', border: 'none', padding: 0, cursor: 'pointer' }}
               >
-                Cancel
+                ✕
               </button>
             </div>
-          </div>
-        )}
-
-        {/* Find Dialog */}
-        {showFindDialog && (
-          <div
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              background: '#C0C0C0',
-              border: '2px solid',
-              borderColor: '#FFFFFF #808080 #808080 #FFFFFF',
-              boxShadow: '2px 2px 5px rgba(0,0,0,0.4)',
-              padding: '12px 16px',
-              zIndex: 100,
-              minWidth: '220px',
-            }}
-          >
-            <div style={{ fontSize: '11px', fontWeight: 'bold', marginBottom: '8px' }}>Find</div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
-              <span style={{ fontSize: '11px' }}>Find what:</span>
+            <div style={{ padding: '12px 10px', display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <span style={{ color: '#000000' }}>Find what:</span>
               <input
                 type="text"
+                autoFocus
                 value={findQuery}
                 onChange={(e) => setFindQuery(e.target.value)}
-                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleFind();
+                }}
                 style={{
                   flex: 1,
+                  height: '21px',
+                  border: '1px solid #808080',
+                  boxShadow: '1px 1px 0px black inset',
                   padding: '2px 4px',
+                  fontFamily: "var(--win-font, 'W95FA', 'MS Sans Serif', Tahoma, sans-serif)",
                   fontSize: '11px',
-                  background: '#FFFFFF',
-                  border: '2px solid',
-                  borderColor: '#808080 #FFFFFF #FFFFFF #808080',
                 }}
               />
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
               <button
-                className="win-btn"
                 onClick={handleFind}
                 style={{
-                  padding: '2px 10px',
+                  width: '75px',
+                  height: '23px',
                   background: '#C0C0C0',
-                  border: '2px solid',
-                  borderColor: '#FFFFFF #808080 #808080 #FFFFFF',
-                  fontSize: '11px',
+                  boxShadow: '2px 2px 0px #DFDFDF inset, -2px -2px 0px #7F7F7F inset, 1px 1px 0px white inset, -1px -1px 0px black inset',
+                  border: '1px solid black',
                   cursor: 'pointer',
+                  fontSize: '11px',
+                  fontFamily: "var(--win-font, 'W95FA', 'MS Sans Serif', Tahoma, sans-serif)",
                 }}
               >
                 Find Next
               </button>
-              <button
-                className="win-btn"
-                onClick={() => setShowFindDialog(false)}
-                style={{
-                  padding: '2px 10px',
-                  background: '#C0C0C0',
-                  border: '2px solid',
-                  borderColor: '#FFFFFF #808080 #808080 #FFFFFF',
-                  fontSize: '11px',
-                  cursor: 'pointer',
-                }}
-              >
-                Cancel
-              </button>
             </div>
           </div>
-        )}
-        {/* About Dialog */}
-        {showAboutDialog && (
+        </div>
+      )}
+
+      {/* Confirm Save on Exit Dialog */}
+      {showConfirmClose && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 99999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          onClick={() => setShowConfirmClose(false)}
+        >
           <div
+            className="win95-window win-dialog"
             style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
+              width: '360px',
               background: '#C0C0C0',
-              border: '2px solid',
-              borderColor: '#FFFFFF #808080 #808080 #FFFFFF',
-              boxShadow: '3px 3px 10px rgba(0,0,0,0.5)',
-              padding: '16px 24px',
-              zIndex: 100,
-              minWidth: '220px',
-              textAlign: 'center',
+              boxShadow: '1px 1px 0px #FFFFFF inset, -1px -1px 0px #000000 inset, 2px 2px 0px #DFDFDF inset, -2px -2px 0px #808080 inset',
+              padding: '3px',
+              boxSizing: 'border-box',
+              fontFamily: "var(--win-font, 'W95FA', 'MS Sans Serif', Tahoma, sans-serif)",
+              fontSize: '11px',
             }}
+            onClick={(e) => e.stopPropagation()}
           >
-            <div style={{ fontSize: '13px', fontWeight: 'bold', marginBottom: '8px', color: '#000080' }}>
-              Notepad
-            </div>
-            <p style={{ fontSize: '12px', margin: '0 0 14px 0' }}>
-              Classic Windows 98 text editor.
-            </p>
-            <button
-              className="win-btn"
-              onClick={() => setShowAboutDialog(false)}
+            <div
               style={{
-                padding: '3px 16px',
-                background: '#C0C0C0',
-                border: '2px solid',
-                borderColor: '#FFFFFF #808080 #808080 #FFFFFF',
-                cursor: 'pointer',
-                fontWeight: 'bold',
-                fontSize: '11px',
+                background: 'linear-gradient(90deg, #000080 0%, #1084D0 100%)',
+                color: 'white',
+                fontWeight: 700,
+                padding: '2px 4px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
               }}
             >
-              OK
-            </button>
+              <span>Notepad</span>
+              <button
+                onClick={() => setShowConfirmClose(false)}
+                style={{ width: '16px', height: '14px', background: '#C0C0C0', border: 'none', padding: 0, cursor: 'pointer' }}
+              >
+                ✕
+              </button>
+            </div>
+            <div style={{ padding: '16px 14px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div style={{ color: '#000000', fontSize: '11px' }}>
+                The text in the {fileName} file has changed. Do you want to save the changes?
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+                <button
+                  onClick={() => {
+                    handleSave();
+                    setShowConfirmClose(false);
+                    if (onClose) onClose();
+                  }}
+                  style={{
+                    width: '70px',
+                    height: '23px',
+                    background: '#C0C0C0',
+                    boxShadow: '2px 2px 0px #DFDFDF inset, -2px -2px 0px #7F7F7F inset, 1px 1px 0px white inset, -1px -1px 0px black inset',
+                    border: '1px solid black',
+                    cursor: 'pointer',
+                    fontSize: '11px',
+                    fontFamily: "var(--win-font, 'W95FA', 'MS Sans Serif', Tahoma, sans-serif)",
+                  }}
+                >
+                  Yes
+                </button>
+                <button
+                  onClick={() => {
+                    setShowConfirmClose(false);
+                    if (onClose) onClose();
+                  }}
+                  style={{
+                    width: '70px',
+                    height: '23px',
+                    background: '#C0C0C0',
+                    boxShadow: '2px 2px 0px #DFDFDF inset, -2px -2px 0px #7F7F7F inset, 1px 1px 0px white inset, -1px -1px 0px black inset',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontSize: '11px',
+                    fontFamily: "var(--win-font, 'W95FA', 'MS Sans Serif', Tahoma, sans-serif)",
+                  }}
+                >
+                  No
+                </button>
+                <button
+                  onClick={() => setShowConfirmClose(false)}
+                  style={{
+                    width: '70px',
+                    height: '23px',
+                    background: '#C0C0C0',
+                    boxShadow: '2px 2px 0px #DFDFDF inset, -2px -2px 0px #7F7F7F inset, 1px 1px 0px white inset, -1px -1px 0px black inset',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontSize: '11px',
+                    fontFamily: "var(--win-font, 'W95FA', 'MS Sans Serif', Tahoma, sans-serif)",
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
           </div>
-        )}
-      </div>
-    </Window>
+        </div>
+      )}
+
+      {/* About Dialog */}
+      <AboutAppDialog
+        isOpen={showAbout}
+        appName="Notepad"
+        version="Version 4.10 (Windows 98)"
+        icon={<NotepadIconSmall />}
+        description="It's text. Just text. Relax."
+        onClose={() => setShowAbout(false)}
+      />
+    </>
   );
 }

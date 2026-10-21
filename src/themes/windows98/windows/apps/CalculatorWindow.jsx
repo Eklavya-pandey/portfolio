@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Window from '../../components/Window';
+import AboutAppDialog from '../../components/AboutAppDialog';
+import { useSound } from '../../../../context/SoundContext';
 
-// Small Calculator Icon
 export const CalculatorIconSmall = () => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
     <rect x="2" y="1" width="12" height="14" rx="1" fill="#C0C0C0" stroke="#000" strokeWidth="1" />
@@ -18,188 +19,200 @@ export const CalculatorIconSmall = () => (
 export default function CalculatorWindow({
   isOpen,
   isActive,
-  isMaximized,
   zIndex,
   position,
   onFocus,
   onMinimize,
-  onMaximize,
   onClose,
 }) {
-  const [display, setDisplay] = useState('0');
+  const { playSound } = useSound();
+
+  const [display, setDisplay] = useState('0.');
   const [prevValue, setPrevValue] = useState(null);
   const [operation, setOperation] = useState(null);
   const [waitingForOperand, setWaitingForOperand] = useState(false);
   const [memory, setMemory] = useState(0);
-  const [showAboutDialog, setShowAboutDialog] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
 
-  // Clear All
+  // Clear All (C / Esc)
   const clearAll = useCallback(() => {
-    setDisplay('0');
+    setDisplay('0.');
     setPrevValue(null);
     setOperation(null);
     setWaitingForOperand(false);
   }, []);
 
-  // Clear Entry
+  // Clear Entry (CE / Del)
   const clearEntry = useCallback(() => {
-    setDisplay('0');
+    setDisplay('0.');
     setWaitingForOperand(false);
   }, []);
 
   // Backspace
   const handleBackspace = useCallback(() => {
     setDisplay((prev) => {
-      if (prev.length <= 1 || prev === '0' || prev === 'Error') return '0';
-      return prev.slice(0, -1);
+      if (prev === 'Cannot divide by zero' || prev === 'Error') return '0.';
+      let stripped = prev.endsWith('.') ? prev.slice(0, -1) : prev;
+      if (stripped.length <= 1 || stripped === '0' || stripped === '-0') return '0.';
+      const next = stripped.slice(0, -1);
+      return next.includes('.') ? next : next + '.';
     });
   }, []);
 
   // Input Digit
   const inputDigit = useCallback((digit) => {
-    if (waitingForOperand) {
-      setDisplay(String(digit));
-      setWaitingForOperand(false);
-    } else {
-      setDisplay((prev) => (prev === '0' || prev === 'Error' ? String(digit) : prev + digit));
-    }
+    setDisplay((prev) => {
+      if (waitingForOperand || prev === 'Cannot divide by zero' || prev === '0.') {
+        setWaitingForOperand(false);
+        return String(digit) + '.';
+      }
+      // If ends with '.', replace or append
+      if (prev.endsWith('.')) {
+        const base = prev.slice(0, -1);
+        if (base === '0') return String(digit) + '.';
+        return base + digit + '.';
+      }
+      return prev + digit;
+    });
   }, [waitingForOperand]);
 
-  // Input Decimal
+  // Input Dot
   const inputDot = useCallback(() => {
-    if (waitingForOperand) {
-      setDisplay('0.');
-      setWaitingForOperand(false);
-    } else if (!display.includes('.')) {
-      setDisplay((prev) => prev + '.');
-    }
-  }, [waitingForOperand, display]);
+    setDisplay((prev) => {
+      if (waitingForOperand) {
+        setWaitingForOperand(false);
+        return '0.';
+      }
+      if (!prev.includes('.')) {
+        return prev + '.';
+      }
+      return prev;
+    });
+  }, [waitingForOperand]);
 
   // Toggle Sign (+/-)
   const toggleSign = useCallback(() => {
     setDisplay((prev) => {
-      const val = parseFloat(prev);
-      if (isNaN(val)) return '0';
-      return String(-val);
+      if (prev === 'Cannot divide by zero') return prev;
+      const num = parseFloat(prev);
+      if (isNaN(num)) return '0.';
+      const negated = -num;
+      const str = String(negated);
+      return str.includes('.') ? str : str + '.';
     });
   }, []);
 
-  // Perform Calculation
-  const calculate = (first, second, op) => {
-    switch (op) {
-      case '+':
-        return first + second;
-      case '-':
-        return first - second;
-      case '*':
-        return first * second;
-      case '/':
-        return second === 0 ? 'Error' : first / second;
-      default:
-        return second;
-    }
+  // Format result
+  const formatResult = (num) => {
+    if (isNaN(num)) return 'Cannot divide by zero';
+    if (!isFinite(num)) return 'Cannot divide by zero';
+    const str = String(Math.round(num * 1e10) / 1e10);
+    return str.includes('.') ? str : str + '.';
   };
 
-  // Perform Binary Operation (+, -, *, /)
+  // Perform binary operation
   const performOperation = useCallback((nextOp) => {
     const inputValue = parseFloat(display);
 
     if (prevValue === null) {
       setPrevValue(inputValue);
     } else if (operation) {
-      const currentValue = prevValue || 0;
-      const result = calculate(currentValue, inputValue, operation);
-      if (result === 'Error') {
-        setDisplay('Cannot divide by zero');
-        setPrevValue(null);
-        setOperation(null);
-        setWaitingForOperand(true);
-        return;
+      let result = 0;
+      switch (operation) {
+        case '+':
+          result = prevValue + inputValue;
+          break;
+        case '-':
+          result = prevValue - inputValue;
+          break;
+        case '*':
+          result = prevValue * inputValue;
+          break;
+        case '/':
+          if (inputValue === 0) {
+            setDisplay('Cannot divide by zero');
+            setPrevValue(null);
+            setOperation(null);
+            setWaitingForOperand(true);
+            return;
+          }
+          result = prevValue / inputValue;
+          break;
+        default:
+          result = inputValue;
       }
-      // Round to 10 decimal places to prevent float precision oddities
-      const rounded = parseFloat(Number(result).toPrecision(12));
-      setDisplay(String(rounded));
-      setPrevValue(rounded);
+      setDisplay(formatResult(result));
+      setPrevValue(result);
     }
 
     setWaitingForOperand(true);
-    setOperation(nextOp);
+    setOperation(nextOp === '=' ? null : nextOp);
   }, [display, prevValue, operation]);
 
-  // Equals (=)
+  // Equals
   const handleEquals = useCallback(() => {
-    const inputValue = parseFloat(display);
-    if (operation && prevValue !== null) {
-      const result = calculate(prevValue, inputValue, operation);
-      if (result === 'Error') {
-        setDisplay('Cannot divide by zero');
-      } else {
-        const rounded = parseFloat(Number(result).toPrecision(12));
-        setDisplay(String(rounded));
-        setPrevValue(null);
-        setOperation(null);
-      }
-      setWaitingForOperand(true);
-    }
-  }, [display, operation, prevValue]);
+    performOperation('=');
+  }, [performOperation]);
 
-  // Square Root
+  // Unary Operations: Sqrt, %, 1/x
   const handleSqrt = useCallback(() => {
-    const val = parseFloat(display);
-    if (val < 0) {
-      setDisplay('Invalid input');
+    const num = parseFloat(display);
+    if (num < 0) {
+      setDisplay('Error');
     } else {
-      setDisplay(String(Math.sqrt(val)));
+      setDisplay(formatResult(Math.sqrt(num)));
     }
     setWaitingForOperand(true);
   }, [display]);
 
-  // Percentage
   const handlePercent = useCallback(() => {
-    const val = parseFloat(display);
+    const num = parseFloat(display);
     if (prevValue !== null) {
-      const pct = (prevValue * val) / 100;
-      setDisplay(String(pct));
+      const pct = (prevValue * num) / 100;
+      setDisplay(formatResult(pct));
     } else {
-      setDisplay(String(val / 100));
+      setDisplay(formatResult(num / 100));
     }
     setWaitingForOperand(true);
   }, [display, prevValue]);
 
-  // 1 / x
   const handleReciprocal = useCallback(() => {
-    const val = parseFloat(display);
-    if (val === 0) {
+    const num = parseFloat(display);
+    if (num === 0) {
       setDisplay('Cannot divide by zero');
     } else {
-      setDisplay(String(1 / val));
+      setDisplay(formatResult(1 / num));
     }
     setWaitingForOperand(true);
   }, [display]);
 
   // Memory Functions
-  const memoryClear = useCallback(() => setMemory(0), []);
-  const memoryRecall = useCallback(() => {
-    setDisplay(String(memory));
+  const handleMC = () => setMemory(0);
+  const handleMR = () => {
+    setDisplay(formatResult(memory));
     setWaitingForOperand(true);
-  }, [memory]);
-  const memoryStore = useCallback(() => {
-    setMemory(parseFloat(display) || 0);
+  };
+  const handleMS = () => {
+    const num = parseFloat(display) || 0;
+    setMemory(num);
     setWaitingForOperand(true);
-  }, [display]);
-  const memoryAdd = useCallback(() => {
-    setMemory((m) => m + (parseFloat(display) || 0));
+  };
+  const handleMPlus = () => {
+    const num = parseFloat(display) || 0;
+    setMemory((prev) => prev + num);
     setWaitingForOperand(true);
-  }, [display]);
+  };
 
-  // Keyboard support when window is active
+  // Keyboard navigation
   useEffect(() => {
     if (!isOpen || !isActive) return;
 
     const handleKeyDown = (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
       if (e.key >= '0' && e.key <= '9') {
         e.preventDefault();
-        inputDigit(Number(e.key));
+        inputDigit(parseInt(e.key, 10));
       } else if (e.key === '.') {
         e.preventDefault();
         inputDot();
@@ -214,242 +227,242 @@ export default function CalculatorWindow({
         handleBackspace();
       } else if (e.key === 'Escape') {
         e.preventDefault();
-        if (showAboutDialog) {
-          setShowAboutDialog(false);
-        } else {
-          clearAll();
-        }
+        clearAll();
+      } else if (e.key === 'Delete') {
+        e.preventDefault();
+        clearEntry();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, isActive, showAboutDialog, inputDigit, inputDot, performOperation, handleEquals, handleBackspace, clearAll]);
+  }, [isOpen, isActive, inputDigit, inputDot, performOperation, handleEquals, handleBackspace, clearAll, clearEntry]);
 
-  // Copy to clipboard
-  const handleCopy = () => {
-    navigator.clipboard?.writeText(display);
-  };
-
-  // Paste from clipboard
-  const handlePaste = async () => {
-    try {
-      const text = await navigator.clipboard.readText();
-      const num = parseFloat(text);
-      if (!isNaN(num)) {
-        setDisplay(String(num));
-      }
-    } catch {}
-  };
-
+  // Menu items
   const menuItems = [
     {
       label: 'Edit',
       items: [
-        { label: 'Copy (Ctrl+C)', onClick: handleCopy },
-        { label: 'Paste (Ctrl+V)', onClick: handlePaste },
+        {
+          label: 'Copy',
+          shortcut: 'Ctrl+C',
+          onClick: () => {
+            navigator.clipboard.writeText(display).catch(() => {});
+          },
+        },
+        {
+          label: 'Paste',
+          shortcut: 'Ctrl+V',
+          onClick: async () => {
+            try {
+              const text = await navigator.clipboard.readText();
+              const num = parseFloat(text);
+              if (!isNaN(num)) {
+                setDisplay(formatResult(num));
+              }
+            } catch {}
+          },
+        },
+      ],
+    },
+    {
+      label: 'View',
+      items: [
+        { label: 'Standard', checked: true },
+        { label: 'Scientific', disabled: true },
       ],
     },
     {
       label: 'Help',
       items: [
+        { label: 'Help Topics', disabled: true },
+        { isSeparator: true },
         {
           label: 'About Calculator',
-          onClick: () => setShowAboutDialog(true),
+          onClick: () => setShowAbout(true),
         },
       ],
     },
   ];
 
-  const btnStyle = (color = '#000080', width = '34px') => ({
-    width,
-    height: '26px',
+  const btnStyle = (color = '#000080') => ({
+    height: '24px',
     background: '#C0C0C0',
-    border: '2px solid',
-    borderColor: '#FFFFFF #808080 #808080 #FFFFFF',
-    boxShadow: '1px 1px 0px #000000',
+    boxShadow: '2px 2px 0px #DFDFDF inset, -2px -2px 0px #7F7F7F inset, 1px 1px 0px white inset, -1px -1px 0px black inset',
+    border: 'none',
     color,
-    fontFamily: "'MS Sans Serif', Tahoma, sans-serif",
     fontSize: '11px',
-    fontWeight: 'bold',
+    fontFamily: "var(--win-font, 'W95FA', 'MS Sans Serif', Tahoma, sans-serif)",
+    fontWeight: 700,
     cursor: 'pointer',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    boxSizing: 'border-box',
     padding: 0,
-    outline: 'none',
   });
 
   return (
-    <Window
-      id="window-calculator"
-      title="Calculator"
-      icon={<CalculatorIconSmall />}
-      isOpen={isOpen}
-      isActive={isActive}
-      isMaximized={false}
-      zIndex={zIndex}
-      position={position}
-      defaultWidth={250}
-      defaultHeight={250}
-      hasMenu={true}
-      menuItems={menuItems}
-      onFocus={onFocus}
-      onMinimize={onMinimize}
-      onMaximize={onMaximize}
-      onClose={onClose}
-    >
-      <div
-        style={{
-          width: '100%',
-          height: '100%',
-          background: '#C0C0C0',
-          padding: '8px 10px',
-          boxSizing: 'border-box',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '8px',
-          userSelect: 'none',
-        }}
+    <>
+      <Window
+        id="calculator-window"
+        title="Calculator"
+        icon={<CalculatorIconSmall />}
+        isOpen={isOpen}
+        isActive={isActive}
+        isMaximized={false}
+        zIndex={zIndex}
+        position={position}
+        defaultWidth={258}
+        defaultHeight={250}
+        resizable={false}
+        hasMenu={true}
+        menuItems={menuItems}
+        hasStatusBar={false}
+        showMinimize={true}
+        showMaximize={true}
+        onFocus={onFocus}
+        onMinimize={onMinimize}
+        onClose={onClose}
       >
-        {/* LCD Display */}
         <div
           style={{
-            height: '26px',
-            background: '#FFFFFF',
-            border: '2px solid',
-            borderColor: '#808080 #FFFFFF #FFFFFF #808080',
-            boxShadow: '1px 1px 0px #000000 inset',
+            alignSelf: 'stretch',
+            flex: 1,
+            background: '#C0C0C0',
+            padding: '8px',
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'flex-end',
-            padding: '0 6px',
-            fontFamily: "'Courier New', Courier, monospace",
-            fontSize: '16px',
-            fontWeight: 'bold',
-            color: '#000000',
-            overflow: 'hidden',
+            flexDirection: 'column',
+            gap: '8px',
+            boxSizing: 'border-box',
+            userSelect: 'none',
+            fontFamily: "var(--win-font, 'W95FA', 'MS Sans Serif', Tahoma, sans-serif)",
           }}
         >
-          {display}
-        </div>
-
-        {/* Top Control Bar: Memory Indicator & Edit Buttons */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          {/* Memory Indicator Box */}
+          {/* Sunken Right-Aligned Display Bar */}
           <div
+            id="calc-display"
             style={{
-              width: '26px',
               height: '24px',
-              border: '2px solid',
-              borderColor: '#808080 #FFFFFF #FFFFFF #808080',
-              background: '#C0C0C0',
+              background: '#FFFFFF',
+              border: '1px solid #808080',
+              borderRightColor: '#FFFFFF',
+              borderBottomColor: '#FFFFFF',
+              boxShadow: '1px 1px 0px black inset',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: 'bold',
-              fontSize: '12px',
-              color: '#CC0000',
+              justifyContent: 'flex-end',
+              padding: '0 6px',
+              color: '#000000',
+              fontSize: '13px',
+              fontFamily: "'Courier New', Courier, monospace",
+              fontWeight: 700,
+              overflow: 'hidden',
+              whiteSpace: 'nowrap',
+              boxSizing: 'border-box',
             }}
           >
-            {memory !== 0 ? 'M' : ''}
+            {display}
           </div>
 
-          {/* Backspace, CE, C */}
-          <div style={{ display: 'flex', gap: '4px' }}>
-            <button style={btnStyle('#CC0000', '58px')} onClick={handleBackspace}>
+          {/* Row 1: Memory Box | Backspace | CE | C */}
+          <div style={{ display: 'grid', gridTemplateColumns: '32px 1fr 1fr 1fr', gap: '5px', alignItems: 'center' }}>
+            {/* Memory Indicator Box */}
+            <div
+              style={{
+                width: '30px',
+                height: '24px',
+                background: '#C0C0C0',
+                border: '1px solid #808080',
+                borderRightColor: '#FFFFFF',
+                borderBottomColor: '#FFFFFF',
+                boxShadow: '1px 1px 0px black inset',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '11px',
+                fontWeight: 700,
+                color: '#800000',
+                boxSizing: 'border-box',
+              }}
+            >
+              {memory !== 0 ? 'M' : ''}
+            </div>
+
+            <button
+              onClick={handleBackspace}
+              style={btnStyle('#800000')}
+            >
               Backspace
             </button>
-            <button style={btnStyle('#CC0000', '40px')} onClick={clearEntry}>
+            <button
+              onClick={clearEntry}
+              style={btnStyle('#800000')}
+            >
               CE
             </button>
-            <button style={btnStyle('#CC0000', '40px')} onClick={clearAll}>
+            <button
+              onClick={clearAll}
+              style={btnStyle('#800000')}
+            >
               C
             </button>
           </div>
-        </div>
 
-        {/* Keypad Grid (Memory Column + 4 Operator/Digit Columns) */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '4px' }}>
-          {/* Row 1 */}
-          <button style={btnStyle('#CC0000')} onClick={memoryClear}>MC</button>
-          <button style={btnStyle('#000080')} onClick={() => inputDigit(7)}>7</button>
-          <button style={btnStyle('#000080')} onClick={() => inputDigit(8)}>8</button>
-          <button style={btnStyle('#000080')} onClick={() => inputDigit(9)}>9</button>
-          <button style={btnStyle('#CC0000')} onClick={() => performOperation('/')}>/</button>
-
-          {/* Row 2 */}
-          <button style={btnStyle('#CC0000')} onClick={memoryRecall}>MR</button>
-          <button style={btnStyle('#000080')} onClick={() => inputDigit(4)}>4</button>
-          <button style={btnStyle('#000080')} onClick={() => inputDigit(5)}>5</button>
-          <button style={btnStyle('#000080')} onClick={() => inputDigit(6)}>6</button>
-          <button style={btnStyle('#CC0000')} onClick={() => performOperation('*')}>*</button>
-
-          {/* Row 3 */}
-          <button style={btnStyle('#CC0000')} onClick={memoryStore}>MS</button>
-          <button style={btnStyle('#000080')} onClick={() => inputDigit(1)}>1</button>
-          <button style={btnStyle('#000080')} onClick={() => inputDigit(2)}>2</button>
-          <button style={btnStyle('#000080')} onClick={() => inputDigit(3)}>3</button>
-          <button style={btnStyle('#CC0000')} onClick={() => performOperation('-')}>-</button>
-
-          {/* Row 4 */}
-          <button style={btnStyle('#CC0000')} onClick={memoryAdd}>M+</button>
-          <button style={btnStyle('#000080')} onClick={() => inputDigit(0)}>0</button>
-          <button style={btnStyle('#000080')} onClick={toggleSign}>+/-</button>
-          <button style={btnStyle('#000080')} onClick={inputDot}>.</button>
-          <button style={btnStyle('#CC0000')} onClick={() => performOperation('+')}>+</button>
-
-          {/* Extra utility row */}
-          <button style={btnStyle('#CC0000')} onClick={handleSqrt}>sqrt</button>
-          <button style={btnStyle('#CC0000')} onClick={handlePercent}>%</button>
-          <button style={btnStyle('#CC0000')} onClick={handleReciprocal}>1/x</button>
-          <button style={{ ...btnStyle('#CC0000', '100%'), gridColumn: 'span 2' }} onClick={handleEquals}>
-            =
-          </button>
-        </div>
-
-        {/* About Dialog */}
-        {showAboutDialog && (
-          <div
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              background: '#C0C0C0',
-              border: '2px solid',
-              borderColor: '#FFFFFF #808080 #808080 #FFFFFF',
-              boxShadow: '3px 3px 10px rgba(0,0,0,0.5)',
-              padding: '16px 20px',
-              zIndex: 100,
-              minWidth: '220px',
-              textAlign: 'center',
-            }}
-          >
-            <div style={{ fontSize: '13px', fontWeight: 'bold', marginBottom: '8px', color: '#000080' }}>
-              Calculator
+          {/* 4 Main Calculation Rows */}
+          <div style={{ display: 'grid', gridTemplateRows: 'repeat(4, 24px)', gap: '5px' }}>
+            {/* Row 1: MC | 7 | 8 | 9 | / | sqrt */}
+            <div style={{ display: 'grid', gridTemplateColumns: '32px 1fr 1fr 1fr 1fr 1fr', gap: '5px' }}>
+              <button onClick={handleMC} style={btnStyle('#800000')}>MC</button>
+              <button onClick={() => inputDigit(7)} style={btnStyle('#000080')}>7</button>
+              <button onClick={() => inputDigit(8)} style={btnStyle('#000080')}>8</button>
+              <button onClick={() => inputDigit(9)} style={btnStyle('#000080')}>9</button>
+              <button onClick={() => performOperation('/')} style={btnStyle('#800000')}>/</button>
+              <button onClick={handleSqrt} style={btnStyle('#000080')}>sqrt</button>
             </div>
-            <p style={{ fontSize: '12px', margin: '0 0 14px 0' }}>
-              Windows 98 Standard Calculator recreation.
-            </p>
-            <button
-              className="win-btn"
-              onClick={() => setShowAboutDialog(false)}
-              style={{
-                padding: '3px 16px',
-                background: '#C0C0C0',
-                border: '2px solid',
-                borderColor: '#FFFFFF #808080 #808080 #FFFFFF',
-                cursor: 'pointer',
-                fontWeight: 'bold',
-                fontSize: '11px',
-              }}
-            >
-              OK
-            </button>
+
+            {/* Row 2: MR | 4 | 5 | 6 | * | % */}
+            <div style={{ display: 'grid', gridTemplateColumns: '32px 1fr 1fr 1fr 1fr 1fr', gap: '5px' }}>
+              <button onClick={handleMR} style={btnStyle('#800000')}>MR</button>
+              <button onClick={() => inputDigit(4)} style={btnStyle('#000080')}>4</button>
+              <button onClick={() => inputDigit(5)} style={btnStyle('#000080')}>5</button>
+              <button onClick={() => inputDigit(6)} style={btnStyle('#000080')}>6</button>
+              <button onClick={() => performOperation('*')} style={btnStyle('#800000')}>*</button>
+              <button onClick={handlePercent} style={btnStyle('#000080')}>%</button>
+            </div>
+
+            {/* Row 3: MS | 1 | 2 | 3 | - | 1/x */}
+            <div style={{ display: 'grid', gridTemplateColumns: '32px 1fr 1fr 1fr 1fr 1fr', gap: '5px' }}>
+              <button onClick={handleMS} style={btnStyle('#800000')}>MS</button>
+              <button onClick={() => inputDigit(1)} style={btnStyle('#000080')}>1</button>
+              <button onClick={() => inputDigit(2)} style={btnStyle('#000080')}>2</button>
+              <button onClick={() => inputDigit(3)} style={btnStyle('#000080')}>3</button>
+              <button onClick={() => performOperation('-')} style={btnStyle('#800000')}>-</button>
+              <button onClick={handleReciprocal} style={btnStyle('#000080')}>1/x</button>
+            </div>
+
+            {/* Row 4: M+ | 0 | +/- | . | + | = */}
+            <div style={{ display: 'grid', gridTemplateColumns: '32px 1fr 1fr 1fr 1fr 1fr', gap: '5px' }}>
+              <button onClick={handleMPlus} style={btnStyle('#800000')}>M+</button>
+              <button onClick={() => inputDigit(0)} style={btnStyle('#000080')}>0</button>
+              <button onClick={toggleSign} style={btnStyle('#000080')}>+/-</button>
+              <button onClick={inputDot} style={btnStyle('#000080')}>.</button>
+              <button onClick={() => performOperation('+')} style={btnStyle('#800000')}>+</button>
+              <button onClick={handleEquals} style={btnStyle('#800000')}>=</button>
+            </div>
           </div>
-        )}
-      </div>
-    </Window>
+        </div>
+      </Window>
+
+      {/* About Dialog */}
+      <AboutAppDialog
+        isOpen={showAbout}
+        appName="Calculator"
+        version="Version 4.10 (Windows 98)"
+        icon={<CalculatorIconSmall />}
+        description="It calculates. Unlike my sleep schedule."
+        onClose={() => setShowAbout(false)}
+      />
+    </>
   );
 }

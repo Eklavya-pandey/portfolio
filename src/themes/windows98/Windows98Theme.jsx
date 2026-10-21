@@ -685,10 +685,7 @@ export default function Windows98Theme() {
     try {
       sessionStorage.setItem('win98_bios_done', 'true');
     } catch {}
-    // Play startup chime right as desktop loads
-    setTimeout(() => {
-      playSound('startup');
-    }, 450);
+
 
     // Check URL parameters and deep links for direct window launch (?screen=skills, /work/onestepprint, etc.)
     const params = new URLSearchParams(window.location.search);
@@ -1116,6 +1113,7 @@ export default function Windows98Theme() {
               onMinimize={() => minimizeWindow('internetExplorer')}
               onMaximize={() => toggleMaximize('internetExplorer')}
               onClose={() => closeWindow('internetExplorer')}
+              onOpenWindow={(key) => openWindow(key)}
             />
           )}
 

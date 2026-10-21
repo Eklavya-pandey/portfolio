@@ -51,9 +51,10 @@ export default function MenuBar({ items = ['File', 'Edit', 'View', 'Help'] }) {
   };
 
   const handleSubItemClick = (subItem) => {
+    if (!subItem || subItem.disabled) return;
     setActiveMenuIdx(null);
     playSound('ding');
-    if (subItem && typeof subItem.onClick === 'function') {
+    if (typeof subItem.onClick === 'function') {
       subItem.onClick();
     }
   };
@@ -75,6 +76,8 @@ export default function MenuBar({ items = ['File', 'Edit', 'View', 'Help'] }) {
         boxShadow: '0 1px 0 0 #FFFFFF',
         boxSizing: 'border-box',
         zIndex: 50,
+        fontFamily: "var(--win-font, 'W95FA', 'MS Sans Serif', Tahoma, sans-serif)",
+        fontSize: '11px',
       }}
     >
       {(items || []).map((item, idx) => {
@@ -103,7 +106,7 @@ export default function MenuBar({ items = ['File', 'Edit', 'View', 'Help'] }) {
                 color: isOpen ? '#FFFFFF' : '#000000',
                 background: isOpen ? '#000080' : 'transparent',
                 fontSize: '11px',
-                fontFamily: "'MS W98 UI', 'Segoe UI', Tahoma, sans-serif",
+                fontFamily: "var(--win-font, 'W95FA', 'MS Sans Serif', Tahoma, sans-serif)",
                 fontWeight: 400,
                 lineHeight: '12px',
               }}
@@ -131,7 +134,7 @@ export default function MenuBar({ items = ['File', 'Edit', 'View', 'Help'] }) {
                   position: 'absolute',
                   top: '19px',
                   left: '0px',
-                  minWidth: '150px',
+                  minWidth: '160px',
                   background: '#C0C0C0',
                   border: '2px solid',
                   borderColor: '#FFFFFF #808080 #808080 #FFFFFF',
@@ -140,6 +143,7 @@ export default function MenuBar({ items = ['File', 'Edit', 'View', 'Help'] }) {
                   zIndex: 1000,
                   display: 'flex',
                   flexDirection: 'column',
+                  fontFamily: "var(--win-font, 'W95FA', 'MS Sans Serif', Tahoma, sans-serif)",
                 }}
               >
                 {subItems.map((sub, sIdx) => {
@@ -157,42 +161,56 @@ export default function MenuBar({ items = ['File', 'Edit', 'View', 'Help'] }) {
                     );
                   }
 
+                  const isDisabled = !!sub.disabled;
+                  const isChecked = !!sub.checked;
+
                   return (
                     <div
                       key={`sub-${sIdx}-${sub.label}`}
                       role="menuitem"
-                      tabIndex={0}
+                      tabIndex={isDisabled ? -1 : 0}
                       className="win98-dropdown-item"
                       onClick={() => handleSubItemClick(sub)}
                       onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
+                        if (!isDisabled && (e.key === 'Enter' || e.key === ' ')) {
                           e.preventDefault();
                           handleSubItemClick(sub);
                         }
                       }}
                       style={{
-                        padding: '3px 12px 3px 8px',
+                        padding: '3px 12px 3px 6px',
                         fontSize: '11px',
-                        fontFamily: "'MS W98 UI', 'Segoe UI', Tahoma, sans-serif",
-                        color: '#000000',
-                        cursor: 'pointer',
+                        fontFamily: "var(--win-font, 'W95FA', 'MS Sans Serif', Tahoma, sans-serif)",
+                        color: isDisabled ? '#808080' : '#000000',
+                        textShadow: isDisabled ? '1px 1px 0px #FFFFFF' : 'none',
+                        cursor: isDisabled ? 'default' : 'pointer',
                         whiteSpace: 'nowrap',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
+                        gap: '8px',
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.background = '#000080';
-                        e.currentTarget.style.color = '#FFFFFF';
+                        if (!isDisabled) {
+                          e.currentTarget.style.background = '#000080';
+                          e.currentTarget.style.color = '#FFFFFF';
+                        }
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.background = 'transparent';
-                        e.currentTarget.style.color = '#000000';
+                        if (!isDisabled) {
+                          e.currentTarget.style.background = 'transparent';
+                          e.currentTarget.style.color = '#000000';
+                        }
                       }}
                     >
-                      <span>{sub.label}</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span style={{ width: '12px', display: 'inline-block', textAlign: 'center', fontWeight: 700 }}>
+                          {isChecked ? '✓' : ''}
+                        </span>
+                        <span>{sub.label}</span>
+                      </div>
                       {sub.shortcut && (
-                        <span style={{ fontSize: '10px', opacity: 0.8, marginLeft: '12px' }}>
+                        <span style={{ fontSize: '10px', opacity: isDisabled ? 0.6 : 0.8, marginLeft: '16px' }}>
                           {sub.shortcut}
                         </span>
                       )}

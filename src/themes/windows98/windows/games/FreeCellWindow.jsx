@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Window from '../../components/Window';
+import AboutAppDialog from '../../components/AboutAppDialog';
 
 const SUIT_INFO = [
   { name: 'clubs', symbol: '♣', color: 'black' },
@@ -10,7 +11,7 @@ const SUIT_INFO = [
 
 const RANK_LABELS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
 
-// Small FreeCell Icon
+// TitleBar icon
 export const FreeCellIconSmall = () => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
     <rect x="1" y="2" width="6" height="5" fill="#FFF" stroke="#000" strokeWidth="0.5" />
@@ -22,6 +23,59 @@ export const FreeCellIconSmall = () => (
   </svg>
 );
 
+// King face icon between free cells and foundations
+function KingFaceIcon() {
+  return (
+    <div
+      style={{
+        width: '38px',
+        height: '76px',
+        border: '1px inset #DFDFDF',
+        background: '#C0C0C0',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        boxSizing: 'border-box',
+        padding: '2px',
+        userSelect: 'none',
+      }}
+      title="FreeCell"
+    >
+      <svg width="32" height="42" viewBox="0 0 32 42">
+        {/* Crown */}
+        <path d="M4 14 L8 6 L16 11 L24 6 L28 14 Z" fill="#FFD700" stroke="#000000" strokeWidth="1" />
+        <circle cx="8" cy="6" r="1.5" fill="#FF0000" />
+        <circle cx="16" cy="11" r="1.5" fill="#0000FF" />
+        <circle cx="24" cy="6" r="1.5" fill="#FF0000" />
+        {/* Head */}
+        <circle cx="16" cy="22" r="9" fill="#FFE0BD" stroke="#000000" strokeWidth="1" />
+        {/* Eyes */}
+        <circle cx="13" cy="20" r="1.2" fill="#000000" />
+        <circle cx="19" cy="20" r="1.2" fill="#000000" />
+        {/* Mustache */}
+        <path d="M11 25 Q16 28 21 25 Q16 30 11 25 Z" fill="#8B4513" />
+        {/* Beard */}
+        <path d="M12 28 Q16 35 20 28 Z" fill="#8B4513" />
+        {/* Robe */}
+        <path d="M7 32 L25 32 L28 42 L4 42 Z" fill="#800000" stroke="#000000" strokeWidth="1" />
+        <path d="M13 32 L19 32 L19 42 L13 42 Z" fill="#FFFFFF" />
+      </svg>
+      <span
+        style={{
+          fontSize: '9px',
+          fontWeight: 'bold',
+          color: '#000080',
+          marginTop: '2px',
+          fontFamily: "var(--win-font, 'W95FA', 'MS Sans Serif', Tahoma, sans-serif)",
+        }}
+      >
+        KING
+      </span>
+    </div>
+  );
+}
+
 // Authentic Microsoft FreeCell PRNG algorithm by Jim Horne
 function generateFreeCellDeck(gameNum) {
   let seed = gameNum;
@@ -30,7 +84,6 @@ function generateFreeCellDeck(gameNum) {
     return (seed >> 16) & 0x7fff;
   }
 
-  // 52 cards
   const cards = [];
   for (let r = 1; r <= 13; r++) {
     for (let s = 0; s < 4; s++) {
@@ -71,34 +124,58 @@ function FreeCellCard({ card, isSelected, onClick, onDoubleClick, style }) {
         borderRadius: '3px',
         background: isSelected ? '#FFFFCC' : '#FFFFFF',
         border: isSelected ? '2px solid #0000FF' : '1px solid #000000',
-        boxShadow: '1px 1px 2px rgba(0,0,0,0.3)',
+        boxShadow: '1px 1px 2px rgba(0,0,0,0.35)',
         boxSizing: 'border-box',
-        padding: '2px 3px',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
         cursor: 'pointer',
         userSelect: 'none',
         color: isRed ? '#D00000' : '#000000',
-        fontFamily: "'MS Sans Serif', Tahoma, Arial, sans-serif",
+        fontFamily: "var(--win-font, 'W95FA', 'MS Sans Serif', Tahoma, sans-serif)",
+        position: 'relative',
         ...style,
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: '2px', lineHeight: '11px' }}>
+      {/* Top Left */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '2px',
+          left: '3px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          lineHeight: '10px',
+        }}
+      >
         <span style={{ fontSize: '10px', fontWeight: 'bold' }}>{card.label}</span>
         <span style={{ fontSize: '10px' }}>{card.symbol}</span>
       </div>
-      <div style={{ alignSelf: 'center', fontSize: '18px', lineHeight: '18px' }}>
-        {card.symbol}
-      </div>
+
+      {/* Center Symbol */}
       <div
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '2px',
-          lineHeight: '11px',
-          alignSelf: 'flex-end',
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          fontSize: card.val > 10 ? '15px' : '20px',
+          fontWeight: card.val > 10 ? 'bold' : 'normal',
+          lineHeight: '20px',
+        }}
+      >
+        {card.val > 10 ? card.label : card.symbol}
+      </div>
+
+      {/* Bottom Right - Rotated 180 degrees */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: '2px',
+          right: '3px',
           transform: 'rotate(180deg)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          lineHeight: '10px',
         }}
       >
         <span style={{ fontSize: '10px', fontWeight: 'bold' }}>{card.label}</span>
@@ -122,36 +199,50 @@ export default function FreeCellWindow({
   const [gameNumber, setGameNumber] = useState(1);
   const [gameInput, setGameInput] = useState('1');
   const [showGameDialog, setShowGameDialog] = useState(false);
+  const [showStatsDialog, setShowStatsDialog] = useState(false);
   const [showAboutDialog, setShowAboutDialog] = useState(false);
 
+  // Free cells (4) & Foundations (4) & Tableau (8 cols: 7, 7, 7, 7, 6, 6, 6, 6 cards)
   const [freeCells, setFreeCells] = useState([null, null, null, null]);
   const [foundations, setFoundations] = useState([[], [], [], []]);
   const [tableau, setTableau] = useState([[], [], [], [], [], [], [], []]);
 
-  const [selectedLocation, setSelectedLocation] = useState(null); // { type: 'free'|'tab'|'found', index, cardIndex }
+  const [selectedLocation, setSelectedLocation] = useState(null);
   const [history, setHistory] = useState([]);
   const [isWon, setIsWon] = useState(false);
 
+  // Local storage statistics
+  const [stats, setStats] = useState(() => {
+    try {
+      const saved = localStorage.getItem('win98_freecell_stats');
+      return saved ? JSON.parse(saved) : { played: 0, won: 0 };
+    } catch {
+      return { played: 0, won: 0 };
+    }
+  });
+
   // Close dialogs on Escape
   useEffect(() => {
-    if (!showGameDialog && !showAboutDialog && !isWon) return;
+    if (!showGameDialog && !showStatsDialog && !showAboutDialog && !isWon) return;
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
         e.stopPropagation();
         if (showGameDialog) setShowGameDialog(false);
+        if (showStatsDialog) setShowStatsDialog(false);
         if (showAboutDialog) setShowAboutDialog(false);
         if (isWon) setIsWon(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [showGameDialog, showAboutDialog, isWon]);
+  }, [showGameDialog, showStatsDialog, showAboutDialog, isWon]);
 
-  // Initialize deal based on gameNumber
+  // Deal game: all 4 free cells empty, columns of 7,7,7,7,6,6,6,6 cards
   const dealGame = useCallback((num) => {
     const deck = generateFreeCellDeck(num);
     const cols = [[], [], [], [], [], [], [], []];
 
+    // Deal 52 cards across 8 columns
     for (let i = 0; i < 52; i++) {
       cols[i % 8].push(deck[i]);
     }
@@ -162,6 +253,14 @@ export default function FreeCellWindow({
     setSelectedLocation(null);
     setHistory([]);
     setIsWon(false);
+
+    setStats((prev) => {
+      const updated = { ...prev, played: prev.played + 1 };
+      try {
+        localStorage.setItem('win98_freecell_stats', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
   }, []);
 
   useEffect(() => {
@@ -190,15 +289,22 @@ export default function FreeCellWindow({
     setIsWon(false);
   };
 
-  // Check victory (all 52 cards on foundations)
+  // Check victory
   useEffect(() => {
     const totalFoundations = foundations.reduce((acc, f) => acc + f.length, 0);
     if (totalFoundations === 52 && !isWon) {
       setIsWon(true);
+      setStats((prev) => {
+        const updated = { ...prev, won: prev.won + 1 };
+        try {
+          localStorage.setItem('win98_freecell_stats', JSON.stringify(updated));
+        } catch {}
+        return updated;
+      });
     }
   }, [foundations, isWon]);
 
-  // Check foundation placement rule
+  // Foundation placement validation
   const canPlaceOnFoundation = (card, pile) => {
     if (!card) return false;
     if (pile.length === 0) return card.val === 1;
@@ -206,50 +312,96 @@ export default function FreeCellWindow({
     return top.suit === card.suit && card.val === top.val + 1;
   };
 
-  // Check tableau placement rule
+  // Tableau placement validation
   const canPlaceOnTableau = (card, col) => {
     if (!card) return false;
-    if (col.length === 0) return true; // Any card on empty col
+    if (col.length === 0) return true; // Any card on empty column
     const top = col[col.length - 1];
     return top.color !== card.color && top.val === card.val + 1;
   };
 
-  // Calculate max movable cards in a sequence
-  const getMaxMovable = () => {
+  // Calculate max movable cards using supermove formula
+  const getMaxMovable = (isDestinationEmptyCol = false) => {
     const emptyFree = freeCells.filter((c) => c === null).length;
-    const emptyCols = tableau.filter((c) => c.length === 0).length;
+    let emptyCols = tableau.filter((c) => c.length === 0).length;
+    if (isDestinationEmptyCol) {
+      emptyCols = Math.max(0, emptyCols - 1);
+    }
     return (1 + emptyFree) * Math.pow(2, emptyCols);
   };
 
-  // Double click auto move
-  const handleAutoMove = (card, source) => {
-    // 1. Try foundations first
-    for (let fIdx = 0; fIdx < 4; fIdx++) {
-      if (canPlaceOnFoundation(card, foundations[fIdx])) {
-        pushHistory();
-        removeCardFromSource(source);
-        setFoundations((prev) => {
-          const next = prev.map((pile) => [...pile]);
-          next[fIdx].push(card);
-          return next;
-        });
-        setSelectedLocation(null);
-        return;
+  // Check if a stack of cards forms a legal descending alternating sequence
+  const isLegalSequence = (cards) => {
+    for (let i = 0; i < cards.length - 1; i++) {
+      const cur = cards[i];
+      const next = cards[i + 1];
+      if (cur.color === next.color || cur.val !== next.val + 1) {
+        return false;
       }
     }
-    // 2. Try empty free cell
-    if (source.type === 'tab') {
-      const freeIdx = freeCells.findIndex((c) => c === null);
-      if (freeIdx !== -1) {
-        pushHistory();
-        removeCardFromSource(source);
-        setFreeCells((prev) => {
-          const next = [...prev];
-          next[freeIdx] = card;
-          return next;
-        });
-        setSelectedLocation(null);
+    return true;
+  };
+
+  // Auto-move to foundations when safe
+  const trySafeAutoMoves = (currentFree, currentFound, currentTab) => {
+    let changed = false;
+    const nextFree = [...currentFree];
+    const nextFound = currentFound.map((f) => [...f]);
+    const nextTab = currentTab.map((col) => [...col]);
+
+    // Check min value of opposite-color foundations
+    const getSafeRank = (suitColor) => {
+      const oppSuits = suitColor === 'red' ? ['spades', 'clubs'] : ['hearts', 'diamonds'];
+      let minOpp = 13;
+      for (const f of nextFound) {
+        if (f.length > 0 && oppSuits.includes(f[0].suit)) {
+          minOpp = Math.min(minOpp, f[f.length - 1].val);
+        } else if (f.length === 0) {
+          minOpp = 0;
+        }
       }
+      return minOpp + 1;
+    };
+
+    // 1. Check free cells
+    for (let i = 0; i < 4; i++) {
+      const card = nextFree[i];
+      if (!card) continue;
+      for (let fIdx = 0; fIdx < 4; fIdx++) {
+        if (canPlaceOnFoundation(card, nextFound[fIdx])) {
+          if (card.val <= 2 || card.val <= getSafeRank(card.color)) {
+            nextFound[fIdx].push(card);
+            nextFree[i] = null;
+            changed = true;
+            break;
+          }
+        }
+      }
+    }
+
+    // 2. Check bottom cards of tableau
+    for (let c = 0; c < 8; c++) {
+      const col = nextTab[c];
+      if (col.length === 0) continue;
+      const card = col[col.length - 1];
+      for (let fIdx = 0; fIdx < 4; fIdx++) {
+        if (canPlaceOnFoundation(card, nextFound[fIdx])) {
+          if (card.val <= 2 || card.val <= getSafeRank(card.color)) {
+            nextFound[fIdx].push(card);
+            col.pop();
+            changed = true;
+            break;
+          }
+        }
+      }
+    }
+
+    if (changed) {
+      setFreeCells(nextFree);
+      setFoundations(nextFound);
+      setTableau(nextTab);
+      // Recurse until no more safe moves
+      setTimeout(() => trySafeAutoMoves(nextFree, nextFound, nextTab), 100);
     }
   };
 
@@ -269,11 +421,41 @@ export default function FreeCellWindow({
     }
   };
 
-  // Handle Free Cell Click
+  // Double click auto move (free cell or foundation)
+  const handleDoubleClick = (card, source) => {
+    // 1. Try foundations first
+    for (let fIdx = 0; fIdx < 4; fIdx++) {
+      if (canPlaceOnFoundation(card, foundations[fIdx])) {
+        pushHistory();
+        removeCardFromSource(source);
+        const nextFound = foundations.map((f) => [...f]);
+        nextFound[fIdx].push(card);
+        setFoundations(nextFound);
+        setSelectedLocation(null);
+        setTimeout(() => trySafeAutoMoves(freeCells, nextFound, tableau), 100);
+        return;
+      }
+    }
+
+    // 2. Try empty free cell
+    if (source.type === 'tab') {
+      const freeIdx = freeCells.findIndex((c) => c === null);
+      if (freeIdx !== -1) {
+        pushHistory();
+        removeCardFromSource(source);
+        const nextFree = [...freeCells];
+        nextFree[freeIdx] = card;
+        setFreeCells(nextFree);
+        setSelectedLocation(null);
+        setTimeout(() => trySafeAutoMoves(nextFree, foundations, tableau), 100);
+      }
+    }
+  };
+
+  // Click on free cell
   const handleFreeCellClick = (cellIdx) => {
     if (selectedLocation) {
       if (freeCells[cellIdx] === null) {
-        // Move single card to free cell
         let movingCard = null;
         if (selectedLocation.type === 'free') {
           movingCard = freeCells[selectedLocation.index];
@@ -287,12 +469,11 @@ export default function FreeCellWindow({
         if (movingCard) {
           pushHistory();
           removeCardFromSource(selectedLocation);
-          setFreeCells((prev) => {
-            const next = [...prev];
-            next[cellIdx] = movingCard;
-            return next;
-          });
+          const nextFree = [...freeCells];
+          nextFree[cellIdx] = movingCard;
+          setFreeCells(nextFree);
           setSelectedLocation(null);
+          setTimeout(() => trySafeAutoMoves(nextFree, foundations, tableau), 100);
           return;
         }
       }
@@ -304,7 +485,7 @@ export default function FreeCellWindow({
     }
   };
 
-  // Handle Foundation Click
+  // Click on foundation
   const handleFoundationClick = (fIdx) => {
     if (!selectedLocation) return;
     let card = null;
@@ -320,18 +501,17 @@ export default function FreeCellWindow({
     if (card && canPlaceOnFoundation(card, foundations[fIdx])) {
       pushHistory();
       removeCardFromSource(selectedLocation);
-      setFoundations((prev) => {
-        const next = prev.map((pile) => [...pile]);
-        next[fIdx].push(card);
-        return next;
-      });
+      const nextFound = foundations.map((pile) => [...pile]);
+      nextFound[fIdx].push(card);
+      setFoundations(nextFound);
       setSelectedLocation(null);
+      setTimeout(() => trySafeAutoMoves(freeCells, nextFound, tableau), 100);
     } else {
       setSelectedLocation(null);
     }
   };
 
-  // Handle Tableau Column Click
+  // Click on tableau column
   const handleTableauClick = (colIdx) => {
     if (!selectedLocation) return;
 
@@ -349,26 +529,34 @@ export default function FreeCellWindow({
       return;
     }
 
+    if (!isLegalSequence(movingCards)) {
+      setSelectedLocation(null);
+      return;
+    }
+
     const baseCard = movingCards[0];
     const targetCol = tableau[colIdx];
+    const isDestEmpty = targetCol.length === 0;
 
-    // Check legality and move limit
     if (canPlaceOnTableau(baseCard, targetCol)) {
-      const maxMovable = getMaxMovable();
+      const maxMovable = getMaxMovable(isDestEmpty);
       if (movingCards.length <= maxMovable) {
         pushHistory();
         removeCardFromSource(selectedLocation);
-        setTableau((prev) => {
-          const next = prev.map((c) => [...c]);
-          next[colIdx] = [...next[colIdx], ...movingCards];
-          return next;
-        });
+        const nextTab = tableau.map((c) => [...c]);
+        nextTab[colIdx] = [...nextTab[colIdx], ...movingCards];
+        setTableau(nextTab);
         setSelectedLocation(null);
+        setTimeout(() => trySafeAutoMoves(freeCells, foundations, nextTab), 100);
         return;
       }
     }
     setSelectedLocation(null);
   };
+
+  // Calculate cards left
+  const totalInFoundations = foundations.reduce((acc, f) => acc + f.length, 0);
+  const cardsLeft = 52 - totalInFoundations;
 
   const menuItems = [
     {
@@ -382,7 +570,11 @@ export default function FreeCellWindow({
             setGameInput(nextNum.toString());
           },
         },
-        { label: 'Select Game #...', onClick: () => setShowGameDialog(true) },
+        { label: 'Select Game...', onClick: () => setShowGameDialog(true) },
+        { label: 'Restart Game', onClick: () => dealGame(gameNumber) },
+        { label: 'Statistics...', onClick: () => setShowStatsDialog(true) },
+        { label: 'Options...', onClick: () => alert('FreeCell Options: Standard') },
+        { isSeparator: true },
         { label: 'Undo', onClick: handleUndo },
         { isSeparator: true },
         { label: 'Exit', onClick: onClose },
@@ -400,311 +592,417 @@ export default function FreeCellWindow({
   ];
 
   return (
-    <Window
-      id="window-freecell"
-      title={`FreeCell Game #${gameNumber}`}
-      icon={<FreeCellIconSmall />}
-      isOpen={isOpen}
-      isActive={isActive}
-      isMaximized={isMaximized}
-      zIndex={zIndex}
-      position={position}
-      defaultWidth={640}
-      defaultHeight={480}
-      hasMenu={true}
-      menuItems={menuItems}
-      onFocus={onFocus}
-      onMinimize={onMinimize}
-      onMaximize={onMaximize}
-      onClose={onClose}
-    >
-      <div
-        style={{
-          width: '100%',
-          height: '100%',
-          background: '#008000',
-          padding: '10px',
-          boxSizing: 'border-box',
-          overflow: 'auto',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '12px',
-          userSelect: 'none',
-          position: 'relative',
-        }}
+    <>
+      <Window
+        id="window-freecell"
+        title={`FreeCell Game #${gameNumber}`}
+        icon={<FreeCellIconSmall />}
+        isOpen={isOpen}
+        isActive={isActive}
+        isMaximized={isMaximized}
+        zIndex={zIndex}
+        position={position}
+        defaultWidth={640}
+        defaultHeight={480}
+        resizable={true}
+        allowMaximize={true}
+        hasMenu={true}
+        menuItems={menuItems}
+        hasStatusBar={true}
+        statusText={`Cards left: ${cardsLeft}`}
+        onFocus={onFocus}
+        onMinimize={onMinimize}
+        onMaximize={onMaximize}
+        onClose={onClose}
       >
-        {/* Top Header: 4 Free Cells & 4 Foundations */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', maxWidth: '600px' }}>
-          {/* 4 Free Cells */}
-          <div style={{ display: 'flex', gap: '6px' }}>
-            {freeCells.map((cell, idx) => (
-              <div
-                key={`free-${idx}`}
-                onClick={() => handleFreeCellClick(idx)}
-                style={{
-                  width: '54px',
-                  height: '76px',
-                  borderRadius: '3px',
-                  border: '1px solid #004D00',
-                  background: 'rgba(0,0,0,0.15)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                }}
-              >
-                {cell ? (
-                  <FreeCellCard
-                    card={cell}
-                    isSelected={selectedLocation?.type === 'free' && selectedLocation?.index === idx}
-                    onDoubleClick={() => handleAutoMove(cell, { type: 'free', index: idx })}
-                  />
-                ) : (
-                  <span style={{ color: '#004D00', fontSize: '10px' }}>FREE</span>
-                )}
-              </div>
-            ))}
-          </div>
-
-          {/* 4 Foundations */}
-          <div style={{ display: 'flex', gap: '6px' }}>
-            {foundations.map((pile, idx) => (
-              <div
-                key={`found-${idx}`}
-                onClick={() => handleFoundationClick(idx)}
-                style={{
-                  width: '54px',
-                  height: '76px',
-                  borderRadius: '3px',
-                  border: '1px solid #004D00',
-                  background: 'rgba(0,0,0,0.15)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                }}
-              >
-                {pile.length > 0 ? (
-                  <FreeCellCard card={pile[pile.length - 1]} />
-                ) : (
-                  <span style={{ color: '#004D00', fontSize: '18px' }}>
-                    {SUIT_INFO[idx].symbol}
-                  </span>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* 8 Tableau Columns */}
-        <div style={{ display: 'flex', gap: '6px', flex: 1, minHeight: '280px' }}>
-          {tableau.map((col, colIdx) => (
-            <div
-              key={`tab-${colIdx}`}
-              onClick={() => handleTableauClick(colIdx)}
-              style={{
-                width: '54px',
-                minHeight: '260px',
-                position: 'relative',
-                border: col.length === 0 ? '1px dashed #004D00' : 'none',
-                borderRadius: '3px',
-                cursor: 'pointer',
-              }}
-            >
-              {col.map((card, cardIdx) => {
-                const isSelected =
-                  selectedLocation?.type === 'tab' &&
-                  selectedLocation?.index === colIdx &&
-                  cardIdx >= selectedLocation?.cardIndex;
-
-                return (
-                  <div
-                    key={card.id}
-                    style={{
-                      position: 'absolute',
-                      top: `${cardIdx * 19}px`,
-                      left: '0px',
-                      zIndex: cardIdx + 1,
-                    }}
-                  >
+        <div
+          style={{
+            width: '100%',
+            height: '100%',
+            background: '#008000',
+            padding: '10px',
+            boxSizing: 'border-box',
+            overflow: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '12px',
+            userSelect: 'none',
+            position: 'relative',
+            fontFamily: "var(--win-font, 'W95FA', 'MS Sans Serif', Tahoma, sans-serif)",
+          }}
+        >
+          {/* Top Header: 4 Free Cells, King Face Icon, 4 Foundations */}
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              maxWidth: '600px',
+            }}
+          >
+            {/* 4 Free Cells */}
+            <div style={{ display: 'flex', gap: '6px' }}>
+              {freeCells.map((cell, idx) => (
+                <div
+                  key={`free-${idx}`}
+                  onClick={() => handleFreeCellClick(idx)}
+                  style={{
+                    width: '54px',
+                    height: '76px',
+                    borderRadius: '3px',
+                    border: '1px solid #005000',
+                    background: 'rgba(0,0,0,0.15)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    boxSizing: 'border-box',
+                  }}
+                >
+                  {cell ? (
                     <FreeCellCard
-                      card={card}
-                      isSelected={isSelected}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedLocation({ type: 'tab', index: colIdx, cardIndex: cardIdx });
-                      }}
-                      onDoubleClick={(e) => {
-                        e.stopPropagation();
-                        if (cardIdx === col.length - 1) {
-                          handleAutoMove(card, { type: 'tab', index: colIdx, cardIndex: cardIdx });
-                        }
-                      }}
+                      card={cell}
+                      isSelected={
+                        selectedLocation?.type === 'free' && selectedLocation?.index === idx
+                      }
+                      onDoubleClick={() =>
+                        handleDoubleClick(cell, { type: 'free', index: idx })
+                      }
                     />
-                  </div>
-                );
-              })}
+                  ) : (
+                    <span style={{ color: '#005000', fontSize: '10px', fontWeight: 'bold' }}>
+                      FREE
+                    </span>
+                  )}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
 
-        {/* Game Number Dialog */}
-        {showGameDialog && (
-          <div
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              background: '#C0C0C0',
-              border: '2px solid',
-              borderColor: '#FFFFFF #808080 #808080 #FFFFFF',
-              boxShadow: '2px 2px 5px rgba(0,0,0,0.4)',
-              padding: '12px 16px',
-              zIndex: 100,
-              minWidth: '200px',
-            }}
-          >
-            <div style={{ fontSize: '11px', fontWeight: 'bold', marginBottom: '8px' }}>Select Game</div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
-              <span style={{ fontSize: '11px' }}>Game #:</span>
-              <input
-                type="number"
-                min="1"
-                max="32000"
-                value={gameInput}
-                onChange={(e) => setGameInput(e.target.value)}
+            {/* Small King Face Icon in center */}
+            <KingFaceIcon />
+
+            {/* 4 Foundations */}
+            <div style={{ display: 'flex', gap: '6px' }}>
+              {foundations.map((pile, idx) => (
+                <div
+                  key={`found-${idx}`}
+                  onClick={() => handleFoundationClick(idx)}
+                  style={{
+                    width: '54px',
+                    height: '76px',
+                    borderRadius: '3px',
+                    border: '1px solid #005000',
+                    background: 'rgba(0,0,0,0.15)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    boxSizing: 'border-box',
+                  }}
+                >
+                  {pile.length > 0 ? (
+                    <FreeCellCard card={pile[pile.length - 1]} />
+                  ) : (
+                    <span style={{ color: '#005000', fontSize: '18px', opacity: 0.6 }}>
+                      {SUIT_INFO[idx].symbol}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 8 Tableau Columns (Fresh deal: 7, 7, 7, 7, 6, 6, 6, 6 cards) */}
+          <div style={{ display: 'flex', gap: '6px', flex: 1, minHeight: '280px' }}>
+            {tableau.map((col, colIdx) => (
+              <div
+                key={`tab-${colIdx}`}
+                onClick={() => handleTableauClick(colIdx)}
                 style={{
-                  width: '80px',
+                  width: '54px',
+                  minHeight: '260px',
+                  position: 'relative',
+                  border: col.length === 0 ? '1px dashed #005000' : 'none',
+                  borderRadius: '3px',
+                  cursor: 'pointer',
+                }}
+              >
+                {col.map((card, cardIdx) => {
+                  const isSelected =
+                    selectedLocation?.type === 'tab' &&
+                    selectedLocation?.index === colIdx &&
+                    cardIdx >= selectedLocation?.cardIndex;
+
+                  return (
+                    <div
+                      key={card.id}
+                      style={{
+                        position: 'absolute',
+                        top: `${cardIdx * 19}px`,
+                        left: '0px',
+                        zIndex: cardIdx + 1,
+                      }}
+                    >
+                      <FreeCellCard
+                        card={card}
+                        isSelected={isSelected}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedLocation({ type: 'tab', index: colIdx, cardIndex: cardIdx });
+                        }}
+                        onDoubleClick={(e) => {
+                          e.stopPropagation();
+                          if (cardIdx === col.length - 1) {
+                            handleDoubleClick(card, { type: 'tab', index: colIdx, cardIndex: cardIdx });
+                          }
+                        }}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+
+          {/* Win Dialog */}
+          {isWon && (
+            <div
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                background: '#C0C0C0',
+                boxShadow:
+                  '1px 1px 0px #FFFFFF inset, -1px -1px 0px #000000 inset, 2px 2px 0px #DFDFDF inset, -2px -2px 0px #808080 inset',
+                padding: '3px',
+                zIndex: 99,
+                textAlign: 'center',
+                minWidth: '240px',
+                fontFamily: "var(--win-font, 'W95FA', 'MS Sans Serif', Tahoma, sans-serif)",
+                fontSize: '11px',
+              }}
+            >
+              <div
+                style={{
+                  background: 'linear-gradient(90deg, #000080 0%, #1084D0 100%)',
+                  color: '#FFFFFF',
                   padding: '2px 4px',
-                  fontSize: '11px',
-                  background: '#FFFFFF',
-                  border: '2px solid',
-                  borderColor: '#808080 #FFFFFF #FFFFFF #808080',
-                }}
-              />
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
-              <button
-                className="win-btn"
-                onClick={() => {
-                  const num = parseInt(gameInput, 10);
-                  if (!isNaN(num) && num > 0) {
-                    setGameNumber(num);
-                    dealGame(num);
-                  }
-                  setShowGameDialog(false);
-                }}
-                style={{
-                  padding: '2px 10px',
-                  background: '#C0C0C0',
-                  border: '2px solid',
-                  borderColor: '#FFFFFF #808080 #808080 #FFFFFF',
-                  fontSize: '11px',
-                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                  textAlign: 'left',
                 }}
               >
-                OK
-              </button>
-              <button
-                className="win-btn"
-                onClick={() => setShowGameDialog(false)}
-                style={{
-                  padding: '2px 10px',
-                  background: '#C0C0C0',
-                  border: '2px solid',
-                  borderColor: '#FFFFFF #808080 #808080 #FFFFFF',
-                  fontSize: '11px',
-                  cursor: 'pointer',
-                }}
-              >
-                Cancel
-              </button>
+                FreeCell
+              </div>
+              <div style={{ padding: '16px 20px' }}>
+                <div style={{ fontSize: '13px', fontWeight: 'bold', marginBottom: '8px' }}>
+                  You win!
+                </div>
+                <p style={{ margin: '0 0 14px 0' }}>
+                  Congratulations! FreeCell Game #{gameNumber} solved!
+                </p>
+                <button
+                  onClick={() => dealGame(gameNumber + 1)}
+                  style={{
+                    padding: '3px 14px',
+                    background: '#C0C0C0',
+                    boxShadow:
+                      '1px 1px 0px #DFDFDF inset, -1px -1px 0px #7F7F7F inset, 1px 1px 0px white, -1px -1px 0px black',
+                    border: 'none',
+                    fontSize: '11px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Next Game
+                </button>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
+      </Window>
 
-        {/* Win Dialog */}
-        {isWon && (
+      {/* Select Game Number Dialog */}
+      {showGameDialog && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 99999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'transparent',
+          }}
+          onClick={() => setShowGameDialog(false)}
+        >
           <div
+            className="win95-window win-dialog"
             style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
+              width: '220px',
               background: '#C0C0C0',
-              border: '2px solid',
-              borderColor: '#FFFFFF #808080 #808080 #FFFFFF',
-              boxShadow: '3px 3px 10px rgba(0,0,0,0.5)',
-              padding: '16px 24px',
-              zIndex: 99,
-              textAlign: 'center',
+              boxShadow:
+                '1px 1px 0px #FFFFFF inset, -1px -1px 0px #000000 inset, 2px 2px 0px #DFDFDF inset, -2px -2px 0px #808080 inset',
+              padding: '3px',
+              fontFamily: "var(--win-font, 'W95FA', 'MS Sans Serif', Tahoma, sans-serif)",
+              fontSize: '11px',
             }}
+            onClick={(e) => e.stopPropagation()}
           >
-            <div style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>You win!</div>
-            <p style={{ fontSize: '12px', margin: '0 0 12px 0' }}>Congratulations! FreeCell Game #{gameNumber} solved!</p>
-            <button
-              className="win-btn"
-              onClick={() => dealGame(gameNumber + 1)}
+            <div
               style={{
-                padding: '4px 16px',
-                background: '#C0C0C0',
-                border: '2px solid',
-                borderColor: '#FFFFFF #808080 #808080 #FFFFFF',
-                cursor: 'pointer',
+                background: 'linear-gradient(90deg, #000080 0%, #1084D0 100%)',
+                color: '#FFFFFF',
+                padding: '2px 4px',
                 fontWeight: 'bold',
-                fontSize: '11px',
               }}
             >
-              Next Game
-            </button>
-          </div>
-        )}
-        {/* About Dialog (Credit line in the About box only: FreeCell, by Jim Horne) */}
-        {showAboutDialog && (
-          <div
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              background: '#C0C0C0',
-              border: '2px solid',
-              borderColor: '#FFFFFF #808080 #808080 #FFFFFF',
-              boxShadow: '3px 3px 10px rgba(0,0,0,0.5)',
-              padding: '16px 24px',
-              zIndex: 100,
-              minWidth: '240px',
-              textAlign: 'center',
-            }}
-          >
-            <div style={{ fontSize: '13px', fontWeight: 'bold', marginBottom: '8px', color: '#000080' }}>
-              FreeCell
+              Select Game
             </div>
-            <p style={{ fontSize: '12px', margin: '0 0 10px 0', fontStyle: 'italic' }}>
-              FreeCell, by Jim Horne.
-            </p>
-            <p style={{ fontSize: '11px', margin: '0 0 14px 0', color: '#333333' }}>
-              Windows 98 Portfolio Edition
-            </p>
-            <button
-              className="win-btn"
-              onClick={() => setShowAboutDialog(false)}
+            <div style={{ padding: '12px 14px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                <span>Game #:</span>
+                <input
+                  type="number"
+                  min="1"
+                  max="32000"
+                  value={gameInput}
+                  onChange={(e) => setGameInput(e.target.value)}
+                  style={{
+                    width: '80px',
+                    padding: '1px 3px',
+                    border: '2px inset #DFDFDF',
+                    fontSize: '11px',
+                  }}
+                />
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
+                <button
+                  onClick={() => {
+                    const num = parseInt(gameInput, 10);
+                    if (!isNaN(num) && num > 0) {
+                      setGameNumber(num);
+                      dealGame(num);
+                    }
+                    setShowGameDialog(false);
+                  }}
+                  style={{
+                    padding: '2px 12px',
+                    background: '#C0C0C0',
+                    boxShadow:
+                      '1px 1px 0px #DFDFDF inset, -1px -1px 0px #7F7F7F inset, 1px 1px 0px white, -1px -1px 0px black',
+                    border: 'none',
+                    fontSize: '11px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  OK
+                </button>
+                <button
+                  onClick={() => setShowGameDialog(false)}
+                  style={{
+                    padding: '2px 12px',
+                    background: '#C0C0C0',
+                    boxShadow:
+                      '1px 1px 0px #DFDFDF inset, -1px -1px 0px #7F7F7F inset, 1px 1px 0px white, -1px -1px 0px black',
+                    border: 'none',
+                    fontSize: '11px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Statistics Dialog */}
+      {showStatsDialog && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 99999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'transparent',
+          }}
+          onClick={() => setShowStatsDialog(false)}
+        >
+          <div
+            className="win95-window win-dialog"
+            style={{
+              width: '240px',
+              background: '#C0C0C0',
+              boxShadow:
+                '1px 1px 0px #FFFFFF inset, -1px -1px 0px #000000 inset, 2px 2px 0px #DFDFDF inset, -2px -2px 0px #808080 inset',
+              padding: '3px',
+              fontFamily: "var(--win-font, 'W95FA', 'MS Sans Serif', Tahoma, sans-serif)",
+              fontSize: '11px',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
               style={{
-                padding: '3px 16px',
-                background: '#C0C0C0',
-                border: '2px solid',
-                borderColor: '#FFFFFF #808080 #808080 #FFFFFF',
-                cursor: 'pointer',
+                background: 'linear-gradient(90deg, #000080 0%, #1084D0 100%)',
+                color: '#FFFFFF',
+                padding: '2px 4px',
                 fontWeight: 'bold',
-                fontSize: '11px',
               }}
             >
-              OK
-            </button>
+              FreeCell Statistics
+            </div>
+            <div style={{ padding: '12px 14px' }}>
+              <table style={{ width: '100%', fontSize: '11px', borderCollapse: 'collapse', marginBottom: '12px' }}>
+                <tbody>
+                  <tr>
+                    <td>Total Played:</td>
+                    <td style={{ fontWeight: 'bold' }}>{stats.played}</td>
+                  </tr>
+                  <tr>
+                    <td>Total Won:</td>
+                    <td style={{ fontWeight: 'bold' }}>{stats.won}</td>
+                  </tr>
+                  <tr>
+                    <td>Winning %:</td>
+                    <td style={{ fontWeight: 'bold' }}>
+                      {stats.played > 0 ? `${Math.round((stats.won / stats.played) * 100)}%` : '0%'}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <button
+                  onClick={() => setShowStatsDialog(false)}
+                  style={{
+                    padding: '2px 16px',
+                    background: '#C0C0C0',
+                    boxShadow:
+                      '1px 1px 0px #DFDFDF inset, -1px -1px 0px #7F7F7F inset, 1px 1px 0px white, -1px -1px 0px black',
+                    border: 'none',
+                    fontSize: '11px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  OK
+                </button>
+              </div>
+            </div>
           </div>
-        )}
-      </div>
-    </Window>
+        </div>
+      )}
+
+      {/* About FreeCell Dialog */}
+      <AboutAppDialog
+        isOpen={showAboutDialog}
+        appName="FreeCell"
+        version="Version 4.10.1998"
+        icon={<FreeCellIconSmall />}
+        description="Technically every game is winnable. Practically, no."
+        onClose={() => setShowAboutDialog(false)}
+      />
+    </>
   );
 }
